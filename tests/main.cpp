@@ -1,0 +1,242 @@
+#include "../Board.h"
+//#define BOOST_TEST_MODULE MyTest
+#define BOOST_TEST_MAIN
+#include <boost/test/included/unit_test.hpp>
+
+BOOST_AUTO_TEST_CASE( testBoard )
+{
+	int boardSize = 9;
+	Board b1(boardSize);
+	BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
+	
+	Board b2(boardSize);
+	BOOST_CHECK_EQUAL(b2.boardSize, boardSize);
+
+	for(int i = 0; i < b2.boardSize; i++)
+		for(int j = 0; j < b2.boardSize; j++)
+			BOOST_CHECK_EQUAL(b2.positions[i][j], Empty);
+	
+	//Valid moves	
+	for(int i = 0; i < b1.boardSize; i++)
+	{
+		for(int j = 0; j < b1.boardSize; j++)
+		{
+			Point validMove(i, j);
+			BOOST_CHECK_EQUAL(b1.isValidMove(validMove), true);
+		}
+	}
+	
+	//Pass
+	Point pass(b1.boardSize, b1.boardSize);
+	BOOST_CHECK_EQUAL(b1.isValidMove(pass), true);
+	
+	//Invalid moves
+	Point invalidMove = Point(b1.boardSize+1, b1.boardSize);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(b1.boardSize, b1.boardSize+1);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(0, b1.boardSize);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(b1.boardSize, 0);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(0, -1);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(-1, 0);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+	invalidMove = Point(-1, -1);
+	BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
+	
+}
+
+BOOST_AUTO_TEST_CASE( testCornerCapture )
+{
+	int boardSize = 9;
+	Board b1(boardSize);
+	BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
+
+	b1.makeMove(Point(0,0)); //Black
+	b1.makeMove(Point(1,0)); //White
+	b1.makeMove(Point(2,0)); //Black
+	b1.makeMove(Point(0,1)); //White //Capture 0,0
+	b1.makeMove(Point(0,2)); //Black
+	b1.makeMove(Point(8,0)); //White
+	b1.makeMove(Point(1,1)); //Black
+	b1.makeMove(Point(8,1)); //White
+	b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
+	b1.makeMove(Point(1,0)); //White //Suicide
+	
+	BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
+	BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
+	BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+}
+
+BOOST_AUTO_TEST_CASE( testGroup )
+{
+	int boardSize = 9;
+	Board b1(boardSize);
+	BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
+
+	b1.makeMove(Point(0,0)); //Black
+	b1.makeMove(Point(1,0)); //White
+	b1.makeMove(Point(2,0)); //Black
+	b1.makeMove(Point(0,1)); //White //Capture 0,0
+	b1.makeMove(Point(0,2)); //Black
+	b1.makeMove(Point(8,0)); //White
+	b1.makeMove(Point(1,1)); //Black
+	b1.makeMove(Point(8,1)); //White
+	b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
+	b1.makeMove(Point(1,0)); //White //Suicide
+	
+	BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
+	BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
+	BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+	
+	BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
+	BOOST_CHECK_EQUAL(b1.blackGroups.size(), 4);
+	
+	b1.makeMove(Point(1,0)); //Black connect 0,0 2,0 1,1
+	
+	BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
+	BOOST_CHECK_EQUAL(b1.blackGroups.size(), 2);
+	
+	Point adjacent(0,1);
+	BOOST_CHECK_EQUAL(b1.blackGroups.size(), 2);
+	
+	/*b1.show();
+	
+	foreach(Group* g, b1.whiteGroups)
+	{
+		cout << "Group\n";
+		foreach(Point* p, g->stones)
+		{
+			cout << p->row << " " << p->column << endl;
+		}
+	}*/
+}
+
+bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
+{
+	int boardSize = 9;
+	Board b1(boardSize);
+	b1.makeMove(Point(stoneX,stoneY));
+	Group* g = b1.blackGroups.at(0);
+	Point p = Point(adjStoneX,adjStoneY);
+	return g->isAdjacent(&p);
+}
+
+BOOST_AUTO_TEST_CASE( testGroupAdjacent )
+{
+	int boardSize = 9;
+	for(int row = 0; row < boardSize; row++)
+	{
+		for(int column = 0; column < boardSize; column++)
+		{
+			//above
+			if(row > 0)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
+			//below
+			if(row < boardSize-1)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
+			//left
+			if(column > 0)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
+			//above
+			if(column < boardSize-1)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
+			
+			//pass
+			BOOST_CHECK_EQUAL(testAdjacent(row, column, boardSize, boardSize), false);
+		}
+	}
+}
+
+bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
+{
+	Board b1(Black);
+	b1.makeMove(Point(stoneX,stoneY));
+	Group* g = b1.blackGroups.at(0);
+	Point p = Point(adjStoneX,adjStoneY);
+	return g->isAdjacent(&p);
+}
+
+BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
+{
+	int boardSize = 9;
+	for(int row = 0; row < boardSize; row++)
+	{
+		for(int column = 0; column < boardSize; column++)
+		{
+			//above
+			if(row > 0)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
+			//below
+			if(row < boardSize-1)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
+			//left
+			if(column > 0)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
+			//above
+			if(column < boardSize-1)
+				BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
+			
+			//pass
+			BOOST_CHECK_EQUAL(testAdjacent(row, column, boardSize, boardSize), false);
+		}
+	}
+}
+
+
+BOOST_AUTO_TEST_CASE( testBoardClone )
+{
+	int boardSize = 9;
+	Board* b1 = new Board(boardSize);
+	b1->makeMove(Point(1,1));
+
+	BOOST_CHECK_EQUAL(b1->blackGroups.size(), 1);
+	BOOST_CHECK_EQUAL(b1->whiteGroups.size(), 0);
+
+	Board* bClone = b1->clone();
+	BOOST_CHECK_EQUAL(bClone->blackGroups.size(), 1);
+	BOOST_CHECK_EQUAL(bClone->whiteGroups.size(), 0);
+	
+
+	delete bClone;
+	delete b1;
+}
+
+BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
+{
+	int boardSize = 9;
+	Board* b1 = new Board(boardSize);
+	for(int row = 0; row < boardSize-1; row++)
+	{
+		for(int column = 0; column < boardSize; column++)
+		{
+			b1->makeMove(Point(row, column));
+			b1->makeMove(Point(boardSize, boardSize));
+		}
+	}
+	
+	Board* b1Clone = b1->clone();
+	float score = b1Clone->getTaylorScore(4.5);
+	BOOST_CHECK_EQUAL(score, 76.5);
+	
+	Board* b1Clone2 = b1->clone();
+	score = b1Clone2->getTaylorScore(0.5);
+	BOOST_CHECK_EQUAL(score, 80.5);
+	//BOOST_CHECK_EQUAL(b1->whiteGroups.size(), 0);
+
+	//Board* bClone = b1->clone();
+	//BOOST_CHECK_EQUAL(bClone->blackGroups.size(), 1);
+	//BOOST_CHECK_EQUAL(bClone->whiteGroups.size(), 0);
+	
+
+	//delete bClone;
+	//delete b1;
+}
