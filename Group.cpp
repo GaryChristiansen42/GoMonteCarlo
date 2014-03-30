@@ -67,13 +67,13 @@ int Group::numLiberties(Board* state) {
   int num = 0;
   int** positions = new int*[state->boardSize];
   int i;
-  for(i = 0; i < state->boardSize; i++) {
+  for (i = 0; i < state->boardSize; i++) {
     positions[i] = new int[state->boardSize];
     memset(positions[i], 0, state->boardSize*sizeof(int));
   }
   foreach(Point* stone, stones) {
     // free above
-    if (stone->column > 0 
+    if (stone->column > 0
       && state->positions[stone->row][stone->column-1] == Empty
       && positions[stone->row][stone->column-1] == 0) {
       num++;
@@ -101,10 +101,10 @@ int Group::numLiberties(Board* state) {
       positions[stone->row+1][stone->column] = 1;
     }
   }
-  
-  //for(i = 0; i < state->boardSize; i++);
-  //  delete positions[i];
-  //delete positions;
+
+  for (i = 0; i < state->boardSize; i++)
+    delete[] positions[i];
+  delete[] positions;
   return num;
 }
 

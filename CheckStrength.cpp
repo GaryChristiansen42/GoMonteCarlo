@@ -57,9 +57,9 @@ void randomMove(UCTNode** currentNode, Board* b) {
 int main(void) {
   printf("Running...\n");
 
-  int numTrials = 1;
+  int numTrials = 100;
   int boardSize = 5;
-  int numSimulations = 10;
+  int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
   PlayerType player2 = MyMonteCarlo;

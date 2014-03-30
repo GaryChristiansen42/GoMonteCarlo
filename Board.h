@@ -20,6 +20,11 @@ class Board {
   Point lastMove;
   Point secondLastMove;
 
+  Point koPoint;
+
+  unsigned int capturedBlack;
+  unsigned int capturedWhite;
+
   std::vector<Point> possibleMoves;
 
   explicit Board(int newBoardSize);
@@ -46,7 +51,7 @@ class Board {
 
   void updateStructures(Point move);
 
-  void removeDeadStones(Player color);
+  unsigned int removeDeadStones(Player color);
 
   void makeMove(Point move);
   void makeRandomMove();

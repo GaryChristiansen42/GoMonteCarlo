@@ -4,9 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <cstdlib>
-
 #include <boost/foreach.hpp>
+
+#include <cstdlib>
 
 #define foreach BOOST_FOREACH
 

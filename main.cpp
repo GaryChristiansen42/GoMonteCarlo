@@ -130,9 +130,9 @@ int main(void) {
   else
     printf("White Won\n");
 
-  float whiteScore = 0, blackScore = 0;
-  b->getSimpleScore(&whiteScore, &blackScore);
-  printf("\nWhite: %f\nBlack: %f\n", whiteScore, blackScore);
+  float score = 0;
+  score = b->getTaylorScore(0.5);
+  printf("\nScore: %f\n", score);
 
   delete currentNode;
   delete b;
