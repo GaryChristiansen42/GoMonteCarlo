@@ -6,6 +6,10 @@
 
 #include <cstdlib>
 
+#include <boost/foreach.hpp>
+
+#define foreach BOOST_FOREACH
+
 #if _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -49,7 +53,7 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node) {
   if (node->possibleChildren.size() == 0 && node->child == NULL) {
     // vector<UCTNode*> possibleChildren;
-    for (int r = 0; r < node->state->boardSize; r++) {
+    /*for (int r = 0; r < node->state->boardSize; r++) {
       for (int c = 0; c < node->state->boardSize; c++) {
         if (node->state->positions[r][c] == Empty) {
           Point move(r, c);
@@ -61,6 +65,11 @@ UCTNode* getNewChild(UCTNode* node) {
           //  delete child;
         }
       }
+    }*/
+    foreach(Point p, node->state->possibleMoves) {
+      UCTNode* child = new UCTNode(p, node->state, node);
+      child->state->makeMove(p);
+      node->possibleChildren.push_back(child);
     }
 
     Point passMove(node->state->boardSize, node->state->boardSize);

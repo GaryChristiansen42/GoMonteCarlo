@@ -52,6 +52,7 @@ class Board {
   void makeRandomMove();
   GameResult playRandomGame();
   void show();
+  bool isSuicide(Point move);
 
   // private:
   void getPossibleMoves();

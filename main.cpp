@@ -102,7 +102,7 @@ int main(void) {
   printf("Go MonteCarloAI\n");
 
   int boardSize = 5;
-  int numSimulations = 10000;
+  int numSimulations = 1000;
 
   Board* b = new Board(boardSize);
 

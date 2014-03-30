@@ -369,7 +369,7 @@ void Board::removeDeadStones(Player color) {
     // remove dead stones on board
     foreach(Point* stone, deadGroup->stones) {
       positions[stone->row][stone->column] = Empty;
-      possibleMoves.push_back(Point(stone->row, stone->column));
+      //possibleMoves.push_back(Point(stone->row, stone->column));
     }
 
     for (std::vector<Group*>::iterator groupIterator = firstGroups->begin();
@@ -452,7 +452,6 @@ void Board::removeDeadStones(Player color) {
 
 void testPossibleMoves(Board* b) {
     std::vector<Point> oldPossibleMoves = b->possibleMoves;
-    b->possibleMoves = std::vector<Point>();
     b->getPossibleMoves();
     assert(oldPossibleMoves.size() == b->possibleMoves.size());
 }
@@ -464,13 +463,20 @@ void Board::makeMove(Point move) {
     bool foundMove = false;
     for (unsigned int i = 0; i < possibleMoves.size(); i++) {
       if (possibleMoves[i] == move) {
-        possibleMoves[i] = possibleMoves.back();
-        possibleMoves.pop_back();
+        //possibleMoves[i] = possibleMoves.back();
+        //possibleMoves.pop_back();
         foundMove = true;
         break;
       }
     }
-    assert(foundMove);
+    if(!foundMove) {
+      printf("Illegal Move\nRow: %d\nColumn: %d\n", move.row, move.column);
+      foreach(Point p, possibleMoves) {
+        printf("  PossibleMove Row: %d Column: %d\n", p.row, p.column);
+      }
+      show();
+      assert(foundMove);
+    }
 
 
     if (positions[move.row][move.column] != Empty) {
@@ -492,6 +498,7 @@ void Board::makeMove(Point move) {
   secondLastMove = lastMove;
   lastMove = move;
 
+  getPossibleMoves();
   #ifdef RUNNING_TESTS
     testPossibleMoves(this);
   #endif
@@ -553,10 +560,53 @@ void Board::show() {
   printf("%s", boardString.str().c_str());
 }
 
+// http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
+bool Board::isSuicide(Point move) {
+  std::vector<Point> neighbors;
+  if (move.row > 0) neighbors.push_back(Point(move.row - 1, move.column));
+  if (move.row < boardSize - 1) neighbors.push_back(Point(move.row + 1, move.column));
+  if (move.column > 0) neighbors.push_back(Point(move.row, move.column - 1));
+  if (move.column < boardSize + 1) neighbors.push_back(Point(move.row, move.column + 1));
+  
+  // Check for empty neighbors
+  foreach(Point p, neighbors) {
+    if (positions[p.row][p.column] == Empty)
+      return false;
+  }
+  
+  // Check for neighbors of same color with more than one liberty
+  foreach(Point p, neighbors) {
+    std::vector<Group*> groupsOfSameColor = turn == Black ? blackGroups : whiteGroups;
+    
+    foreach(Group* g, groupsOfSameColor) {
+      if (!g->contains(&p))
+        continue;
+      if (g->numLiberties(this) > 1)
+        return false;
+    }
+  }
+  
+  // Check for neighbors of opposite color with only one liberty
+  foreach(Point p, neighbors) {
+    std::vector<Group*> groupsOfOppositeColor = turn == Black ? whiteGroups : blackGroups;
+    
+    foreach(Group* g, groupsOfOppositeColor) {
+      if (!g->contains(&p))
+        continue;
+      if (g->numLiberties(this) == 1)
+        return false;
+    }
+  }
+  
+  return true;
+}
+
 void Board::getPossibleMoves() {
+  if (possibleMoves.size() > 0)
+    possibleMoves.clear();
   for (int r = 0; r < boardSize; r++)
     for (int c = 0; c < boardSize; c++)
-      if (positions[r][c] == Empty)
+      if (positions[r][c] == Empty && !isSuicide(Point(r,c)))
         possibleMoves.push_back(Point(r, c));
   possibleMoves.push_back(Point(boardSize, boardSize));
 }

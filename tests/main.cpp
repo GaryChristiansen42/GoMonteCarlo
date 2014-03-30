@@ -69,11 +69,109 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
 	b1.makeMove(Point(1,1)); //Black
 	b1.makeMove(Point(8,1)); //White
 	b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
-	b1.makeMove(Point(1,0)); //White //Suicide
 	
 	BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
 	BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
 	BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+}
+
+BOOST_AUTO_TEST_CASE( testIsSuicide )
+{
+	int boardSize = 6;
+	Board b1(boardSize);
+    
+    //Black
+	BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+	b1.makeMove(Point(0,1)); 
+    
+    //White
+    BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+    b1.makeMove(Point(0,2));
+    
+    //Black
+	BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+	b1.makeMove(Point(1,0));
+    
+    //White
+    BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), true);
+    b1.makeMove(Point(1,1));
+    
+    //Black
+	BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+	b1.makeMove(Point(5,5));
+    
+    //White
+    BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+    b1.makeMove(Point(2,0));
+    
+    //Black
+	BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), true);
+	b1.makeMove(Point(4,5));
+    
+    //White
+    BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+    b1.makeMove(Point(0,0));
+    
+    //Black
+	BOOST_CHECK_EQUAL(b1.isSuicide(Point(1,0)), true);
+    BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,1)), true);
+    
+    /*  
+        W _ W _ _
+        _ W _ _ _
+        W _ _ _ _
+        _ _ _ _ B
+        _ _ _ _ B
+    */
+    
+    boardSize = 5;
+	Board b2(boardSize);
+    
+    b2.makeMove(Point(0,0)); //Black
+    b2.makeMove(Point(2,1)); //White
+    
+    b2.makeMove(Point(0,1)); //Black
+    b2.makeMove(Point(2,2)); //White
+    
+    b2.makeMove(Point(0,3)); //Black
+    b2.makeMove(Point(2,4)); //White
+    
+    b2.makeMove(Point(0,4)); //Black
+    b2.makeMove(Point(3,0)); //White
+    
+    b2.makeMove(Point(1,0)); //Black
+    b2.makeMove(Point(3,1)); //White
+    
+    b2.makeMove(Point(1,1)); //Black
+    b2.makeMove(Point(3,2)); //White
+    
+    b2.makeMove(Point(1,2)); //Black
+    b2.makeMove(Point(3,3)); //White
+    
+    b2.makeMove(Point(1,3)); //Black
+    b2.makeMove(Point(3,4)); //White
+    
+    b2.makeMove(Point(1,4)); //Black
+    b2.makeMove(Point(4,0)); //White
+    
+    b2.makeMove(Point(2,0)); //Black
+    b2.makeMove(Point(4,2)); //White
+    
+    b2.makeMove(Point(2,3)); //Black
+    b2.makeMove(Point(4,4)); //White
+    
+    b2.makeMove(Point(5,5)); //Black
+    
+    b2.show();
+    
+    //White
+    BOOST_CHECK_EQUAL(b2.isSuicide(Point(0,2)), false);
+    
+    b2.makeMove(Point(0,2)); //White
+    
+    Board* b2Clone = b2.clone();
+	float score = b2Clone->getTaylorScore(0);
+	BOOST_CHECK_EQUAL(score, -25);
 }
 
 BOOST_AUTO_TEST_CASE( testGroup )
@@ -91,7 +189,7 @@ BOOST_AUTO_TEST_CASE( testGroup )
 	b1.makeMove(Point(1,1)); //Black
 	b1.makeMove(Point(8,1)); //White
 	b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
-	b1.makeMove(Point(1,0)); //White //Suicide
+    b1.makeMove(Point(8,2)); //White
 	
 	BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
 	BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
@@ -154,6 +252,28 @@ BOOST_AUTO_TEST_CASE( testGroupAdjacent )
 			BOOST_CHECK_EQUAL(testAdjacent(row, column, boardSize, boardSize), false);
 		}
 	}
+}
+
+BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
+{
+	int boardSize = 5;
+    Board b1(boardSize);
+	b1.makeMove(Point(0, 0)); // Black
+	Group* g = b1.blackGroups.at(0);
+    
+    BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
+    
+    b1.makeMove(Point(0, 1)); //White
+    BOOST_CHECK_EQUAL(g->numLiberties(&b1), 1);
+    
+    b1.makeMove(Point(1, 0)); //Black
+    BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
+    
+    b1.makeMove(Point(1, 1)); //White
+    BOOST_CHECK_EQUAL(g->numLiberties(&b1), 1);
+    
+    b1.makeMove(Point(2, 0)); //Black
+    BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
 }
 
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
@@ -230,13 +350,4 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
 	Board* b1Clone2 = b1->clone();
 	score = b1Clone2->getTaylorScore(0.5);
 	BOOST_CHECK_EQUAL(score, 80.5);
-	//BOOST_CHECK_EQUAL(b1->whiteGroups.size(), 0);
-
-	//Board* bClone = b1->clone();
-	//BOOST_CHECK_EQUAL(bClone->blackGroups.size(), 1);
-	//BOOST_CHECK_EQUAL(bClone->whiteGroups.size(), 0);
-	
-
-	//delete bClone;
-	//delete b1;
 }
