@@ -86,8 +86,9 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations) {
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
-  static unsigned int seed = time(NULL);
-  unsigned int choice = rand_r(&seed) % b->possibleMoves.size();
+  static unsigned int seed = static_cast<unsigned int>(time(NULL));
+  unsigned int choice = rand_r(&seed) %
+    static_cast<unsigned int>(b->possibleMoves.size());
   Point chosenMove = b->possibleMoves[choice];
 
   printf("Row: %d\nColumn: %d\n", chosenMove.row, chosenMove.column);
@@ -102,7 +103,7 @@ int main(void) {
   printf("Go MonteCarloAI\n");
 
   int boardSize = 5;
-  int numSimulations = 1000;
+  int numSimulations = 10;
 
   Board* b = new Board(boardSize);
 
@@ -117,8 +118,8 @@ int main(void) {
     if (b->turn == Black)
       computerMove(&currentNode, b, numSimulations);
     else
-      // computerMove(&currentNode, b);
-      playerMove(&currentNode, b);
+      computerMove(&currentNode, b, numSimulations);
+      // playerMove(&currentNode, b);
       // randomMove(&currentNode, b);
     b->show();
   }

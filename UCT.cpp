@@ -85,8 +85,9 @@ UCTNode* getNewChild(UCTNode* node) {
     return NULL;
   // else //Pick random child
   // {
-    static unsigned int seed = time(NULL);
-    unsigned int choice = rand_r(&seed) % node->possibleChildren.size();
+    static unsigned int seed = static_cast<unsigned int>(time(NULL));
+    unsigned int choice = rand_r(&seed) %
+      static_cast<unsigned int>(node->possibleChildren.size());
     UCTNode* chosenChild = node->possibleChildren[choice];
     // for(unsigned int i = 0; i < possibleChildren.size(); i++)
     //  if(i != choice)

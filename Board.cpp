@@ -403,7 +403,7 @@ unsigned int Board::removeDeadStones(Player color) {
   else
     koPoint = Point(-1, -1);
 
-  return capturedStones.size();
+  return static_cast<unsigned int>(capturedStones.size());
   /*deadGroups.clear();
   for(vector<Group*>::iterator it = secondGroup.begin(); it != secondGroup.end(); ++it)
   {
@@ -530,8 +530,9 @@ void Board::makeMove(Point move) {
 }
 
 void Board::makeRandomMove() {
-  static unsigned int seed = time(NULL);
-  unsigned int choice = rand_r(&seed) % possibleMoves.size();
+  static unsigned int seed = static_cast<unsigned int>(time(NULL));
+  unsigned int choice = rand_r(&seed) %
+    static_cast<unsigned int>(possibleMoves.size());
   Point chosenMove = possibleMoves[choice];
   makeMove(chosenMove);
 }

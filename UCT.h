@@ -8,7 +8,7 @@
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
 
-void printNode(UCTNode* n, char* spaces="");
+void printNode(UCTNode* n, const char* spaces="");
 
 UCTNode* bestChild(UCTNode* node);
 
