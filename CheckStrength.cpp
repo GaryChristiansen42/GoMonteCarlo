@@ -52,8 +52,9 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
-  static unsigned int seed = time(NULL);
-  unsigned int choice = rand_r(&seed) % b->possibleMoves.size();
+  static unsigned int seed = static_cast<unsigned int>(time(NULL));
+  unsigned int choice = rand_r(&seed) %
+    static_cast<unsigned int>(b->possibleMoves.size());
   Point chosenMove = b->possibleMoves[choice];
 
   b->makeMove(chosenMove);

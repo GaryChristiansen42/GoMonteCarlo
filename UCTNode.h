@@ -9,6 +9,7 @@
 struct UCTNode {
   int visits;
   double totalRewards;
+
   Point move;
 
   Board* state;

@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -g -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -8,7 +8,7 @@ CFLAGS=-c -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Winvalid-pch -Wunsafe-loop-optimizations  \
 	-Wlong-long -Wmissing-braces -Wmissing-field-initializers \
 	-Wmissing-format-attribute -Wmissing-include-dirs \
-	-Wmissing-noreturn -Wpacked  -Wpadded -Wparentheses  \
+	-Wmissing-noreturn -Wpacked  -Wparentheses  \
 	-Wpointer-arith -Wredundant-decls -Wreturn-type \
 	-Wsequence-point  -Wshadow -Wsign-compare  -Wstack-protector \
 	-Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default \
@@ -17,7 +17,7 @@ CFLAGS=-c -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-  -g
+	#-Wpadded
 
 all: GoMonteCarlo CheckStrength
 
