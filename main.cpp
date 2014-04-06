@@ -58,8 +58,13 @@ void showTree(UCTNode* node, int numTabs, int maxDepth = 1) {
   showTree(node->sibling, numTabs, maxDepth);
 }
 
-void computerMove(UCTNode** currentNode, Board* b, int numSimulations) {
-  UCTNode* newCurrentNode = UCTSearch((*currentNode), b, numSimulations);
+void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
+  float millaSecondsToThink) {
+  UCTNode* newCurrentNode = NULL;
+  if (numSimulations != 0)
+    newCurrentNode = UCTSearch((*currentNode), b, numSimulations);
+  else
+    newCurrentNode = UCTSearch((*currentNode), b, millaSecondsToThink);
 
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -102,7 +107,8 @@ int main(void) {
   printf("Go MonteCarloAI\n");
 
   int boardSize = 5;
-  int numSimulations = 1000;
+  int numSimulations = 0;
+  float millaSecondsToThink = 15000;
 
   Board* b = new Board(boardSize);
 
@@ -115,7 +121,7 @@ int main(void) {
   GameResult result = None;
   while (!b->isGameOver(&result)) {
     if (b->turn == Black)
-      computerMove(&currentNode, b, numSimulations);
+      computerMove(&currentNode, b, numSimulations, millaSecondsToThink);
     else
       // computerMove(&currentNode, b);
       playerMove(&currentNode, b);

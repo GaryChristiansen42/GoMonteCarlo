@@ -582,6 +582,11 @@ void Board::show() {
   if (lastMove == pass)
     boardString << ((turn == Black) ? "White" : "Black")
       << " passed\n";
+  Board *bClone = this->clone();
+  float komi = 0.5;
+  float score = bClone->getTaylorScore(komi);
+  delete bClone;
+  printf("Score: %f\n", score);
   printf("%s", boardString.str().c_str());
 }
 

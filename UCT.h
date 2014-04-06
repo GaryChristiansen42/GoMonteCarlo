@@ -20,6 +20,7 @@ int DefaultPolicy(UCTNode* node);
 
 void backup(UCTNode* v, int reward);
 
-UCTNode* UCTSearch(UCTNode* root, Board* b, int numSimulations);
+UCTNode* UCTSearch(UCTNode* root, Board* state, int numSimulations);
+UCTNode* UCTSearch(UCTNode* root, Board* state, float secondsToThink);
 
 #endif  // UCT_H_

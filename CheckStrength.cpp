@@ -8,7 +8,10 @@
 #include "UCT.h"
 
 enum PlayerType {
-  MyMonteCarlo,
+  MyMonteCarlo1HalfSecond,
+  MyMonteCarlo1Second,
+  MyMonteCarlo5Seconds,
+  MyMonteCarlo10Seconds,
   RandomPlayer,
   GnuGo
 };
@@ -19,8 +22,13 @@ const char * playerTypeStrings[3] = {
   "GnuGo"
 };
 
-void computerMove(UCTNode** currentNode, Board* b, int numSimulations) {
-  UCTNode* newCurrentNode = UCTSearch((*currentNode), b, numSimulations);
+void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
+  float millaSecondsToThink) {
+  UCTNode* newCurrentNode = NULL;
+  if (numSimulations != 0)
+    newCurrentNode = UCTSearch((*currentNode), b, numSimulations);
+  else
+    newCurrentNode = UCTSearch((*currentNode), b, millaSecondsToThink);
 
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -58,11 +66,11 @@ int main(void) {
   printf("Running...\n");
 
   int numTrials = 100;
-  int boardSize = 5;
-  int numSimulations = 1000;
+  int boardSize = 9;
+  // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  PlayerType player2 = MyMonteCarlo;
+  PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
@@ -81,8 +89,17 @@ int main(void) {
          case RandomPlayer:
           randomMove(&node, b);
           break;
-         case MyMonteCarlo:
-          computerMove(&node, b, numSimulations);
+         case MyMonteCarlo1HalfSecond:
+          computerMove(&node, b, 0, 500);
+          break;
+         case MyMonteCarlo1Second:
+          computerMove(&node, b, 0, 1000);
+          break;
+         case MyMonteCarlo5Seconds:
+          computerMove(&node, b, 0, 5000);
+          break;
+         case MyMonteCarlo10Seconds:
+          computerMove(&node, b, 0, 10000);
           break;
          case GnuGo:
          default:

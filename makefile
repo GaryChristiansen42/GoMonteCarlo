@@ -49,4 +49,4 @@ Board.o: Board.cpp
 	$(CC) $(CFLAGS) Board.cpp
 
 clean:
-	rm -rf  *.o GoMonteCarlo
+	rm -rf  *.o GoMonteCarlo CheckStrength
