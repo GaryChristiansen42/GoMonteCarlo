@@ -212,6 +212,6 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     && state->positions[best->move.row][best->move.column] != Empty) {
     assert(false);
   }
-  // printf("Thought for %d simulations.\n", i);
+  printf("Thought for %d simulations.\n", i);
   return best;
 }

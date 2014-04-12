@@ -107,7 +107,7 @@ void randomMove(UCTNode** currentNode, Board* b) {
 int main(void) {
   printf("Go MonteCarloAI\n");
 
-  int boardSize = 5;
+  int boardSize = 19;
   int numSimulations = 0;
   float millaSecondsToThink = 15000;
 
@@ -124,7 +124,7 @@ int main(void) {
     if (b->turn == Black)
       computerMove(&currentNode, b, numSimulations, millaSecondsToThink);
     else
-      computerMove(&currentNode, b, numSimulations);
+      computerMove(&currentNode, b, numSimulations, millaSecondsToThink);
       // playerMove(&currentNode, b);
       // randomMove(&currentNode, b);
     b->show();
