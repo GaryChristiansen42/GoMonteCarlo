@@ -190,8 +190,8 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     int reward = DefaultPolicy(v);
     backup(v, reward);
 
-    if (i % 1000 == 0 && i != 0)
-      printf("%d\n", i);
+    // if (i % 1000 == 0 && i != 0)
+      // printf("%d\n", i);
     end = clock();
     i++;
   }
@@ -212,6 +212,6 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     && state->positions[best->move.row][best->move.column] != Empty) {
     assert(false);
   }
-  printf("Thought for %d simulations.\n", i);
+  // printf("Thought for %d simulations.\n", i);
   return best;
 }

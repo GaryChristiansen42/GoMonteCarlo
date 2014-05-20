@@ -287,7 +287,7 @@ bool Board::isGameOver(GameResult *result) {
       *result = BlackWon;
     else
       *result = Draw;*/
-    float komi = 4.5;
+    float komi = 7.5;
     Board* temp = clone();
     float score = temp->getTaylorScore(komi);
     delete temp;
@@ -514,6 +514,33 @@ void Board::makeMove(Point move) {
     else
       capturedBlack += numCaptured;
     // removeDeadStones((turn == Black ? Black : White));
+
+    // TODO: replace with getNeighbors
+    std::vector<Point> neighbors;
+    if (move.row - 1 >= 0)
+      neighbors.push_back(Point(move.row - 1, move.column));
+    if (move.row + 1 < boardSize)
+      neighbors.push_back(Point(move.row + 1, move.column));
+    if (move.column - 1 >= 0)
+      neighbors.push_back(Point(move.row, move.column - 1));
+    if (move.column + 1 < boardSize)
+      neighbors.push_back(Point(move.row, move.column + 1));
+
+    bool neighborOfSameColor = false;
+    for (Point neighbor : neighbors) {
+      if (positions[neighbor.row][neighbor.column] == positions[move.row][move.column]) {
+      neighborOfSameColor = true;
+      break;
+      }
+    }
+
+    // if the move has a neighbor of the same color, then the next move cannot be ko
+    if (neighborOfSameColor) {
+      koPoint = Point(-1, -1);
+    }
+  }
+  else {
+    koPoint = Point(-1, -1);
   }
 
   // cout << whiteGroups.size() << " " << blackGroups.size() << "\n";
@@ -525,7 +552,7 @@ void Board::makeMove(Point move) {
 
   getPossibleMoves();
   #ifdef RUNNING_TESTS
-    testPossibleMoves(this);
+    //testPossibleMoves(this);
   #endif
 }
 
@@ -584,7 +611,7 @@ void Board::show() {
     boardString << ((turn == Black) ? "White" : "Black")
       << " passed\n";
   Board *bClone = this->clone();
-  float komi = 0.5;
+  float komi = 7.5;
   float score = bClone->getTaylorScore(komi);
   delete bClone;
   printf("Score: %f\n", score);
