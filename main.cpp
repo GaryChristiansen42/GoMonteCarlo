@@ -35,29 +35,6 @@ void playerMove(UCTNode** currentNode, Board* b) {
   (*currentNode) = newCurrentNode;
 }
 
-void printTabs(int numTabs) {
-  for (int i = 0; i < numTabs; i++)
-    printf("\t");
-}
-
-void showTree(UCTNode* node, int numTabs, int maxDepth = 1) {
-  if (node == NULL || numTabs >= maxDepth || node->visits < 2)
-    return;
-  printTabs(numTabs);
-  printf("Node\n");
-  printTabs(numTabs);
-  printf("\tMove: %d %d\n", node->move.row, node->move.column);
-  printTabs(numTabs);
-  printf("\tRewards/Visits: %f %d\n", node->totalRewards, node->visits);
-  printTabs(numTabs);
-  // (*file) << "Wins: " << root->wins
-  // << " Losses: " << root->losses << " Visits: " << root->visits << endl;
-  printTabs(numTabs);
-  printf("Children: \n");
-  showTree(node->child, numTabs+1, maxDepth);
-  showTree(node->sibling, numTabs, maxDepth);
-}
-
 void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   float millaSecondsToThink) {
   UCTNode* newCurrentNode = NULL;

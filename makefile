@@ -1,5 +1,5 @@
-CC=g++ -pthread
-  CFLAGS=-c -g -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CC=g++ -pthread -Wl,--no-as-needed
+CFLAGS=-c -g -std=c++0x -pthread -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \

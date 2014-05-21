@@ -1,6 +1,10 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-void Log(const char* message);
+class UCTNode;
+
+void Log(const char* message, bool newline=true);
+
+void logTree(UCTNode* node, int numTabs, int maxDepth=1);
 
 #endif

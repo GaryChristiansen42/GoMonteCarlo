@@ -24,7 +24,7 @@ std::mutex treePolicyMutex;
 std::mutex backUpMutex;
 
 double diffclock(clock_t clock1, clock_t clock2) {
-  double diffticks = clock1 - clock2;
+  double diffticks = double(clock1 - clock2);
   double diffms = diffticks / (CLOCKS_PER_SEC / 1000);
   return diffms;
 }
@@ -252,6 +252,9 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     && state->positions[best->move.row][best->move.column] != Empty) {
     assert(false);
   }
+
+  logTree(root, 0, 3); 
+
   char buffer[100];
   sprintf(buffer, "Thought for %d simulations.", i);
   Log(buffer);
