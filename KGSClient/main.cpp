@@ -14,12 +14,6 @@ char version[] = "3.5.11";
 
 Board* b = NULL;
 
-void log(char* message) {
-  std::ofstream file("log.txt", std::ios::app);
-  file << message << std::endl;
-  file.close();
-}
-
 void switchTurnTo(Player color) {
   if (b->turn == color) {
     return;

@@ -12,6 +12,7 @@ enum PlayerType {
   MyMonteCarlo1Second,
   MyMonteCarlo5Seconds,
   MyMonteCarlo10Seconds,
+  MyMonteCarlo14AndHalfSeconds,
   RandomPlayer,
   GnuGo
 };
@@ -71,7 +72,7 @@ int main(void) {
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  PlayerType player2 = MyMonteCarlo1HalfSecond;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
@@ -101,6 +102,9 @@ int main(void) {
           break;
          case MyMonteCarlo10Seconds:
           computerMove(&node, b, 0, 10000);
+          break;
+         case MyMonteCarlo14AndHalfSeconds:
+          computerMove(&node, b, 0, 14500);
           break;
          case GnuGo:
          default:

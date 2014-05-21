@@ -1,5 +1,5 @@
-CC=g++
-CFLAGS=-c -g -Wall -Wextra -Weffc++ -Werror -pedantic \
+CC=g++ -pthread
+  CFLAGS=-c -g -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -21,14 +21,14 @@ CFLAGS=-c -g -Wall -Wextra -Weffc++ -Werror -pedantic \
 
 all: GoMonteCarlo CheckStrength
 
-CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o
-	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o -o CheckStrength
+CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
+	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength
 
 CheckStrength.o: CheckStrength.cpp
 	$(CC) $(CFLAGS) CheckStrength.cpp
 
-GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o -o GoMonteCarlo
+GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GoMonteCarlo
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -36,7 +36,7 @@ main.o: main.cpp
 UCTNode.o: UCTNode.cpp
 	$(CC) $(CFLAGS) UCTNode.cpp
 
-UCT.o: UCT.cpp
+UCT.o: UCT.cpp 
 	$(CC) $(CFLAGS) UCT.cpp
 	
 Point.o: Point.cpp
@@ -47,6 +47,9 @@ Group.o: Group.cpp
 
 Board.o: Board.cpp
 	$(CC) $(CFLAGS) Board.cpp
+
+Common.o: Common.cpp
+	$(CC) $(CFLAGS) Common.cpp
 
 clean:
 	rm -rf  *.o GoMonteCarlo CheckStrength

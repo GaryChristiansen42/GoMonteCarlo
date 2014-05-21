@@ -7,6 +7,10 @@
 #include <boost/foreach.hpp>
 
 #include <cstdlib>
+#include <thread>
+#include <mutex>
+
+#include "Common.h"
 
 #define foreach BOOST_FOREACH
 
@@ -16,6 +20,8 @@
 
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
+std::mutex treePolicyMutex;
+std::mutex backUpMutex;
 
 double diffclock(clock_t clock1, clock_t clock2) {
   double diffticks = clock1 - clock2;
@@ -181,20 +187,54 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, int numSimulations) {
   return best;
 }
 
+void runSimulationThread(int threadNum, bool* running, UCTNode* root) {
+  treePolicyMutex.lock();
+  UCTNode* v = TreePolicy(root);
+  treePolicyMutex.unlock();
+
+  int reward = DefaultPolicy(v);
+
+  backUpMutex.lock();
+  backup(v, reward);
+  backUpMutex.unlock();
+
+  running[threadNum] = false;
+}
+
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   clock_t start = clock();
   clock_t end = clock();
   int i = 0;
-  while (diffclock(end, start) < millaSecondsToThink) {
-    UCTNode* v = TreePolicy(root);
-    int reward = DefaultPolicy(v);
-    backup(v, reward);
 
+  int numThreads = 20;
+  bool* running = new bool[numThreads];
+  std::thread* threads = new std::thread[numThreads];
+  for (int threadNum = 0; threadNum < numThreads; threadNum++) {
+    i++;
+    running[threadNum] = true;
+    threads[threadNum] = std::thread(runSimulationThread, threadNum, running, root);
+  }
+
+  while (diffclock(end, start) < millaSecondsToThink) {
+    for (int threadNum = 0; threadNum < numThreads; threadNum++) {
+      if (running[threadNum] == false) {
+        i++;
+        threads[threadNum].join();
+        running[threadNum] = true;
+
+        threads[threadNum] = std::thread(runSimulationThread, threadNum, running, root);
+      }
+    }
+    usleep(1000);
     // if (i % 1000 == 0 && i != 0)
       // printf("%d\n", i);
     end = clock();
-    i++;
   }
+  for (int threadNum = 0; threadNum < numThreads; threadNum++)
+    threads[threadNum].join();
+  delete[] running;
+  delete[] threads;
+
   UCTNode* best = root->child;
   UCTNode* next = root->child;
   while (next != NULL) {
@@ -212,6 +252,8 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     && state->positions[best->move.row][best->move.column] != Empty) {
     assert(false);
   }
-  // printf("Thought for %d simulations.\n", i);
+  char buffer[100];
+  sprintf(buffer, "Thought for %d simulations.", i);
+  Log(buffer);
   return best;
 }
