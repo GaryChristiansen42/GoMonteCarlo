@@ -3,12 +3,14 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <boost/foreach.hpp>
 
 #include <cstdlib>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include "Common.h"
 
@@ -22,11 +24,12 @@
 
 std::mutex treePolicyMutex;
 std::mutex backUpMutex;
+std::atomic<int> simulationCount;
 
-double diffclock(clock_t clock1, clock_t clock2) {
-  double diffticks = clock1 - clock2;
-  double diffms = diffticks / (CLOCKS_PER_SEC / 1000);
-  return diffms;
+double diffclock(timespec start, timespec finish) {
+  double elapsed = finish.tv_sec - start.tv_sec;
+  elapsed += (finish.tv_nsec - start.tv_nsec)/1000000000.0;
+  return elapsed * (-1000);
 }
 
 void printNode(UCTNode* n, char* spaces) {
@@ -187,52 +190,55 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, int numSimulations) {
   return best;
 }
 
-void runSimulationThread(int threadNum, bool* running, UCTNode* root) {
-  treePolicyMutex.lock();
-  UCTNode* v = TreePolicy(root);
-  treePolicyMutex.unlock();
+void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
+  struct timespec start, end;
+  clock_gettime(CLOCK_MONOTONIC, &start);
+  clock_gettime(CLOCK_MONOTONIC, &end);
 
-  int reward = DefaultPolicy(v);
+  int i = 0;
 
-  backUpMutex.lock();
-  backup(v, reward);
-  backUpMutex.unlock();
+  // if (rand() % 2 == 0)
+    // usleep(15000000);
 
-  running[threadNum] = false;
+  while (diffclock(end, start) < millaSecondsToThink) {
+    simulationCount++;
+    i++;
+
+    
+    treePolicyMutex.lock();
+    UCTNode* v = TreePolicy(root);
+    treePolicyMutex.unlock();
+
+    int reward = DefaultPolicy(v);
+
+    backUpMutex.lock();
+    backup(v, reward);
+    backUpMutex.unlock();
+
+    /*if (i % 100 == 0 && i != 0) {
+      char buffer[100];
+      sprintf(buffer, "#%d - %d", getpid(), i);
+      Log(buffer);
+      sprintf(buffer, "  %f %d", diffclock(end, start), millaSecondsToThink);
+      Log(buffer);
+    }*/
+    // end = clock();
+    clock_gettime(CLOCK_MONOTONIC, &end);
+  }
+  Log(std::to_string(i).c_str());
 }
 
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
-  clock_t start = clock();
-  clock_t end = clock();
-  int i = 0;
+  simulationCount = 0;
 
-  int numThreads = 20;
-  bool* running = new bool[numThreads];
+  int numThreads = 2;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
-    i++;
-    running[threadNum] = true;
-    threads[threadNum] = std::thread(runSimulationThread, threadNum, running, root);
+    threads[threadNum] = std::thread(runSimulationThread, root, millaSecondsToThink);
   }
 
-  while (diffclock(end, start) < millaSecondsToThink) {
-    for (int threadNum = 0; threadNum < numThreads; threadNum++) {
-      if (running[threadNum] == false) {
-        i++;
-        threads[threadNum].join();
-        running[threadNum] = true;
-
-        threads[threadNum] = std::thread(runSimulationThread, threadNum, running, root);
-      }
-    }
-    usleep(1000);
-    // if (i % 1000 == 0 && i != 0)
-      // printf("%d\n", i);
-    end = clock();
-  }
   for (int threadNum = 0; threadNum < numThreads; threadNum++)
     threads[threadNum].join();
-  delete[] running;
   delete[] threads;
 
   UCTNode* best = root->child;
@@ -253,7 +259,7 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     assert(false);
   }
   char buffer[100];
-  sprintf(buffer, "Thought for %d simulations.", i);
+  sprintf(buffer, "Thought for %d simulations.", (int)simulationCount);
   Log(buffer);
   return best;
 }

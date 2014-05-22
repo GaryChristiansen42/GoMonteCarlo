@@ -1,4 +1,4 @@
-CC=g++ -pthread
+CC=g++ -pthread 
   CFLAGS=-c -g -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
@@ -22,13 +22,13 @@ CC=g++ -pthread
 all: GoMonteCarlo CheckStrength
 
 CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength
+	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength -lrt
 
 CheckStrength.o: CheckStrength.cpp
 	$(CC) $(CFLAGS) CheckStrength.cpp
 
 GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GoMonteCarlo
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GoMonteCarlo -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
