@@ -398,11 +398,6 @@ unsigned int Board::removeDeadStones(Player color) {
     // goto beg1;
   }
 
-  if (capturedStones.size() == 1)
-    koPoint = capturedStones[0];
-  else
-    koPoint = Point(-1, -1);
-
   return static_cast<unsigned int>(capturedStones.size());
   /*deadGroups.clear();
   for(vector<Group*>::iterator it = secondGroup.begin(); it != secondGroup.end(); ++it)
@@ -513,6 +508,13 @@ void Board::makeMove(Point move) {
       capturedWhite += numCaptured;
     else
       capturedBlack += numCaptured;
+
+    if (numCaptured > 0)
+      koPoint = move;
+    else
+      koPoint = Point(-1, -1);
+
+
     // removeDeadStones((turn == Black ? Black : White));
 
     // TODO: replace with getNeighbors
