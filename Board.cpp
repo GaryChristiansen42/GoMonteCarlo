@@ -365,7 +365,7 @@ void Board::updateStructures(Point move) {
   }
 }
 
-unsigned int Board::removeDeadStones(Player color) {
+unsigned int Board::removeDeadStones(Player color, Point move) {
   std::vector<Point> capturedStones;
 
   std::vector<Group*>* firstGroups =
@@ -396,6 +396,17 @@ unsigned int Board::removeDeadStones(Player color) {
     delete deadGroup;
     // deadGroups.erase(it);
     // goto beg1;
+  }
+
+  if (capturedStones.size() > 0) {
+    for (Point p : capturedStones) {
+      if (move.isAdjacent(p)) {
+        koPoint = p;
+	break;
+      }
+    }
+  } else {
+    koPoint = Point(-1, -1);
   }
 
   return static_cast<unsigned int>(capturedStones.size());
@@ -487,6 +498,7 @@ void Board::makeMove(Point move) {
     }
     if (!foundMove) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n", move.row, move.column);
+      printf("Ko Point Row: %d Column: %d\n", koPoint.row, koPoint.column);
       foreach(Point p, possibleMoves) {
         printf("  PossibleMove Row: %d Column: %d\n", p.row, p.column);
       }
@@ -503,16 +515,12 @@ void Board::makeMove(Point move) {
     positions[move.row][move.column] = turn;
 
     updateStructures(move);
-    int numCaptured = removeDeadStones((turn == Black ? White : Black));
+    int numCaptured = removeDeadStones((turn == Black ? White : Black), move);
     if (turn == Black)
       capturedWhite += numCaptured;
     else
       capturedBlack += numCaptured;
 
-    if (numCaptured > 0)
-      koPoint = move;
-    else
-      koPoint = Point(-1, -1);
 
 
     // removeDeadStones((turn == Black ? Black : White));

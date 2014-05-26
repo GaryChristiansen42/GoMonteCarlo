@@ -27,8 +27,8 @@ std::mutex backUpMutex;
 std::atomic<int> simulationCount;
 
 double diffclock(timespec start, timespec finish) {
-  double elapsed = finish.tv_sec - start.tv_sec;
-  elapsed += (finish.tv_nsec - start.tv_nsec)/1000000000.0;
+  double elapsed = (double)(finish.tv_sec - start.tv_sec);
+  elapsed += (double)(finish.tv_nsec - start.tv_nsec)/1000000000.0;
   return elapsed * (-1000);
 }
 
@@ -231,7 +231,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 2;
+  int numThreads = 4;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root, millaSecondsToThink);
@@ -259,7 +259,7 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     assert(false);
   }
   char buffer[100];
-  sprintf(buffer, "Thought for %d simulations.", (int)simulationCount);
+  sprintf(buffer, "Thought for %d simulations.\nR: %f V: %d\nR/V: %f", (int)simulationCount, best->totalRewards, best->visits, double(best->totalRewards/best->visits));
   Log(buffer);
   return best;
 }

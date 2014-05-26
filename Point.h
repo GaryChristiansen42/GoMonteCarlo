@@ -11,5 +11,7 @@ struct Point{
 
   bool operator==(const Point &p);
   bool operator!=(const Point &p);
+
+  bool isAdjacent(const Point &p);
 };
 #endif  // POINT_H_
