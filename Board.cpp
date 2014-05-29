@@ -525,7 +525,7 @@ void Board::makeMove(Point move) {
 
     // removeDeadStones((turn == Black ? Black : White));
 
-    // TODO: replace with getNeighbors
+    // TODO(Gary): replace with getNeighbors
     std::vector<Point> neighbors;
     if (move.row - 1 >= 0)
       neighbors.push_back(Point(move.row - 1, move.column));
@@ -538,18 +538,19 @@ void Board::makeMove(Point move) {
 
     bool neighborOfSameColor = false;
     for (Point neighbor : neighbors) {
-      if (positions[neighbor.row][neighbor.column] == positions[move.row][move.column]) {
+      if (positions[neighbor.row][neighbor.column]
+        == positions[move.row][move.column]) {
       neighborOfSameColor = true;
       break;
       }
     }
 
-    // if the move has a neighbor of the same color, then the next move cannot be ko
+    // if the move has a neighbor of the same color,
+    // then the next move cannot be ko
     if (neighborOfSameColor) {
       koPoint = Point(-1, -1);
     }
-  }
-  else {
+  } else {
     koPoint = Point(-1, -1);
   }
 
@@ -562,7 +563,7 @@ void Board::makeMove(Point move) {
 
   getPossibleMoves();
   #ifdef RUNNING_TESTS
-    //testPossibleMoves(this);
+    // testPossibleMoves(this);
   #endif
 }
 
@@ -592,7 +593,8 @@ void Board::show() {
       } else if (row == boardSize) {
         boardString << column+1 << " ";
       } else if (column == boardSize) {
-        boardString << char(row+'a' + (row > 7 ? 1 : 0)) << " ";
+        boardString << static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
+          << " ";
       } else {
         switch (positions[row][column]) {
         case 0:

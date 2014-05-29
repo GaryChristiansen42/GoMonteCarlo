@@ -3,4 +3,4 @@
 
 void Log(const char* message);
 
-#endif
+#endif  // COMMON_H_
