@@ -398,11 +398,11 @@ unsigned int Board::removeDeadStones(Player color, Point move) {
     // goto beg1;
   }
 
-  if (capturedStones.size() > 0) {
+  if (capturedStones.size() == 1) {
     for (Point p : capturedStones) {
       if (move.isAdjacent(p)) {
         koPoint = p;
-	break;
+        break;
       }
     }
   } else {
@@ -590,9 +590,9 @@ void Board::show() {
       if (row == boardSize && column == boardSize) {
         boardString << "  ";
       } else if (row == boardSize) {
-        boardString << column << " ";
+        boardString << column+1 << " ";
       } else if (column == boardSize) {
-        boardString << row << " ";
+        boardString << char(row+'a' + (row > 7 ? 1 : 0)) << " ";
       } else {
         switch (positions[row][column]) {
         case 0:
