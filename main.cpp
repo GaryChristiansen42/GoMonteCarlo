@@ -94,7 +94,7 @@ void randomMove(UCTNode** currentNode, Board* b) {
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
   unsigned int choice = rand_r(&seed) %
     static_cast<unsigned int>(b->possibleMoves.size());
-  Point chosenMove = b->possibleMoves[choice];
+  const Point chosenMove = b->possibleMoves[choice];
 
   printf("Row: %d\nColumn: %d\n", chosenMove.row, chosenMove.column);
 

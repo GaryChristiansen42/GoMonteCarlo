@@ -17,8 +17,12 @@ enum PlayerType {
   GnuGo
 };
 
-const char * playerTypeStrings[3] = {
-  "MyMonteCarlo",
+const char * playerTypeStrings[7] = {
+  "MyMonteCarlo1HalfSecond",
+  "MyMonteCarlo1Second",
+  "MyMonteCarlo5Seconds",
+  "MyMonteCarlo10Seconds",
+  "MyMonteCarlo14AndHalfSeconds",
   "RandomPlayer",
   "GnuGo"
 };
@@ -67,12 +71,13 @@ void randomMove(UCTNode** currentNode, Board* b) {
 int main(void) {
   printf("Running...\n");
 
-  int numTrials = 100;
+  int numTrials = 1;
   int boardSize = 9;
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  PlayerType player2 = MyMonteCarlo1Second;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
@@ -82,6 +87,7 @@ int main(void) {
       if (i % 10 == 0 && i != 0)
         printf("\nTrial Number: %d\n", i);
       Board* b = new Board(boardSize);
+      b->init();
       UCTNode *node = new UCTNode(Point(-1, -1), b, NULL);
 
       GameResult r;
@@ -104,7 +110,7 @@ int main(void) {
           computerMove(&node, b, 0, 10000);
           break;
          case MyMonteCarlo14AndHalfSeconds:
-          computerMove(&node, b, 0, 60000);
+          computerMove(&node, b, 0, 14500);
           break;
          case GnuGo:
          default:

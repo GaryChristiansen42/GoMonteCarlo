@@ -15,6 +15,7 @@ class Board {
   int **positions;
   std::vector<Group*> blackGroups;
   std::vector<Group*> whiteGroups;
+  std::vector<Group*> emptyGroups;
   Player turn;
 
   Point lastMove;
@@ -36,12 +37,16 @@ class Board {
  public:
   ~Board();
 
+  void init();
+
   bool operator==(const Board &b);
 
   // void initialize(Player computer);
   Board* clone();
 
-  bool isValidMove(Point move);
+  bool isValidMove(const Point &move);
+  std::vector<Point> getNeighbors(const Point &p);
+  bool hasPathAStar(const Point &from, const Point &to);
 
   // Fuego
   void getSimpleScore(float* whiteScore, float* blackScore);
@@ -49,17 +54,20 @@ class Board {
 
   bool isGameOver(GameResult *result);
 
-  void updateStructures(Point move);
+  void updateStructures(const Point &move);
+  void updateEmptyGroups(const Point &move, 
+    const std::vector<Point> &capturedStones);
 
-  unsigned int removeDeadStones(Player color, Point move);
+  unsigned int removeDeadStones(const Player &color, const Point &move);
 
   void makeMove(Point move);
   void makeRandomMove();
   GameResult playRandomGame();
   void show();
-  bool isSuicide(Point move);
+  bool isSuicide(const Point &move);
 
   // private:
   void getPossibleMoves();
+  void oldGetPossibleMoves();
 };
 #endif  // BOARD_H_

@@ -20,11 +20,11 @@ class Group {
 
   void addStone(Point* p);
 
-  bool contains(Point* p);
-  bool isAdjacent(Point* p);
+  bool contains(const Point &p);
+  bool isAdjacent(const Point &p);
 
-  bool hasLiberties(Board* state);
-  int numLiberties(Board* state);
+  bool hasLiberties(const Board &state);
+  int numLiberties(const Board &state);
 };
 
 void printGroup(Group* g);

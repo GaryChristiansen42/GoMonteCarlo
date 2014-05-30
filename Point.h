@@ -9,9 +9,9 @@ struct Point{
   Point();
   Point(int newRow, int newColumn);
 
-  bool operator==(const Point &p);
-  bool operator!=(const Point &p);
+  bool operator==(const Point &p) const;
+  bool operator!=(const Point &p) const;
 
-  bool isAdjacent(const Point &p);
+  bool isAdjacent(const Point &p) const;
 };
 #endif  // POINT_H_

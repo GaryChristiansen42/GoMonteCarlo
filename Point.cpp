@@ -8,7 +8,7 @@ Point::Point(int newRow, int newColumn) :
   row(newRow), column(newColumn)
 { }
 
-bool Point::operator==(const Point &p) {
+bool Point::operator==(const Point &p) const {
   if (this->row == p.row
       && this->column == p.column)
     return true;
@@ -16,14 +16,14 @@ bool Point::operator==(const Point &p) {
 }
 
 
-bool Point::operator!=(const Point &p) {
+bool Point::operator!=(const Point &p) const {
   if (this->row == p.row
       && this->column == p.column)
     return false;
   return true;
 }
 
-bool Point::isAdjacent(const Point &p) {
+bool Point::isAdjacent(const Point &p) const {
   if (p.row == row) {
     if (p.column == column + 1 || p.column == column - 1) {
       return true;

@@ -5,16 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <boost/foreach.hpp>
-
 #include <cstdlib>
 #include <thread>
 #include <mutex>
 #include <atomic>
 
 #include "Common.h"
-
-#define foreach BOOST_FOREACH
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -81,7 +77,7 @@ UCTNode* getNewChild(UCTNode* node) {
         }
       }
     }*/
-    foreach(Point p, node->state->possibleMoves) {
+    for(Point p : node->state->possibleMoves) {
       UCTNode* child = new UCTNode(p, node->state, node);
       child->state->makeMove(p);
       node->possibleChildren.push_back(child);
@@ -230,7 +226,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 4;
+  int numThreads = 2;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,
@@ -249,7 +245,7 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
     next = next->sibling;
   }
 
-  Point pass(root->state->boardSize, root->state->boardSize);
+  const Point pass(root->state->boardSize, root->state->boardSize);
   if (!(best->move == pass)
     && root->state->positions[best->move.row][best->move.column] != Empty) {
     assert(false);
@@ -261,7 +257,7 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %f V: %d\nR/V: %f",
-    static_cast<int>simulationCount, best->totalRewards, best->visits,
+    static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
   return best;

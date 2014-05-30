@@ -1,20 +1,19 @@
 #include "Board.h"
 
 #include <assert.h>
-#include <boost/foreach.hpp>
 
 #include <cstdio>
+#include <cstring>
 #include <sstream>
 #include <vector>
 #include <stack>
-
-#define foreach BOOST_FOREACH
 
 Board::Board(int newBoardSize) :
   boardSize(newBoardSize),
   positions(new int*[newBoardSize]),
   blackGroups(std::vector<Group*>()),
   whiteGroups(std::vector<Group*>()),
+  emptyGroups(std::vector<Group*>()),
   turn(Black),
   lastMove(Point(-1, -1)),
   secondLastMove(Point(-1, -1)),
@@ -28,7 +27,7 @@ Board::Board(int newBoardSize) :
   }
   // memset(&positions, 0, sizeof(int)*boardSize*boardSize);
   // TODO(GaryChristiansen): this is being thrown away for clones
-  getPossibleMoves();
+  // getPossibleMoves();
 }
 
 /*Board::Board(const Board& b) :
@@ -45,20 +44,20 @@ Board::Board(int newBoardSize) :
     memcpy(positions[r], b.positions[r], BOARD_SIZE*sizeof(int));
   }
 
-  foreach(Group* g, b.blackGroups)
+  for(Group* g : b.blackGroups)
   {
     Group* gClone = new Group(Black);
-    foreach(Point* p, g->stones)
+    for(Point* p : g->stones)
     {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
     }
     blackGroups.push_back(gClone);
   }
-  foreach(Group* g, b.whiteGroups)
+  for(Group* g : b.whiteGroups)
   {
     Group* gClone = new Group(White);
-    foreach(Point* p, g->stones)
+    for(Point* p : g->stones)
     {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
@@ -81,20 +80,20 @@ Board& Board::operator=(const Board& b)
   lastMove = b.lastMove;
   secondLastMove = b.secondLastMove;
 
-  foreach(Group* g, b.blackGroups)
+  for(Group* g : b.blackGroups)
   {
     Group* gClone = new Group(Black);
-    foreach(Point* p, g->stones)
+    for(Point* p : g->stones)
     {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
     }
     blackGroups.push_back(gClone);
   }
-  foreach(Group* g, b.whiteGroups)
+  for(Group* g : b.whiteGroups)
   {
     Group* gClone = new Group(White);
-    foreach(Point* p, g->stones)
+    for(Point* p : g->stones)
     {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
@@ -109,10 +108,24 @@ Board::~Board() {
     delete[] positions[r];
   delete[] positions;
 
-  foreach(Group* g, blackGroups)
+  for(Group* g : blackGroups)
     delete g;
-  foreach(Group* g, whiteGroups)
+  for(Group* g : whiteGroups)
     delete g;
+  for(Group* g : emptyGroups)
+    delete g;
+}
+
+// Should only be called when creating a new board, not a clone
+void Board::init() {
+  // Fill emptyGroups with correct data
+  Group* g = new Group(Empty);
+  for (int row = 0; row < boardSize; row++)
+    for (int column = 0; column < boardSize; column++)
+      g->stones.push_back(new Point(row, column));
+  emptyGroups.push_back(g);
+
+  getPossibleMoves();
 }
 
 bool Board::operator==(const Board &b) {
@@ -168,21 +181,29 @@ Board* Board::clone() {
   b->capturedBlack = capturedBlack;
   b->capturedWhite = capturedWhite;
 
-  foreach(Group* g, blackGroups) {
+  for(Group* g : blackGroups) {
     Group* gClone = new Group(Black);
-    foreach(Point* p, g->stones) {
+    for(Point* p : g->stones) {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
     }
     b->blackGroups.push_back(gClone);
   }
-  foreach(Group* g, whiteGroups) {
+  for(Group* g : whiteGroups) {
     Group* gClone = new Group(White);
-    foreach(Point* p, g->stones) {
+    for(Point* p : g->stones) {
       Point* pClone = new Point(p->row, p->column);
       gClone->addStone(pClone);
     }
     b->whiteGroups.push_back(gClone);
+  }
+  for(Group* g : emptyGroups) {
+    Group* gClone = new Group(White);
+    for(Point* p : g->stones) {
+      Point* pClone = new Point(p->row, p->column);
+      gClone->addStone(pClone);
+    }
+    b->emptyGroups.push_back(gClone);
   }
 
   return b;
@@ -199,12 +220,34 @@ Board* Board::clone() {
     return false;
   return true;
 }*/
-bool Board::isValidMove(Point move) {
-  foreach(Point p, possibleMoves) {
+bool Board::isValidMove(const Point &move) {
+  for(Point p : possibleMoves) {
     if (p == move)
       return true;
   }
   return false;
+}
+
+std::vector<Point> Board::getNeighbors(const Point &p) {
+  std::vector<Point> neighbors;
+  if (p.row - 1 >= 0)
+    neighbors.push_back(Point(p.row - 1, p.column));
+  if (p.row + 1 < boardSize)
+    neighbors.push_back(Point(p.row + 1, p.column));
+  if (p.column - 1 >= 0)
+    neighbors.push_back(Point(p.row, p.column - 1));
+  if (p.column + 1 < boardSize)
+    neighbors.push_back(Point(p.row, p.column + 1));
+  return neighbors;
+}
+
+bool Board::hasPathAStar(const Point &from, const Point &to) {
+  bool x = false;
+  if (from == to)
+    x = !x;
+  if (x)
+    x = !x;
+  return true;
 }
 
 // Fuego
@@ -302,13 +345,13 @@ bool Board::isGameOver(GameResult *result) {
   return false;
 }
 
-void Board::updateStructures(Point move) {
+void Board::updateStructures(const Point &move) {
   std::vector<Group*>* groupsToSearch =
     (turn == Black) ? &blackGroups : &whiteGroups;
   Group* updatedGroup = NULL;
-  foreach(Group* group, *groupsToSearch) {
+  for(Group* group : *groupsToSearch) {
     // if adjacent to structure of same color, then join that structure
-    if (group->isAdjacent(&move)) {
+    if (group->isAdjacent(move)) {
       group->addStone(new Point(move.row, move.column));
       updatedGroup = group;
       break;
@@ -324,13 +367,13 @@ void Board::updateStructures(Point move) {
   if (updatedGroup) {
     // Find groups adjacent to updated group
     std::vector<Group*> adjacentGroups;
-    foreach(Group* group, *groupsToSearch) {
+    for(Group* group : *groupsToSearch) {
       if (group == updatedGroup)
         continue;
-      foreach(Point* stone, updatedGroup->stones) {
-        if (group->isAdjacent(stone)) {
+      for(Point* stone : updatedGroup->stones) {
+        if (group->isAdjacent(*stone)) {
           bool inAdjacent = false;
-          foreach(Group* adjacentGroup, adjacentGroups) {
+          for(Group* adjacentGroup : adjacentGroups) {
             if (group == adjacentGroup) {
               inAdjacent = true;
               break;
@@ -343,7 +386,7 @@ void Board::updateStructures(Point move) {
     }
 
     // combines adjacent groups
-    foreach(Group* adjacentGroup, adjacentGroups) {
+    for(Group* adjacentGroup : adjacentGroups) {
       if (adjacentGroup == updatedGroup)
         continue;
       while (adjacentGroup->stones.size() > 0) {
@@ -352,7 +395,7 @@ void Board::updateStructures(Point move) {
       }
     }
     // int j = 0; j < groupsToSearch->size(); j++)
-    foreach(Group* adjacentGroup, adjacentGroups) {
+    for(Group* adjacentGroup : adjacentGroups) {
       for (std::vector<Group*>::iterator it = groupsToSearch->begin();
         it != groupsToSearch->end(); ++it) {
         if ((*it) == adjacentGroup) {
@@ -365,7 +408,124 @@ void Board::updateStructures(Point move) {
   }
 }
 
-unsigned int Board::removeDeadStones(Player color, Point move) {
+void Board::updateEmptyGroups(const Point &move, 
+  const std::vector<Point> &capturedStones) {
+   // Update empty groups
+  bool found = false;
+  for (unsigned int i = 0; i < emptyGroups.size(); i++) {
+    for (unsigned int j = 0; j < emptyGroups[i]->stones.size(); j++) {
+      if ((*emptyGroups[i]->stones[j]) == move) {
+        found = true;
+        delete emptyGroups[i]->stones[j];
+        emptyGroups[i]->stones[j] = 
+          emptyGroups[i]->stones[emptyGroups[i]->stones.size() - 1];
+        emptyGroups[i]->stones.pop_back();
+        
+        if (emptyGroups[i]->stones.size() == 0) {
+          delete emptyGroups[i];
+          emptyGroups[i] = emptyGroups[emptyGroups.size() - 1];
+          emptyGroups.pop_back();
+        }
+        goto out;
+      }
+    }
+  }
+  out:
+  assert(found);
+
+  // Add captured stones to a group
+  if (capturedStones.size() > 0) {
+    Group* g = new Group(Empty);
+    for (Point p : capturedStones) {
+      g->stones.push_back(new Point(p.row, p.column));
+    }
+    emptyGroups.push_back(g);
+  }
+
+
+  // flood fill adjacent sides in order to divide up a group that was
+  // separated during the move
+  std::vector<Point> neighbors = getNeighbors(move);
+  std::vector<Point> emptyNeighbors;
+  for (Point p : neighbors) {
+    if (positions[p.row][p.column] == Empty)
+      emptyNeighbors.push_back(p);
+  }
+
+  bool cantFindEachOther = false;
+  cantFindEachOther = true;
+  /*for (Point p : emptyNeighbors) {
+    for (Point p2 : emptyNeighbors) {
+      if (p == p2)
+        continue;
+      if (!hasPathAStar(p, p2))
+        cantFindEachOther = true;
+    }
+  }*/
+
+  int numEmptyNeighbors = emptyNeighbors.size();
+  int handledEmptyNeighbors = 0;
+  if (numEmptyNeighbors > 1 && cantFindEachOther) {
+    while (handledEmptyNeighbors != numEmptyNeighbors) {
+      Point emptyNeighbor = emptyNeighbors[0];
+      int** copiedPositions = new int*[boardSize];
+      for (int i = 0; i < boardSize; i++) {
+        copiedPositions[i] = new int[boardSize];
+        memcpy(copiedPositions[i], positions[i], boardSize*sizeof(int));
+      }
+
+      Group *newEmptyGroup = new Group(Empty);
+
+      std::stack<Point> s;
+      s.push(emptyNeighbor);
+      while(!s.empty()) {
+        Point p = s.top();
+        s.pop();
+
+        if (copiedPositions[p.row][p.column] != Empty) {
+          continue;
+        } else if (copiedPositions[p.row][p.column] == Empty) {
+          copiedPositions[p.row][p.column] = Mark;
+
+          std::vector<Point> pNeighbors = getNeighbors(p);
+          for (Point pNeighbor : pNeighbors) {
+            s.push(pNeighbor);
+          }
+          newEmptyGroup->addStone(new Point(p.row, p.column));
+          for (unsigned int i = 0; i < emptyNeighbors.size(); i++) {
+            if (p == emptyNeighbors[i]) {
+              handledEmptyNeighbors++;
+              emptyNeighbors[i] = 
+                emptyNeighbors[emptyNeighbors.size() - 1];
+              emptyNeighbors.pop_back();
+            }
+          }
+        } // if copiedPositions == Mark
+      }  // while (!s.empty())
+
+      // bool foundEmptyNeighborGroup = false;
+      for (unsigned int i = 0; i < emptyGroups.size(); i++) {
+        if (emptyGroups[i]->contains(emptyNeighbor)) {
+          // foundEmptyNeighborGroup = true;
+          delete emptyGroups[i];
+          emptyGroups[i] = emptyGroups[emptyGroups.size() - 1];
+          emptyGroups.pop_back();
+          break;
+        }
+      }
+      // assert(foundEmptyNeighborGroup);
+      emptyGroups.push_back(newEmptyGroup);
+
+      for (int i = 0; i < boardSize; i++) {
+        delete[] copiedPositions[i];
+      }
+      delete[] copiedPositions;
+    }  // if (numEmptyNeighbors > 1) {
+  }  // while (handledEmptyNeighbors != numEmptyNeighbors) {
+}
+
+unsigned int Board::removeDeadStones(const Player &color, 
+  const Point &move) {
   std::vector<Point> capturedStones;
 
   std::vector<Group*>* firstGroups =
@@ -373,14 +533,14 @@ unsigned int Board::removeDeadStones(Player color, Point move) {
   // vector<Group*> secondGroup = (turn == Black) ? blackGroups : whiteGroups;
 
   std::vector<Group*> deadGroups;
-  foreach(Group* group, *firstGroups)
-    if (!(group->hasLiberties(this)))
+  for(Group* group : *firstGroups)
+    if (!(group->hasLiberties(*this)))
       deadGroups.push_back(group);
 
   // beg1:
-  foreach(Group* deadGroup, deadGroups) {
+  for(Group* deadGroup : deadGroups) {
     // remove dead stones on board
-    foreach(Point* stone, deadGroup->stones) {
+    for(Point* stone : deadGroup->stones) {
       positions[stone->row][stone->column] = Empty;
       capturedStones.push_back(Point(stone->row, stone->column));
       // possibleMoves.push_back(Point(stone->row, stone->column));
@@ -408,6 +568,8 @@ unsigned int Board::removeDeadStones(Player color, Point move) {
   } else {
     koPoint = Point(-1, -1);
   }
+
+  updateEmptyGroups(move, capturedStones);
 
   return static_cast<unsigned int>(capturedStones.size());
   /*deadGroups.clear();
@@ -481,6 +643,13 @@ void testPossibleMoves(Board* b) {
     std::vector<Point> oldPossibleMoves = b->possibleMoves;
     b->getPossibleMoves();
     assert(oldPossibleMoves.size() == b->possibleMoves.size());
+
+    oldPossibleMoves = b->possibleMoves;
+    b->oldGetPossibleMoves();
+    if (oldPossibleMoves.size() != b->possibleMoves.size()) {
+      b->show();
+      assert(oldPossibleMoves.size() == b->possibleMoves.size());
+    }
 }
 
 void Board::makeMove(Point move) {
@@ -499,7 +668,7 @@ void Board::makeMove(Point move) {
     if (!foundMove) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n", move.row, move.column);
       printf("Ko Point Row: %d Column: %d\n", koPoint.row, koPoint.column);
-      foreach(Point p, possibleMoves) {
+      for(Point p : possibleMoves) {
         printf("  PossibleMove Row: %d Column: %d\n", p.row, p.column);
       }
       show();
@@ -526,16 +695,7 @@ void Board::makeMove(Point move) {
     // removeDeadStones((turn == Black ? Black : White));
 
     // TODO(Gary): replace with getNeighbors
-    std::vector<Point> neighbors;
-    if (move.row - 1 >= 0)
-      neighbors.push_back(Point(move.row - 1, move.column));
-    if (move.row + 1 < boardSize)
-      neighbors.push_back(Point(move.row + 1, move.column));
-    if (move.column - 1 >= 0)
-      neighbors.push_back(Point(move.row, move.column - 1));
-    if (move.column + 1 < boardSize)
-      neighbors.push_back(Point(move.row, move.column + 1));
-
+    std::vector<Point> neighbors = getNeighbors(move);
     bool neighborOfSameColor = false;
     for (Point neighbor : neighbors) {
       if (positions[neighbor.row][neighbor.column]
@@ -631,7 +791,7 @@ void Board::show() {
 }
 
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
-bool Board::isSuicide(Point move) {
+bool Board::isSuicide(const Point &move) {
   std::vector<Point> neighbors;
   if (move.row > 0)
     neighbors.push_back(Point(move.row - 1, move.column));
@@ -643,33 +803,33 @@ bool Board::isSuicide(Point move) {
     neighbors.push_back(Point(move.row, move.column + 1));
 
   // Check for empty neighbors
-  foreach(Point p, neighbors) {
+  for(Point p : neighbors) {
     if (positions[p.row][p.column] == Empty)
       return false;
   }
 
   // Check for neighbors of same color with more than one liberty
-  foreach(Point p, neighbors) {
+  for(Point p : neighbors) {
     std::vector<Group*> groupsOfSameColor = turn == Black ?
       blackGroups : whiteGroups;
 
-    foreach(Group* g, groupsOfSameColor) {
-      if (!g->contains(&p))
+    for(Group* g : groupsOfSameColor) {
+      if (!g->contains(p))
         continue;
-      if (g->numLiberties(this) > 1)
+      if (g->numLiberties(*this) > 1)
         return false;
     }
   }
 
   // Check for neighbors of opposite color with only one liberty
-  foreach(Point p, neighbors) {
+  for(Point p : neighbors) {
     std::vector<Group*> groupsOfOppositeColor = turn == Black ?
       whiteGroups : blackGroups;
 
-    foreach(Group* g, groupsOfOppositeColor) {
-      if (!g->contains(&p))
+    for(Group* g : groupsOfOppositeColor) {
+      if (!g->contains(p))
         continue;
-      if (g->numLiberties(this) == 1)
+      if (g->numLiberties(*this) == 1)
         return false;
     }
   }
@@ -679,7 +839,7 @@ bool Board::isSuicide(Point move) {
 
 void printPossibleMoves(Board* b) {
   printf("Possible Moves: \n");
-  foreach(Point p, b->possibleMoves) {
+  for(Point p : b->possibleMoves) {
     printf("  R: %d C: %d\n", p.row, p.column);
   }
 }
@@ -687,6 +847,22 @@ void printPossibleMoves(Board* b) {
 void Board::getPossibleMoves() {
   if (possibleMoves.size() > 0)
     possibleMoves.clear();
+
+  for (Group* g : emptyGroups) {
+    if ((*g->stones[0]) != koPoint && !isSuicide((*g->stones[0]))) {
+      for (Point* p : g->stones) {
+        possibleMoves.push_back(Point(p->row, p->column));
+      }
+    }
+  }
+
+  possibleMoves.push_back(Point(boardSize, boardSize));
+}
+
+void Board::oldGetPossibleMoves() {
+  if (possibleMoves.size() > 0)
+    possibleMoves.clear();
+
   for (int r = 0; r < boardSize; r++)
     for (int c = 0; c < boardSize; c++)
       if (positions[r][c] == Empty
