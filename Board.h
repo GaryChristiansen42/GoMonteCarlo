@@ -25,6 +25,8 @@ class Board {
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
+  std::vector<Point> pointsToCheck;
+
   std::vector<Point> possibleMoves;
 
   explicit Board(int newBoardSize);
