@@ -47,6 +47,7 @@ class Board {
   bool isValidMove(const Point &move);
   std::vector<Point> getNeighbors(const Point &p);
   bool hasPathAStar(const Point &from, const Point &to);
+  bool hasPathDFS(const Point &from, const Point &to);
 
   // Fuego
   void getSimpleScore(float* whiteScore, float* blackScore);

@@ -250,6 +250,44 @@ bool Board::hasPathAStar(const Point &from, const Point &to) {
   return true;
 }
 
+bool Board::hasPathDFS(const Point &from, const Point &to) {
+  int** copiedPositions = new int*[boardSize];
+  for (int i = 0; i < boardSize; i++) {
+    copiedPositions[i] = new int[boardSize];
+    memcpy(copiedPositions[i], positions[i], boardSize*sizeof(int));
+  }
+
+  bool found = false;
+  std::stack<Point> s;
+  s.push(from);
+  while (!s.empty()) {
+    Point p = s.top();
+    s.pop();
+
+    if (copiedPositions[p.row][p.column] == Empty) {
+      copiedPositions[p.row][p.column] = Mark;
+      std::vector<Point> neighbors = getNeighbors(p);
+      for (Point p2 : neighbors) {
+        if (p2 == to) {
+          found = true;
+          goto out;
+        }
+        if (positions[p2.row][p2.column] == Empty)
+          s.push(p2);
+      }
+    } else if (copiedPositions[p.row][p.column] != Mark) {
+      continue;
+    }
+  }
+
+  out:
+
+  for (int i = 0; i < boardSize; i++)
+    delete[] copiedPositions[i];
+  delete[] copiedPositions;
+  return found;
+}
+
 // Fuego
 void Board::getSimpleScore(float* whiteScore, float* blackScore) {
   for (int row = 0; row < boardSize; row++) {
@@ -343,6 +381,21 @@ bool Board::isGameOver(GameResult *result) {
     return true;
   }
   return false;
+}
+
+void testPossibleMoves(Board* b) {
+    std::vector<Point> oldPossibleMoves = b->possibleMoves;
+    b->getPossibleMoves();
+    assert(oldPossibleMoves.size() == b->possibleMoves.size());
+
+    oldPossibleMoves = b->possibleMoves;
+    b->oldGetPossibleMoves();
+    if (oldPossibleMoves.size() != b->possibleMoves.size()) {
+      printf("NextLastMove - %d %d\n", b->secondLastMove.row, b->secondLastMove.column);
+      printf("LastMove - %d %d\n", b->lastMove.row, b->lastMove.column);
+      b->show();
+      assert(oldPossibleMoves.size() == b->possibleMoves.size());
+    }
 }
 
 void Board::updateStructures(const Point &move) {
@@ -453,17 +506,44 @@ void Board::updateEmptyGroups(const Point &move,
   }
 
   bool cantFindEachOther = false;
-  cantFindEachOther = true;
-  /*for (Point p : emptyNeighbors) {
-    for (Point p2 : emptyNeighbors) {
-      if (p == p2)
+  if (move.row + 1 < boardSize && move.column + 1 < boardSize
+    && positions[move.row+1][move.column+1] != Empty)
+    cantFindEachOther = true;
+  else if (move.row + 1 < boardSize && move.column - 1 >= 0
+    && positions[move.row+1][move.column-1] != Empty)
+    cantFindEachOther = true;
+  else if (move.row - 1 >= 0 && move.column + 1 < boardSize
+    && positions[move.row-1][move.column+1] != Empty)
+    cantFindEachOther = true;
+  else if (move.row - 1 >= 0 && move.column - 1 >= 0
+    && positions[move.row-1][move.column-1] != Empty)
+    cantFindEachOther = true;
+  else if (move.row + 1 < boardSize
+    && positions[move.row+1][move.column] != Empty)
+    cantFindEachOther = true;
+  else if (move.row - 1 >= 0
+    && positions[move.row-1][move.column] != Empty)
+    cantFindEachOther = true;
+  else if (move.column + 1 < boardSize
+    && positions[move.row][move.column+1] != Empty)
+    cantFindEachOther = true;
+  else if (move.column - 1 >= 0
+    && positions[move.row][move.column-1] != Empty)
+    cantFindEachOther = true;
+  if (cantFindEachOther) {
+  // for (Point p : emptyNeighbors) {
+    cantFindEachOther = false;
+    for (Point p : emptyNeighbors) {
+      if (emptyNeighbors[0] == p)
         continue;
-      if (!hasPathAStar(p, p2))
+      if (!hasPathDFS(emptyNeighbors[0], p)) {
         cantFindEachOther = true;
+        break;
+      }
     }
-  }*/
+  }
 
-  int numEmptyNeighbors = emptyNeighbors.size();
+  int numEmptyNeighbors = static_cast<int>(emptyNeighbors.size());
   int handledEmptyNeighbors = 0;
   if (numEmptyNeighbors > 1 && cantFindEachOther) {
     while (handledEmptyNeighbors != numEmptyNeighbors) {
@@ -520,8 +600,8 @@ void Board::updateEmptyGroups(const Point &move,
         delete[] copiedPositions[i];
       }
       delete[] copiedPositions;
-    }  // if (numEmptyNeighbors > 1) {
-  }  // while (handledEmptyNeighbors != numEmptyNeighbors) {
+    }  // while (handledEmptyNeighbors != numEmptyNeighbors) {
+  }  // if (numEmptyNeighbors > 1) {
 }
 
 unsigned int Board::removeDeadStones(const Player &color, 
@@ -637,19 +717,6 @@ unsigned int Board::removeDeadStones(const Player &color,
       structures.push_back(structure);
     }
   }*/
-}
-
-void testPossibleMoves(Board* b) {
-    std::vector<Point> oldPossibleMoves = b->possibleMoves;
-    b->getPossibleMoves();
-    assert(oldPossibleMoves.size() == b->possibleMoves.size());
-
-    oldPossibleMoves = b->possibleMoves;
-    b->oldGetPossibleMoves();
-    if (oldPossibleMoves.size() != b->possibleMoves.size()) {
-      b->show();
-      assert(oldPossibleMoves.size() == b->possibleMoves.size());
-    }
 }
 
 void Board::makeMove(Point move) {

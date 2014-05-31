@@ -92,12 +92,14 @@ void doBoardSize() {
   std::cin >> boardSize;
   delete b;
   b = new Board(boardSize);
+  b->init();
 
   printf("= \n\n");
 }
 
 int main() {
   b = new Board(boardSize);
+  b->init();
   //currentMove = new UCTNode(Point(-1, -1), b, NULL);
 
   while (true) {
@@ -111,6 +113,7 @@ int main() {
     } else if (!strcmp(command, "clear_board")) {
       delete b;
       b = new Board(boardSize);
+      b->init();
       printf("= \n\n");
     } else if (!strcmp(command, "exit")) {
       exit(0);
