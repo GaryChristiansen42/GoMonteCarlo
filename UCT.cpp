@@ -226,7 +226,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 4;
+  int numThreads = 1;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,
