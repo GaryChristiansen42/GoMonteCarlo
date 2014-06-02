@@ -8,12 +8,15 @@
 #define foreach BOOST_FOREACH
 
 Group::Group(Player newColor) :
-  stones(std::vector<Point*>()), color(newColor)
+  stones(std::vector<Point*>()), color(newColor),
+  liberties(std::vector<Point*>())
 { }
 
 Group::~Group() {
-  foreach(Point* stone, stones)
-    delete stone;
+  // foreach(Point* stone, stones)
+    // delete stone;
+  // foreach(Point* p, liberties)
+    // delete p;
 }
 
 void Group::addStone(Point* p) {
@@ -42,70 +45,48 @@ bool Group::isAdjacent(Point* p) {
   return false;
 }
 
-bool Group::hasLiberties(Board* state) {
-  foreach(Point* stone, stones) {
-    // free above
-    if (stone->column > 0 &&
-      state->positions[stone->row][stone->column-1] == Empty)
-      return true;
-    // free below
-    if (stone->column < state->boardSize-1
-      && state->positions[stone->row][stone->column+1] == Empty)
-      return true;
-    // free to the left
-    if (stone->row > 0
-      && state->positions[stone->row-1][stone->column] == Empty)
-      return true;
-    if (stone->row < state->boardSize-1
-      && state->positions[stone->row+1][stone->column] == Empty)
-      return true;
-  }
-  return false;
+bool Group::hasLiberties() {
+  recalculateLiberties();
+  return liberties.size() > 0;
 }
 
-int Group::numLiberties(Board* state) {
-  int num = 0;
-  int** positions = new int*[state->boardSize];
-  int i;
-  for (i = 0; i < state->boardSize; i++) {
-    positions[i] = new int[state->boardSize];
-    memset(positions[i], 0, state->boardSize*sizeof(int));
-  }
-  foreach(Point* stone, stones) {
-    // free above
-    if (stone->column > 0
-      && state->positions[stone->row][stone->column-1] == Empty
-      && positions[stone->row][stone->column-1] == 0) {
-      num++;
-      positions[stone->row][stone->column-1] = 1;
+int Group::numLiberties() {
+  recalculateLiberties();
+  return (int)liberties.size();
+}
+
+void Group::recalculateLiberties() {
+  liberties.clear();
+  std::vector<Point*> marked;
+  for(Point* stone : stones) {
+    if (stone->north != NULL && stone->north->color == Empty
+      && !stone->north->marked) {
+      liberties.push_back(stone->north);
+      marked.push_back(stone->north);
+      stone->north->marked = true;
     }
-    // free below
-    if (stone->column < state->boardSize-1
-      && state->positions[stone->row][stone->column+1] == Empty
-      && positions[stone->row][stone->column+1] == 0) {
-      num++;
-      positions[stone->row][stone->column+1] = 1;
+    if (stone->east != NULL && stone->east->color == Empty
+      && !stone->east->marked) {
+      liberties.push_back(stone->east);
+      marked.push_back(stone->east);
+      stone->east->marked = true;
     }
-    // free to the left
-    if (stone->row > 0
-      && state->positions[stone->row-1][stone->column] == Empty
-      && positions[stone->row-1][stone->column] == 0) {
-      num++;
-      positions[stone->row-1][stone->column] = 1;
+    if (stone->south != NULL && stone->south->color == Empty
+      && !stone->south->marked) {
+      liberties.push_back(stone->south);
+      marked.push_back(stone->south);
+      stone->south->marked = true;
     }
-    // free to the right
-    if (stone->row < state->boardSize-1
-      && state->positions[stone->row+1][stone->column] == Empty
-      && positions[stone->row+1][stone->column] == 0) {
-      num++;
-      positions[stone->row+1][stone->column] = 1;
+    if (stone->west != NULL && stone->west->color == Empty
+      && !stone->west->marked) {
+      liberties.push_back(stone->west);
+      marked.push_back(stone->west);
+      stone->west->marked = true;
     }
   }
 
-  for (i = 0; i < state->boardSize; i++)
-    delete[] positions[i];
-  delete[] positions;
-  return num;
+  for (Point* p : marked)
+    p->marked = false;
 }
 
 void printGroup(Group* g) {

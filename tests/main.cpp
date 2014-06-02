@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE( testBoard )
 
   for(int i = 0; i < b2.boardSize; i++)
     for(int j = 0; j < b2.boardSize; j++)
-      BOOST_CHECK_EQUAL(b2.positions[i][j], Empty);
+      BOOST_CHECK_EQUAL(b2.positions[i][j]->color, Empty);
   
   //Valid moves 
   for(int i = 0; i < b1.boardSize; i++)
@@ -70,9 +70,9 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
   b1.makeMove(Point(8,1)); //White
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
 }
 
 BOOST_AUTO_TEST_CASE( testBoardKo )
@@ -219,9 +219,9 @@ BOOST_AUTO_TEST_CASE( testGroup )
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   b1.makeMove(Point(8,2)); //White
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
   
   BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
   BOOST_CHECK_EQUAL(b1.blackGroups.size(), 4);
@@ -289,19 +289,19 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
   b1.makeMove(Point(0, 0)); // Black
   Group* g = b1.blackGroups.at(0);
     
-  BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
     
   b1.makeMove(Point(0, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(&b1), 1);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
   
   b1.makeMove(Point(1, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
     
   b1.makeMove(Point(1, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(&b1), 1);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
     
   b1.makeMove(Point(2, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(&b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
 }
 
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)

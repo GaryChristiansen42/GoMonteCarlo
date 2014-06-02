@@ -12,28 +12,32 @@ class Group;
 class Board {
  public:
   int boardSize;
-  int **positions;
+  Point ***positions;
   std::vector<Group*> blackGroups;
   std::vector<Group*> whiteGroups;
   Player turn;
 
-  Point lastMove;
-  Point secondLastMove;
+  Point* lastMove;
+  Point* secondLastMove;
 
-  Point koPoint;
+  Point* koPoint;
+
+  Point* pass;
 
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
-  std::vector<Point> pointsToCheck;
+  // std::vector<Point> pointsToCheck;
 
-  std::vector<Point> possibleMoves;
+  std::vector<Point*> possibleMoves;
 
   explicit Board(int newBoardSize);
 
  private:
   Board(const Board& b);
   Board& operator=(const Board& b);
+
+  void makeMove(Point* move);
 
  public:
   ~Board();
@@ -51,17 +55,23 @@ class Board {
 
   bool isGameOver(GameResult *result);
 
-  void updateStructures(Point move);
+  void updateStructures(Point* move);
 
   unsigned int removeDeadStones(Player color);
 
   void makeMove(Point move);
+
   void makeRandomMove();
   GameResult playRandomGame();
+
   void show();
+
   bool isSuicide(Point move);
+  bool isSuicide(Point* move);
 
   // private:
   void getPossibleMoves();
+  
+  Point* getPoint(Point* p);
 };
 #endif  // BOARD_H_

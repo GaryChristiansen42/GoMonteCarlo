@@ -27,20 +27,21 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   float millaSecondsToThink) {
   UCTNode* newCurrentNode = NULL;
   if (numSimulations != 0)
-    newCurrentNode = UCTSearch((*currentNode), b, numSimulations);
+    newCurrentNode = UCTSearch((*currentNode), numSimulations);
   else
-    newCurrentNode = UCTSearch((*currentNode), b, millaSecondsToThink);
+    newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink);
 
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
 
   (*currentNode) = newCurrentNode;
   b->makeMove((*currentNode)->move);
+
   // check if b == currentNode->state
   for (int row = 0; row < b->boardSize; row++)
     for (int column = 0; column < b->boardSize; column++)
-      if (b->positions[row][column]
-        != (*currentNode)->state->positions[row][column]) {
+      if (*b->positions[row][column]
+        != *(*currentNode)->state->positions[row][column]) {
         printf("Problem at %d %d\n", row, column);
       }
   if (!(*b == *(*currentNode)->state))
@@ -56,10 +57,10 @@ void randomMove(UCTNode** currentNode, Board* b) {
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
   unsigned int choice = rand_r(&seed) %
     static_cast<unsigned int>(b->possibleMoves.size());
-  Point chosenMove = b->possibleMoves[choice];
+  Point* chosenMove = b->possibleMoves[choice];
 
-  b->makeMove(chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(chosenMove, b, NULL);
+  b->makeMove(*chosenMove);
+  UCTNode* newCurrentNode = new UCTNode(*chosenMove, b, NULL);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 }
@@ -73,6 +74,7 @@ int main(void) {
   float komi = 0;
   PlayerType player1 = RandomPlayer;
   PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
