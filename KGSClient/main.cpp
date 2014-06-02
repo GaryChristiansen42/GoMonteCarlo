@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "../UCT.h"
+#include "../Common.h"
 
 //UCTNode *currentMove;
 int boardSize = 9;
@@ -58,7 +59,7 @@ void doPlay() {
 
   char buffer[100];
   sprintf(buffer, "Play %d at %d %d", color, row, column);
-  log(buffer);
+  Log(buffer);
 }
 
 void doGenMove() {
@@ -84,7 +85,7 @@ void doGenMove() {
 
   char buffer[100];
   sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
-  log(buffer);
+  Log(buffer);
 }
 
 void doBoardSize() {
@@ -103,7 +104,7 @@ int main() {
     char command[128];
     std::cin >> command;
 
-    log(command);
+    Log(command);
 
     if (!strcmp(command, "boardsize")) {
       doBoardSize();
@@ -163,8 +164,8 @@ int main() {
       printf("= %s\n\n", version);
     } else {
       printf("? unknown command \n\n");
-      log("? unknown command");
-      log("command");
+      Log("? unknown command");
+      Log("command");
     }
   }
 

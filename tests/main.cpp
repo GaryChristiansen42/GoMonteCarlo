@@ -88,6 +88,84 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   b1.makeMove(Point(4,1)); // White
   b1.makeMove(Point(0,0)); // Black // Capture 1,0
   BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
+
+  Board b2(boardSize);
+  b2.makeMove(Point(1, 0)); // Black
+  b2.makeMove(Point(0, 0)); // White
+  b2.makeMove(Point(1, 1)); // Black
+  b2.makeMove(Point(0, 1)); // White
+  b2.makeMove(Point(2, 1)); // Black
+  b2.makeMove(Point(0, 2)); // White
+  b2.makeMove(Point(2, 3)); // Black
+  b2.makeMove(Point(1, 3)); // White
+  b2.makeMove(Point(2, 4)); // Black
+  b2.makeMove(Point(1, 4)); // White
+  b2.makeMove(Point(3, 2)); // Black
+  b2.makeMove(Point(2, 0)); // White
+  b2.makeMove(Point(3, 3)); // Black
+  b2.makeMove(Point(3, 0)); // White
+  b2.makeMove(Point(4, 2)); // Black
+  b2.makeMove(Point(3, 1)); // White
+  b2.makeMove(Point(4, 4)); // Black
+  /*
+  WWW--
+  BB-WW
+  WB-BB
+  WWBB-
+  --B-B
+  */
+
+  b2.makeMove(Point(2, 2)); // White
+  /*
+  WWW--
+  BB-WW
+  WBWBB
+  WWBB-
+  --B-B
+  */
+  b2.makeMove(Point(1, 2)); // White
+  /*
+  WWW--
+  BBBWW
+  WB-BB
+  WWBB-
+  --B-B
+  */
+  b2.makeMove(Point(2, 2)); // White
+  /*
+  WWW--
+  ---WW
+  W-WBB
+  WWBB-
+  --B-B
+  */
+
+  Board b3(boardSize);
+  b3.makeMove(Point(4, 2)); // Black
+  b3.makeMove(Point(1, 2)); // White
+
+  b3.makeMove(Point(4, 4)); // Black
+  b3.makeMove(Point(2, 3)); // White
+
+  b3.makeMove(Point(2, 4)); // Black
+  b3.makeMove(Point(2, 2)); // White
+
+  b3.makeMove(Point(0, 2)); // Black
+  b3.makeMove(Point(3, 1)); // White
+
+  b3.makeMove(Point(0, 4)); // Black
+  b3.makeMove(Point(0, 3)); // White
+
+  b3.makeMove(Point(3, 3)); // Black
+  b3.makeMove(Point(0, 1)); // White
+
+  b3.makeMove(Point(1, 3)); // Black
+  b3.makeMove(Point(3, 2)); // White
+ 
+  b3.makeMove(Point(1, 4)); // Black
+  b3.makeMove(Point(3, 4)); // White
+
+  b3.makeMove(Point(2, 4)); // Black
 }
 
 BOOST_AUTO_TEST_CASE( testIsSuicide )

@@ -32,3 +32,19 @@ bool Point::operator!=(const Point &p) {
     return false;
   return true;
 }
+
+bool Point::isAdjacent(const Point &p) {
+  if (p.row == row) {
+    if (p.column == column + 1 || p.column == column - 1) {
+      return true;
+    }
+  }
+
+  if (p.column == column) {
+    if (p.row == row + 1 || p.row == row - 1) {
+      return true;
+    }
+  }
+
+  return false;
+}

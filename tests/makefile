@@ -1,10 +1,10 @@
-CC=g++
-CFLAGS=-c -std=c++0x -Wall -Wextra -Werror -pedantic -g
+CC=g++ -pthread
+CFLAGS=-c -g --std=c++0x -Wall -Wextra -Werror -pedantic
 
 all: TestGoMonteCarlo
 
 TestGoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o TestGoMonteCarlo
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o TestGoMonteCarlo -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
