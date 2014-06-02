@@ -230,7 +230,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 4;
+  int numThreads = 1;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,
@@ -261,7 +261,7 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %f V: %d\nR/V: %f",
-    static_cast<int>simulationCount, best->totalRewards, best->visits,
+    static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
   return best;

@@ -104,7 +104,7 @@ int main(void) {
           computerMove(&node, b, 0, 10000);
           break;
          case MyMonteCarlo14AndHalfSeconds:
-          computerMove(&node, b, 0, 60000);
+          computerMove(&node, b, 0, 14500);
           break;
          case GnuGo:
          default:
