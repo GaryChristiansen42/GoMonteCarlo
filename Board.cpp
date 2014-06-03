@@ -102,7 +102,6 @@ Board& Board::operator=(const Board& b)
 }*/
 
 Board::~Board() {
-  /*
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       delete positions[row][column];
@@ -114,7 +113,10 @@ Board::~Board() {
   foreach(Group* g, blackGroups)
     delete g;
   foreach(Group* g, whiteGroups)
-    delete g;*/
+    delete g;
+
+  if (pass != NULL)
+    delete pass;
 }
 
 void Board::init() {
@@ -155,9 +157,11 @@ bool Board::operator==(const Board &b) {
     for (int column = 0; column < boardSize; column++)
       if (*positions[row][column] != *b.positions[row][column])
         return false;
-  if (!(*lastMove == *b.lastMove))
+  if (secondLastMove == NULL && b.secondLastMove == NULL
+    && !(*lastMove == *b.lastMove))
     return false;
-  if (!(*secondLastMove == *b.secondLastMove))
+  if (secondLastMove != NULL && b.secondLastMove != NULL
+    && !(*secondLastMove == *b.secondLastMove))
     return false;
   return true;
 }

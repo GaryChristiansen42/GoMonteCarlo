@@ -30,7 +30,7 @@ void playerMove(UCTNode** currentNode, Board* b) {
   printf("Row: %d\nColumn: %d\n", choice.row, choice.column);
 
   b->makeMove(choice);
-  UCTNode* newCurrentNode = new UCTNode(choice, b, NULL);
+  UCTNode* newCurrentNode = new UCTNode(choice, NULL);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 }
@@ -99,7 +99,7 @@ void randomMove(UCTNode** currentNode, Board* b) {
   printf("Row: %d\nColumn: %d\n", chosenMove->row, chosenMove->column);
 
   b->makeMove(*chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, b, NULL);
+  UCTNode* newCurrentNode = new UCTNode(*chosenMove, NULL);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 }
@@ -114,7 +114,8 @@ int main(void) {
   Board* b = new Board(boardSize);
 
   UCTNode *currentNode;
-  root = new UCTNode(Point(-1, -1), b, NULL);
+  root = new UCTNode(Point(-1, -1), NULL);
+  root->state = b;
   currentNode = root;
 
   b->show();

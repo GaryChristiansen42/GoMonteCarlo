@@ -35,6 +35,7 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   delete (*currentNode);
 
   (*currentNode) = newCurrentNode;
+  newCurrentNode->parent = NULL;
   b->makeMove((*currentNode)->move);
 
   // check if b == currentNode->state
@@ -59,23 +60,26 @@ void randomMove(UCTNode** currentNode, Board* b) {
     static_cast<unsigned int>(b->possibleMoves.size());
   Point* chosenMove = b->possibleMoves[choice];
 
+  UCTNode* newCurrentNode = new UCTNode(*chosenMove, *currentNode);
+  if (newCurrentNode->parent != NULL)
+    newCurrentNode->init();
   b->makeMove(*chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, b, NULL);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
+  newCurrentNode->parent = NULL;
 }
 
 int main(void) {
   printf("Running...\n");
 
-  int numTrials = 100;
+  int numTrials = 1;
   int boardSize = 9;
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
-  PlayerType player2 = MyMonteCarlo1Second;
-  // PlayerType player2 = MyMonteCarlo1HalfSecond;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player2 = MyMonteCarlo1Second;
+  //  PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
@@ -86,7 +90,8 @@ int main(void) {
         printf("\nTrial Number: %d\n", i);
       Board* b = new Board(boardSize);
       b->init();
-      UCTNode *node = new UCTNode(Point(-1, -1), b, NULL);
+      UCTNode *node = new UCTNode(Point(-1, -1), NULL);
+      node->state = b->clone();
 
       GameResult r;
       int k = 0;
@@ -116,8 +121,9 @@ int main(void) {
           assert(false);
           break;
         }
+        b->show();
         k++;
-        if (k > 25)
+        if (k > 2000)
           exit(0);
       }
 

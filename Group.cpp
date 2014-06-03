@@ -26,10 +26,8 @@ void Group::addStone(Point* p) {
 }
 
 bool Group::contains(Point* p) {
-  foreach(Point* stone, stones) {
-    if (stone->row == p->row && stone->column == p->column)
-      return true;
-  }
+  if (p->group == this)
+    return true;
   return false;
 }
 

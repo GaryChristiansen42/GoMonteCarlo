@@ -82,16 +82,14 @@ UCTNode* getNewChild(UCTNode* node) {
       }
     }*/
     foreach(Point *p, node->state->possibleMoves) {
-      UCTNode* child = new UCTNode(*p, node->state, node);
-      child->state->makeMove(*p);
+      UCTNode* child = new UCTNode(*p, node);
       node->possibleChildren.push_back(child);
     }
 
     Point pass(node->state->boardSize, node->state->boardSize);
     if (!node->isChild(pass)) {
       // Add pass move to possible moves
-      UCTNode* passChild = new UCTNode(pass, node->state, node);
-      passChild->state->makeMove(pass);
+      UCTNode* passChild = new UCTNode(pass, node);
       node->possibleChildren.push_back(passChild);
     }
   }
@@ -110,6 +108,8 @@ UCTNode* getNewChild(UCTNode* node) {
     // node->possibleChildren.erase(&node->possibleChildren.begin()+choice);
     node->possibleChildren[choice] = node->possibleChildren.back();
     node->possibleChildren.pop_back();
+    if (chosenChild->visits == 0)
+      chosenChild->init();
     return chosenChild;
   //  }
 }

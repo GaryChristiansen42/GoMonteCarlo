@@ -21,10 +21,12 @@ struct UCTNode {
 
   std::vector<UCTNode*> possibleChildren;
 
-  UCTNode(Point newMove, Board* newState, UCTNode* newParent);
+  UCTNode(Point newMove, UCTNode* newParent);
   UCTNode(const UCTNode& n);
   UCTNode operator=(const UCTNode& n);
   ~UCTNode();
+
+  void init();
 
   void addChild(UCTNode* newChild);
   void removeChild(UCTNode* childToRemove);
