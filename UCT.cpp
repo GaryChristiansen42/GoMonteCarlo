@@ -5,16 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <boost/foreach.hpp>
-
 #include <cstdlib>
 #include <thread>
 #include <mutex>
 #include <atomic>
 
 #include "Common.h"
-
-#define foreach BOOST_FOREACH
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -81,7 +77,7 @@ UCTNode* getNewChild(UCTNode* node) {
         }
       }
     }*/
-    foreach(Point *p, node->state->possibleMoves) {
+    for(Point *p : node->state->possibleMoves) {
       UCTNode* child = new UCTNode(*p, node);
       node->possibleChildren.push_back(child);
     }

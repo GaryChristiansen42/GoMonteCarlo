@@ -1,11 +1,7 @@
 #include "Group.h"
 
-#include <boost/foreach.hpp>
-
 #include <vector>
 #include <cstdio>
-
-#define foreach BOOST_FOREACH
 
 Group::Group(Player newColor) :
   stones(std::vector<Point*>()), color(newColor),
@@ -13,10 +9,6 @@ Group::Group(Player newColor) :
 { }
 
 Group::~Group() {
-  // foreach(Point* stone, stones)
-    // delete stone;
-  // foreach(Point* p, liberties)
-    // delete p;
 }
 
 void Group::addStone(Point* p) {
@@ -32,7 +24,7 @@ bool Group::contains(Point* p) {
 }
 
 bool Group::isAdjacent(Point* p) {
-  foreach(Point* stone, stones) {
+  for(Point* stone : stones) {
     if (stone->row == p->row+1 && stone->column == p->column)
       return true;
     if (stone->row == p->row-1 && stone->column == p->column)
@@ -90,7 +82,7 @@ void Group::recalculateLiberties() {
 }
 
 void printGroup(Group* g) {
-  foreach(Point* stone, g->stones) {
+  for(Point* stone : g->stones) {
     printf("r=%d c=%d\n", stone->row, stone->column);
   }
 }
