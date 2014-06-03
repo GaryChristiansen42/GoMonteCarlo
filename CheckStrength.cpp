@@ -73,7 +73,8 @@ int main(void) {
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  PlayerType player2 = MyMonteCarlo1Second;
   // PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
@@ -84,9 +85,11 @@ int main(void) {
       if (i % 10 == 0 && i != 0)
         printf("\nTrial Number: %d\n", i);
       Board* b = new Board(boardSize);
+      b->init();
       UCTNode *node = new UCTNode(Point(-1, -1), b, NULL);
 
       GameResult r;
+      int k = 0;
       while (!b->isGameOver(&r)) {
         PlayerType currentPlayer = b->turn == Black ? player1 : player2;
         switch (currentPlayer) {
@@ -113,6 +116,9 @@ int main(void) {
           assert(false);
           break;
         }
+        k++;
+        if (k > 25)
+          exit(0);
       }
 
       if (static_cast<Player>(r) == Black) {

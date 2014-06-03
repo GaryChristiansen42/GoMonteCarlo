@@ -14,6 +14,7 @@ class Group {
   std::vector<Point*> stones;
   Player color;
   std::vector<Point*> liberties;
+  int numberLiberties;
 
   explicit Group(Player newColor);
 

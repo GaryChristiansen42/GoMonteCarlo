@@ -41,6 +41,7 @@ class Board {
 
  public:
   ~Board();
+  void init();
 
   bool operator==(const Board &b);
 

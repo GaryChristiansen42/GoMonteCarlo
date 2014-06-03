@@ -25,28 +25,7 @@ Board::Board(int newBoardSize) :
   possibleMoves(std::vector<Point*>()) {
   for (int row = 0; row < boardSize; row++) {
     positions[row] = new Point*[boardSize];
-    // memset(positions[row], 0, boardSize*sizeof(Point*));
-    for (int column = 0; column < boardSize; column++) {
-      positions[row][column] =
-        new Point(row, column, Empty, NULL, NULL, NULL, NULL);
-    }
   }
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
-      if (row + 1 < boardSize)
-        positions[row][column]->north = positions[row+1][column];
-      if (column + 1 < boardSize)
-        positions[row][column]->east = positions[row][column+1];
-      if (row - 1 >= 0)
-        positions[row][column]->south = positions[row-1][column];
-      if (column - 1 >= 0)
-        positions[row][column]->west = positions[row][column-1];
-    }
-  }
-
-  // memset(&positions, 0, sizeof(int)*boardSize*boardSize);
-  // TODO(GaryChristiansen): this is being thrown away for clones
-  getPossibleMoves();
 }
 
 /*Board::Board(const Board& b) :
@@ -138,6 +117,37 @@ Board::~Board() {
     delete g;*/
 }
 
+void Board::init() {
+  for (int row = 0; row < boardSize; row++) {
+    // memset(positions[row], 0, boardSize*sizeof(Point*));
+    for (int column = 0; column < boardSize; column++) {
+      positions[row][column] = new Point(row, column);
+    }
+  }
+  for (int row = 0; row < boardSize; row++) {
+    for (int column = 0; column < boardSize; column++) {
+      if (row + 1 < boardSize)
+        positions[row][column]->north = positions[row+1][column];
+      if (column + 1 < boardSize)
+        positions[row][column]->east = positions[row][column+1];
+      if (row - 1 >= 0)
+        positions[row][column]->south = positions[row-1][column];
+      if (column - 1 >= 0)
+        positions[row][column]->west = positions[row][column-1];
+    }
+  }
+
+  for (Group* g : blackGroups) {
+    g->recalculateLiberties();
+  }
+  for (Group* g : whiteGroups) {
+    g->recalculateLiberties();
+  }
+  // memset(&positions, 0, sizeof(int)*boardSize*boardSize);
+  // TODO(GaryChristiansen): this is being thrown away for clones
+  getPossibleMoves();
+}
+
 bool Board::operator==(const Board &b) {
   if (boardSize != b.boardSize)
     return false;
@@ -175,7 +185,7 @@ Board* Board::clone() {
     for (int column = 0; column < boardSize; column++) {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
-        NULL, NULL, NULL, NULL);
+        NULL, NULL, NULL, NULL, NULL);
     }
   }
   for (int row = 0; row < boardSize; row++) {
@@ -208,8 +218,8 @@ Board* Board::clone() {
   foreach(Group* g, blackGroups) {
     Group* gClone = new Group(Black);
     foreach(Point* p, g->stones) {
-      Point* pClone = new Point(p->row, p->column, p->color, p->north,
-        p->east, p->south, p->west);
+      Point temp(p->row, p->column);
+      Point* pClone = b->getPoint(&temp);
       gClone->addStone(pClone);
     }
     b->blackGroups.push_back(gClone);
@@ -217,8 +227,8 @@ Board* Board::clone() {
   foreach(Group* g, whiteGroups) {
     Group* gClone = new Group(White);
     foreach(Point* p, g->stones) {
-      Point* pClone = new Point(p->row, p->column, p->color, p->north,
-        p->east, p->south, p->west);
+      Point temp(p->row, p->column);
+      Point* pClone = b->getPoint(&temp);
       gClone->addStone(pClone);
     }
     b->whiteGroups.push_back(gClone);
@@ -386,19 +396,22 @@ void Board::updateStructures(Point* move) {
       if (adjacentGroup == updatedGroup)
         continue;
       while (adjacentGroup->stones.size() > 0) {
-        updatedGroup->stones.push_back(adjacentGroup->stones.front());
+        updatedGroup->addStone(adjacentGroup->stones.front());
         adjacentGroup->stones.erase(adjacentGroup->stones.begin());
       }
     }
     // int j = 0; j < groupsToSearch->size(); j++)
     foreach(Group* adjacentGroup, adjacentGroups) {
+      bool found = false;
       for (std::vector<Group*>::iterator it = groupsToSearch->begin();
         it != groupsToSearch->end(); ++it) {
         if ((*it) == adjacentGroup) {
           groupsToSearch->erase(it);
+          found = true;
           break;
         }
       }
+      assert(found);
       delete adjacentGroup;
     }
   }
@@ -421,6 +434,7 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
     // remove dead stones on board
     foreach(Point* stone, deadGroup->stones) {
       stone->color = Empty;
+      stone->group = NULL;
       capturedStones.push_back(stone);
       // possibleMoves.push_back(Point(stone->row, stone->column));
     }
@@ -447,6 +461,61 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   } else {
     koPoint = NULL;
   }
+
+  std::vector<Group*> neighborGroupsToBeUpdated;
+  for (Point* p : capturedStones) {
+    bool found;
+    if (p->north != NULL && p->north->group != NULL) {
+      found = false;
+      for (Group* g : neighborGroupsToBeUpdated) {
+        if (g == p->north->group) {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        neighborGroupsToBeUpdated.push_back(p->north->group);
+    }
+
+    if (p->east != NULL && p->east->group != NULL) {
+      found = false;
+      for (Group* g : neighborGroupsToBeUpdated) {
+        if (g == p->east->group) {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        neighborGroupsToBeUpdated.push_back(p->east->group);
+    }
+
+    if (p->south != NULL && p->south->group != NULL) {
+      found = false;
+      for (Group* g : neighborGroupsToBeUpdated) {
+        if (g == p->south->group) {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        neighborGroupsToBeUpdated.push_back(p->south->group);
+    }
+
+    if (p->west != NULL && p->west->group != NULL) {
+      found = false;
+      for (Group* g : neighborGroupsToBeUpdated) {
+        if (g == p->west->group) {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        neighborGroupsToBeUpdated.push_back(p->west->group);
+    }
+  }
+
+  for (Group* g : neighborGroupsToBeUpdated)
+    g->recalculateLiberties();
 
   return static_cast<unsigned int>(capturedStones.size());
   /*deadGroups.clear();
@@ -584,7 +653,54 @@ void Board::makeMove(Point* move) {
       assert(false);
     }
     move->color = turn;
+    std::vector<Group*> decrementedGroups;
+    if (move->north != NULL && move->north->color != Empty) {
+      move->north->group->numberLiberties--;
+      decrementedGroups.push_back(move->north->group);
+    }
+    if (move->east != NULL && move->east->color != Empty) {
+      bool found = false;
+      for (Group* g : decrementedGroups) {
+        if (g == move->east->group) {
+          found = true;
+        }
+      }
+      if (!found) {
+        move->east->group->numberLiberties--;
+        decrementedGroups.push_back(move->east->group);
+      }
+    }
+    if (move->south != NULL && move->south->color != Empty) {
+      bool found = false;
+      for (Group* g : decrementedGroups) {
+        if (g == move->south->group) {
+          found = true;
+        }
+      }
+      if (!found) {
+        move->south->group->numberLiberties--;
+        decrementedGroups.push_back(move->south->group);
+      }
+    }
+    if (move->west != NULL && move->west->color != Empty) {
+      bool found = false;
+      for (Group* g : decrementedGroups) {
+        if (g == move->west->group) {
+          found = true;
+        }
+      }
+      if (!found) {
+        move->west->group->numberLiberties--;
+        decrementedGroups.push_back(move->west->group);
+      }
+    }
 
+    /*for (Group* g : blackGroups) {
+      g->recalculateLiberties();
+    }
+    for (Group* g : whiteGroups) {
+      g->recalculateLiberties();
+    }*/
     updateStructures(move);
     int numCaptured =
         removeDeadStones((turn == Black ? White : Black), move);

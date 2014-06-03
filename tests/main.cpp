@@ -7,9 +7,11 @@ BOOST_AUTO_TEST_CASE( testBoard )
 {
   int boardSize = 9;
   Board b1(boardSize);
+  b1.init();
   BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
   
   Board b2(boardSize);
+  b2.init();
   BOOST_CHECK_EQUAL(b2.boardSize, boardSize);
 
   for(int i = 0; i < b2.boardSize; i++)
@@ -58,6 +60,7 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
 {
   int boardSize = 9;
   Board b1(boardSize);
+  b1.init();
   BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
 
   b1.makeMove(Point(0,0)); //Black
@@ -79,6 +82,7 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
 {
   int boardSize = 5;
   Board b1(boardSize);
+  b1.init();
 
   b1.makeMove(Point(0,0)); // Black
   b1.makeMove(Point(1,0)); // White
@@ -90,6 +94,7 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
 
   Board b2(boardSize);
+  b2.init();
   b2.makeMove(Point(1, 0)); // Black
   b2.makeMove(Point(0, 0)); // White
   b2.makeMove(Point(1, 1)); // Black
@@ -141,6 +146,7 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   */
 
   Board b3(boardSize);
+  b3.init();
   b3.makeMove(Point(4, 2)); // Black
   b3.makeMove(Point(1, 2)); // White
 
@@ -172,6 +178,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
 {
   int boardSize = 6;
   Board b1(boardSize);
+  b1.init();
     
   //Black
   BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
@@ -219,6 +226,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
     
   boardSize = 5;
   Board b2(boardSize);
+  b2.init();
     
   b2.makeMove(Point(0,0)); //Black
   b2.makeMove(Point(2,1)); //White
@@ -284,6 +292,7 @@ BOOST_AUTO_TEST_CASE( testGroup )
 {
   int boardSize = 9;
   Board b1(boardSize);
+  b1.init();
   BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
 
   b1.makeMove(Point(0,0)); //Black
@@ -328,6 +337,7 @@ bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 {
   int boardSize = 9;
   Board b1(boardSize);
+  b1.init();
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = b1.blackGroups.at(0);
   Point p = Point(adjStoneX,adjStoneY);
@@ -364,6 +374,7 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
 {
   int boardSize = 5;
   Board b1(boardSize);
+  b1.init();
   b1.makeMove(Point(0, 0)); // Black
   Group* g = b1.blackGroups.at(0);
     
@@ -385,6 +396,7 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 {
   Board b1(Black);
+  b1.init();
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = b1.blackGroups.at(0);
   Point p = Point(adjStoneX,adjStoneY);
@@ -422,6 +434,7 @@ BOOST_AUTO_TEST_CASE( testBoardClone )
 {
   int boardSize = 9;
   Board* b1 = new Board(boardSize);
+  b1->init();
   b1->makeMove(Point(1,1));
 
   BOOST_CHECK_EQUAL(b1->blackGroups.size(), 1);
@@ -440,6 +453,7 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
 {
   int boardSize = 9;
   Board* b1 = new Board(boardSize);
+  b1->init();
   for(int row = 0; row < boardSize-1; row++)
   {
     for(int column = 0; column < boardSize; column++)

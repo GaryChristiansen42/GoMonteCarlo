@@ -9,7 +9,7 @@
 
 Group::Group(Player newColor) :
   stones(std::vector<Point*>()), color(newColor),
-  liberties(std::vector<Point*>())
+  liberties(std::vector<Point*>()), numberLiberties(0)
 { }
 
 Group::~Group() {
@@ -20,7 +20,9 @@ Group::~Group() {
 }
 
 void Group::addStone(Point* p) {
+  p->group = this;
   stones.push_back(p);
+  recalculateLiberties();
 }
 
 bool Group::contains(Point* p) {
@@ -46,13 +48,11 @@ bool Group::isAdjacent(Point* p) {
 }
 
 bool Group::hasLiberties() {
-  recalculateLiberties();
-  return liberties.size() > 0;
+  return numberLiberties > 0;
 }
 
 int Group::numLiberties() {
-  recalculateLiberties();
-  return (int)liberties.size();
+  return numberLiberties;
 }
 
 void Group::recalculateLiberties() {
@@ -87,6 +87,8 @@ void Group::recalculateLiberties() {
 
   for (Point* p : marked)
     p->marked = false;
+
+  numberLiberties = (int)liberties.size();
 }
 
 void printGroup(Group* g) {
