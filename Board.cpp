@@ -221,8 +221,10 @@ Board* Board::clone() {
     for(Point* p : g->stones) {
       Point temp(p->row, p->column);
       Point* pClone = b->getPoint(&temp);
-      gClone->addStone(pClone);
+      gClone->stones.push_back(pClone);
+      pClone->group = gClone;
     }
+    gClone->recalculateLiberties();
     b->blackGroups.push_back(gClone);
   }
   for(Group* g : whiteGroups) {
@@ -230,8 +232,10 @@ Board* Board::clone() {
     for(Point* p : g->stones) {
       Point temp(p->row, p->column);
       Point* pClone = b->getPoint(&temp);
-      gClone->addStone(pClone);
+      gClone->stones.push_back(pClone);
+      pClone->group = gClone;
     }
+    gClone->recalculateLiberties();
     b->whiteGroups.push_back(gClone);
   }
 
@@ -841,28 +845,18 @@ bool Board::isSuicide(Point* move) {
 
   // Check for neighbors of same color with more than one liberty
   for(Point *p : neighbors) {
-    std::vector<Group*> groupsOfSameColor = turn == Black ?
-      blackGroups : whiteGroups;
-
-    for(Group* g : groupsOfSameColor) {
-      if (!g->contains(p))
-        continue;
-      if (g->numLiberties() > 1)
+    Player sameColor = turn == Black ? Black : White;
+    if (p->group->color == sameColor)
+      if (p->group->numLiberties() > 1)
         return false;
-    }
   }
 
   // Check for neighbors of opposite color with only one liberty
   for(Point *p : neighbors) {
-    std::vector<Group*> groupsOfOppositeColor = turn == Black ?
-      whiteGroups : blackGroups;
-
-    for(Group* g : groupsOfOppositeColor) {
-      if (!g->contains(p))
-        continue;
-      if (g->numLiberties() == 1)
+    Player oppositeColor = turn == Black ? White : Black;
+    if (p->group->color == oppositeColor)
+      if (p->group->numLiberties() == 1)
         return false;
-    }
   }
 
   return true;
