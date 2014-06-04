@@ -247,8 +247,8 @@ void Board::getSimpleScore(float* whiteScore, float* blackScore) {
 
 float Board::getTaylorScore(float komi) {
   float score = -komi;  // score = blackScore - whiteScore
-  score += static_cast<float>(capturedWhite) -
-    static_cast<float>(capturedBlack);
+  // score += static_cast<float>(capturedWhite) -
+    // static_cast<float>(capturedBlack);
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       if (positions[row][column]->color == Black) {

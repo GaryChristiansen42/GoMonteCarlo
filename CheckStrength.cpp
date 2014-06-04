@@ -17,8 +17,12 @@ enum PlayerType {
   GnuGo
 };
 
-const char * playerTypeStrings[3] = {
-  "MyMonteCarlo",
+const char * playerTypeStrings[7] = {
+  "MyMonteCarlo1HalfSecond",
+  "MyMonteCarlo1Second",
+  "MyMonteCarlo5Seconds",
+  "MyMonteCarlo10Seconds",
+  "MyMonteCarlo14AndHalfSeconds",
   "RandomPlayer",
   "GnuGo"
 };
@@ -84,7 +88,8 @@ int main(void) {
   int boardSize = 9;
   // int numSimulations = 1000;
   float komi = 0;
-  PlayerType player1 = RandomPlayer;
+  // PlayerType player1 = RandomPlayer;
+  PlayerType player1 = MyMonteCarlo1Second;
   // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
   PlayerType player2 = MyMonteCarlo1HalfSecond;
@@ -102,7 +107,6 @@ int main(void) {
       node->state = b->clone();
 
       GameResult r;
-      int k = 0;
       while (!b->isGameOver(&r)) {
         PlayerType currentPlayer = b->turn == Black ? player1 : player2;
         switch (currentPlayer) {
@@ -129,10 +133,7 @@ int main(void) {
           assert(false);
           break;
         }
-        b->show();
-        k++;
-        if (k > 2000)
-          exit(0);
+        // b->show();
       }
 
       if (static_cast<Player>(r) == Black) {
