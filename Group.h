@@ -1,7 +1,7 @@
 #ifndef GROUP_H_
 #define GROUP_H_
 
-#include <vector>
+#include <set>
 
 #include "Go.h"
 #include "Point.h"
@@ -11,9 +11,9 @@ class Board;
 
 class Group {
  public:
-  std::vector<Point*> stones;
+  std::set<Point*> stones;
   Player color;
-  std::vector<Point*> liberties;
+  std::set<Point*> liberties;
   int numberLiberties;
 
   explicit Group(Player newColor);

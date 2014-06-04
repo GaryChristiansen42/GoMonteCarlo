@@ -3,7 +3,7 @@
 
 #define RUNNING_TESTS
 
-#include <vector>
+#include <set>
 
 #include "Group.h"
 
@@ -13,8 +13,8 @@ class Board {
  public:
   int boardSize;
   Point ***positions;
-  std::vector<Group*> blackGroups;
-  std::vector<Group*> whiteGroups;
+  std::set<Group*> blackGroups;
+  std::set<Group*> whiteGroups;
   Player turn;
 
   Point* lastMove;
@@ -29,7 +29,7 @@ class Board {
 
   // std::vector<Point> pointsToCheck;
 
-  std::vector<Point*> possibleMoves;
+  std::set<Point*> possibleMoves;
 
   explicit Board(int newBoardSize);
 

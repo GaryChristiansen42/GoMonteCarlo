@@ -1,11 +1,10 @@
 #include "Group.h"
 
-#include <vector>
 #include <cstdio>
 
 Group::Group(Player newColor) :
-  stones(std::vector<Point*>()), color(newColor),
-  liberties(std::vector<Point*>()), numberLiberties(0)
+  stones(std::set<Point*>()), color(newColor),
+  liberties(std::set<Point*>()), numberLiberties(0)
 { }
 
 Group::~Group() {
@@ -13,7 +12,7 @@ Group::~Group() {
 
 void Group::addStone(Point* p) {
   p->group = this;
-  stones.push_back(p);
+  stones.insert(p);
   recalculateLiberties();
 }
 
@@ -24,6 +23,7 @@ bool Group::contains(Point* p) {
 }
 
 bool Group::isAdjacent(Point* p) {
+  // TODO(GaryChristiansen) Optimize this
   for(Point* stone : stones) {
     if (stone->row == p->row+1 && stone->column == p->column)
       return true;
@@ -47,30 +47,30 @@ int Group::numLiberties() {
 
 void Group::recalculateLiberties() {
   liberties.clear();
-  std::vector<Point*> marked;
+  std::set<Point*> marked;
   for(Point* stone : stones) {
     if (stone->north != NULL && stone->north->color == Empty
       && !stone->north->marked) {
-      liberties.push_back(stone->north);
-      marked.push_back(stone->north);
+      liberties.insert(stone->north);
+      marked.insert(stone->north);
       stone->north->marked = true;
     }
     if (stone->east != NULL && stone->east->color == Empty
       && !stone->east->marked) {
-      liberties.push_back(stone->east);
-      marked.push_back(stone->east);
+      liberties.insert(stone->east);
+      marked.insert(stone->east);
       stone->east->marked = true;
     }
     if (stone->south != NULL && stone->south->color == Empty
       && !stone->south->marked) {
-      liberties.push_back(stone->south);
-      marked.push_back(stone->south);
+      liberties.insert(stone->south);
+      marked.insert(stone->south);
       stone->south->marked = true;
     }
     if (stone->west != NULL && stone->west->color == Empty
       && !stone->west->marked) {
-      liberties.push_back(stone->west);
-      marked.push_back(stone->west);
+      liberties.insert(stone->west);
+      marked.insert(stone->west);
       stone->west->marked = true;
     }
   }
