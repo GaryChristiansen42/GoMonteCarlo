@@ -69,8 +69,9 @@ void doGenMove() {
 
   switchTurnTo(color);
 
-  UCTNode* currentMove = new UCTNode(Point(-1, -1), b, NULL);
-  Point bestMove = UCTSearch(currentMove, b, millaSecondsToThink)->move;
+  UCTNode* currentMove = new UCTNode(Point(-1, -1), NULL);
+  currentMove->state = b->clone();
+  Point bestMove = UCTSearch(currentMove, millaSecondsToThink)->move;
   delete currentMove;
 
   b->makeMove(bestMove);
@@ -78,7 +79,7 @@ void doGenMove() {
   char rowChar = (char)(bestMove.row+'a');
   if (bestMove.row > 7)
     rowChar++;
-  if (bestMove == Point(boardSize, boardSize))
+  if (bestMove == *b->pass)
     printf("= pass\n\n");
   else
     printf("= %c%d\n\n", rowChar, bestMove.column+1);
@@ -92,12 +93,14 @@ void doBoardSize() {
   std::cin >> boardSize;
   delete b;
   b = new Board(boardSize);
+  b->init();
 
   printf("= \n\n");
 }
 
 int main() {
   b = new Board(boardSize);
+  b->init();
   //currentMove = new UCTNode(Point(-1, -1), b, NULL);
 
   while (true) {
@@ -111,6 +114,7 @@ int main() {
     } else if (!strcmp(command, "clear_board")) {
       delete b;
       b = new Board(boardSize);
+      b->init();
       printf("= \n\n");
     } else if (!strcmp(command, "exit")) {
       exit(0);
@@ -140,14 +144,14 @@ int main() {
       printf("= \n\n");
     } else if (!strcmp(command, "special")) {
       printf("%d\n", b->isSuicide(Point(4,1)));
-      printf("%d %d\n", b->koPoint.row, b->koPoint.column);
+      printf("%d %d\n", b->koPoint->row, b->koPoint->column);
     } else if (!strcmp(command, "show_board")) {
       b->show();
       printf("\n\n");
     } else if (!strcmp(command, "show_moves")) {
       b->getPossibleMoves();
-      for(Point p : b->possibleMoves)
-        printf("%d%d ", p.row, p.column);
+      for(Point *p : b->possibleMoves)
+        printf("%d%d ", p->row, p->column);
       printf("\n\n");
     } else if (!strcmp(command, "time_left")) {
       char throwawayColor[10];

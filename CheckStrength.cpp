@@ -58,7 +58,15 @@ void randomMove(UCTNode** currentNode, Board* b) {
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
   unsigned int choice = rand_r(&seed) %
     static_cast<unsigned int>(b->possibleMoves.size());
-  Point* chosenMove = b->possibleMoves[choice];
+  Point *chosenMove = NULL;
+  for (Point* p : b->possibleMoves) {
+    if (choice == 0) {
+      chosenMove = p;
+      break;
+    }
+    choice--;
+  }
+  assert(chosenMove != NULL);
 
   UCTNode* newCurrentNode = new UCTNode(*chosenMove, *currentNode);
   if (newCurrentNode->parent != NULL)
@@ -77,9 +85,9 @@ int main(void) {
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo1HalfSecond;
+  // PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;

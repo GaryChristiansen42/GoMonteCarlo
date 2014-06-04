@@ -4,8 +4,8 @@
 #include <cstdio>
 
 Group::Group(Player newColor) :
-  stones(std::vector<Point*>()), color(newColor),
-  liberties(std::vector<Point*>()), numberLiberties(0)
+  stones(std::list<Point*>()), color(newColor),
+  liberties(std::list<Point*>()), numberLiberties(0)
 { }
 
 Group::~Group() {

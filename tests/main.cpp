@@ -339,7 +339,7 @@ bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   Board b1(boardSize);
   b1.init();
   b1.makeMove(Point(stoneX,stoneY));
-  Group* g = b1.blackGroups.at(0);
+  Group* g = *b1.blackGroups.begin();
   Point p = Point(adjStoneX,adjStoneY);
   return g->isAdjacent(&p);
 }
@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
   Board b1(boardSize);
   b1.init();
   b1.makeMove(Point(0, 0)); // Black
-  Group* g = b1.blackGroups.at(0);
+  Group* g = *b1.blackGroups.begin();
     
   BOOST_CHECK_EQUAL(g->numLiberties(), 2);
     
@@ -398,7 +398,7 @@ bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   Board b1(Black);
   b1.init();
   b1.makeMove(Point(stoneX,stoneY));
-  Group* g = b1.blackGroups.at(0);
+  Group* g = *b1.blackGroups.begin();
   Point p = Point(adjStoneX,adjStoneY);
   return g->isAdjacent(&p);
 }
