@@ -25,13 +25,13 @@ bool Group::contains(Point* p) {
 
 bool Group::isAdjacent(Point* p) {
   for(Point* stone : stones) {
-    if (stone->row == p->row+1 && stone->column == p->column)
+    if (stone->north == p)
       return true;
-    if (stone->row == p->row-1 && stone->column == p->column)
+    if (stone->east == p)
       return true;
-    if (stone->row == p->row && stone->column == p->column+1)
+    if (stone->south == p)
       return true;
-    if (stone->row == p->row && stone->column == p->column-1)
+    if (stone->west == p)
       return true;
   }
   return false;

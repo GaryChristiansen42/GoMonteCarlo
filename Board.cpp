@@ -141,8 +141,7 @@ void Board::init() {
   for (Group* g : whiteGroups) {
     g->recalculateLiberties();
   }
-  // memset(&positions, 0, sizeof(int)*boardSize*boardSize);
-  // TODO(GaryChristiansen): this is being thrown away for clones
+
   getPossibleMoves();
 }
 
@@ -161,23 +160,6 @@ bool Board::operator==(const Board &b) {
     return false;
   return true;
 }
-
-
-/*void Board::initialize(Player computer)
-{
-  positions = new int*[BOARD_SIZE];
-  for(int r = 0; r < BOARD_SIZE; r++)
-  {
-    positions[r] = new int[BOARD_SIZE];
-    memset(positions[r], 0, BOARD_SIZE*sizeof(int));
-  }
-
-  turn = Black;
-  this->computer = computer;
-  
-  lastMove = Point(-1, -1);
-  secondLastMove = Point(-1, -1);
-}*/
 
 Board* Board::clone() {
   Board* b = new Board(boardSize);
@@ -241,17 +223,6 @@ Board* Board::clone() {
   return b;
 }
 
-/*bool Board::isValidMove(Point move) {
-  Point pass(boardSize, boardSize);
-  if (move == pass)  // passes are valid
-    return true;
-  else if (move.column >= boardSize || move.row >= boardSize
-    || move.row < 0 || move.column < 0)
-    return false;
-  else if (positions[move.row][move.column] != Empty)
-    return false;
-  return true;
-}*/
 bool Board::isValidMove(Point move) {
   for(Point *p : possibleMoves) {
     if (*p == move)
@@ -699,12 +670,6 @@ void Board::makeMove(Point* move) {
       }
     }
 
-    /*for (Group* g : blackGroups) {
-      g->recalculateLiberties();
-    }
-    for (Group* g : whiteGroups) {
-      g->recalculateLiberties();
-    }*/
     updateStructures(move);
     int numCaptured =
         removeDeadStones((turn == Black ? White : Black), move);
@@ -713,11 +678,6 @@ void Board::makeMove(Point* move) {
     else
       capturedBlack += numCaptured;
 
-
-
-    // removeDeadStones((turn == Black ? Black : White));
-
-    // TODO: replace with getNeighbors
     std::list<Point*> neighbors;
     if (move->north != NULL)
       neighbors.push_back(move->north);
@@ -744,8 +704,6 @@ void Board::makeMove(Point* move) {
   } else {
     koPoint = NULL;
   }
-
-  // cout << whiteGroups.size() << " " << blackGroups.size() << "\n";
 
   turn = (turn == Black ? White : Black);
 
