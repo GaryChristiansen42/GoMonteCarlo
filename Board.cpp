@@ -327,68 +327,75 @@ bool Board::isGameOver(GameResult *result) {
 }
 
 void Board::updateStructures(Point* move) {
-  std::list<Group*>* groupsToSearch =
-    (turn == Black) ? &blackGroups : &whiteGroups;
-  Group* updatedGroup = NULL;
-  for(Group* group : *groupsToSearch) {
-    // if adjacent to structure of same color, then join that structure
-    if (group->isAdjacent(move)) {
-      group->addStone(move);
-      updatedGroup = group;
-      break;
-    }
+  std::list<Group*> groupsToCombine;
+  bool inGroup = false;
+  if (move->north != NULL && move->north->color == move->color) {
+    move->north->group->addStone(move);
+    groupsToCombine.push_back(move->north->group);
+    inGroup = true;
   }
-  if (!updatedGroup) {
+  if (move->east != NULL && move->east->color == move->color) {
+    if (!inGroup) {
+      move->east->group->addStone(move);
+      inGroup = true;
+    }
+    groupsToCombine.push_back(move->east->group);
+  }
+  if (move->south != NULL && move->south->color == move->color) {
+    if (!inGroup) {
+      move->south->group->addStone(move);
+      inGroup = true;
+    }
+    groupsToCombine.push_back(move->south->group);
+  }
+  if (move->west != NULL && move->west->color == move->color) {
+    if (!inGroup) {
+      move->west->group->addStone(move);
+      inGroup = true;
+    }
+    groupsToCombine.push_back(move->west->group);
+  }
+
+
+  std::list<Group*>* groupsSameColor =
+    (move->color == Black) ? &blackGroups : &whiteGroups;
+  if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
     group->addStone(move);
-    groupsToSearch->push_back(group);
-    // updatedGroup = group;
+    groupsSameColor->push_back(group);
   }
 
-  if (updatedGroup) {
-    // Find groups adjacent to updated group
-    std::list<Group*> adjacentGroups;
-    for(Group* group : *groupsToSearch) {
-      if (group == updatedGroup)
+  if (groupsToCombine.size() > 1) {
+    std::list<Group*> toDelete;
+    for (Group* g : groupsToCombine) {
+      if (g == move->group) {  // move's group will survive, others removed
         continue;
-      for(Point* stone : updatedGroup->stones) {
-        if (group->isAdjacent(stone)) {
-          bool inAdjacent = false;
-          for(Group* adjacentGroup : adjacentGroups) {
-            if (group == adjacentGroup) {
-              inAdjacent = true;
-              break;
-            }
-          }
-          if (!inAdjacent)
-            adjacentGroups.push_back(group);
-        }
       }
-    }
+      while (g->stones.size() > 0) {
+        move->group->stones.push_back(*g->stones.begin());
+        (*g->stones.begin())->group = move->group;
+        g->stones.pop_front();
+      }
 
-    // combines adjacent groups
-    for(Group* adjacentGroup : adjacentGroups) {
-      if (adjacentGroup == updatedGroup)
-        continue;
-      while (adjacentGroup->stones.size() > 0) {
-        updatedGroup->addStone(adjacentGroup->stones.front());
-        adjacentGroup->stones.erase(adjacentGroup->stones.begin());
-      }
+      toDelete.push_back(g);
+
     }
-    // int j = 0; j < groupsToSearch->size(); j++)
-    for(Group* adjacentGroup : adjacentGroups) {
+    while(toDelete.size() > 0) {
       bool found = false;
-      for (std::list<Group*>::iterator it = groupsToSearch->begin();
-        it != groupsToSearch->end(); ++it) {
-        if ((*it) == adjacentGroup) {
-          groupsToSearch->erase(it);
+      for (auto it = groupsSameColor->begin(); it != groupsSameColor->end();
+        ++it) {
+        if (toDelete.front() == *it) {
+          delete (*it);
+          groupsSameColor->erase(it);
           found = true;
           break;
         }
       }
       assert(found);
-      delete adjacentGroup;
+      toDelete.remove(toDelete.front()); 
     }
+
+    move->group->recalculateLiberties();
   }
 }
 
@@ -493,71 +500,6 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
     g->recalculateLiberties();
 
   return static_cast<unsigned int>(capturedStones.size());
-  /*deadGroups.clear();
-  for(vector<Group*>::iterator it = secondGroup.begin(); it != secondGroup.end(); ++it)
-  {
-    if(!(*it)->hasLiberties(positions))
-    {
-      deadGroups.push_back((*it));
-    }
-  }
-  
-  beg:
-  for(vector<Group*>::iterator it = deadGroups.begin(); it != deadGroups.end(); ++it)
-  {
-    for(int i = 0; i < (*it)->stones.size(); i++)
-    {
-      Point* p = (*it)->stones.at(i);
-      positions[p->row][p->column] = Empty;
-    }
-    for(vector<Group*>::iterator it2 = secondGroup.begin(); it2 != secondGroup.end(); ++it2)
-    {
-      if((*it) == (*it2))
-      {
-        secondGroup.erase(it2);
-        break;
-      }
-    }
-    delete (*it);
-    goto beg;
-  }*/
-
-  /*std::vector<Point*> whiteStones;
-  std::vector<Point*> blackStones;
-  //find all stones
-  for(int row = 0; row < BOARD_SIZE; row++)
-  {
-    for(int column = 0; column < BOARD_SIZE; column++)
-    {
-      if(positions[row][column] == White)
-        whiteStones.push_back(new Point(row, column));
-      else if(positions[row][column] == Black)
-        blackStones.push_back(new Point(row, column));
-    }
-  }
-  
-  //find all structures
-  for(int i = 0; i < whiteStones.size(); i++)
-  {
-    bool inStructure = false;
-    for(int j = 0; j < structures.size(); j++)
-    {
-      Structure structure = structures.at(j);
-      //if adjacent to structure of same color, then join that structure
-      if(structure.color != White)
-        continue;
-      if(structure.isAdjacent(whiteStones.at(i)))
-      {
-        structure.addStone(whiteStones.at(i));
-      }
-    }
-    if(!inStructure)
-    {
-      Structure structure(positions, White);
-      structure.addStone(whiteStones.at(i));
-      structures.push_back(structure);
-    }
-  }*/
 }
 
 void testPossibleMoves(Board* b) {

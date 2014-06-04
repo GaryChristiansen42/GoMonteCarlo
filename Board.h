@@ -57,7 +57,6 @@ class Board {
   bool isGameOver(GameResult *result);
 
   void updateStructures(Point* move);
-
   unsigned int removeDeadStones(Player color, Point* move);
 
   void makeMove(Point move);

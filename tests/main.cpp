@@ -341,7 +341,8 @@ bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = *b1.blackGroups.begin();
   Point p = Point(adjStoneX,adjStoneY);
-  return g->isAdjacent(&p);
+  Point *p2 = b1.getPoint(&p);
+  return g->isAdjacent(p2);
 }
 
 BOOST_AUTO_TEST_CASE( testGroupAdjacent )
@@ -400,7 +401,8 @@ bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = *b1.blackGroups.begin();
   Point p = Point(adjStoneX,adjStoneY);
-  return g->isAdjacent(&p);
+  Point *p2 = b1.getPoint(&p);
+  return g->isAdjacent(p2);
 }
 
 BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
