@@ -4,8 +4,8 @@
 #include <assert.h>
 #include <vector>
 
-UCTNode::UCTNode(Point newMove, Board* newState, UCTNode* newParent) :
-  visits(0), totalRewards(0.0), move(newMove), state(newState->clone()),
+UCTNode::UCTNode(Point newMove, UCTNode* newParent) :
+  visits(0), totalRewards(0.0), move(newMove), state(NULL),
   bestNode(NULL), child(NULL), sibling(NULL), parent(newParent),
   possibleChildren(std::vector<UCTNode*>())
 { }
@@ -20,6 +20,11 @@ UCTNode::~UCTNode() {
 
   for (unsigned int i = 0; i < possibleChildren.size(); i++)
     delete possibleChildren[i];
+}
+
+void UCTNode::init() {
+  state = parent->state->clone();
+  state->makeMove(move);
 }
 
 void UCTNode::addChild(UCTNode* newChild) {

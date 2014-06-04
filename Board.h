@@ -12,21 +12,23 @@ class Group;
 class Board {
  public:
   int boardSize;
-  int **positions;
+  Point ***positions;
   std::vector<Group*> blackGroups;
   std::vector<Group*> whiteGroups;
   std::vector<Group*> emptyGroups;
   Player turn;
 
-  Point lastMove;
-  Point secondLastMove;
+  Point* lastMove;
+  Point* secondLastMove;
 
-  Point koPoint;
+  Point* koPoint;
+
+  Point* pass;
 
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
-  std::vector<Point> possibleMoves;
+  std::vector<Point*> possibleMoves;
 
   explicit Board(int newBoardSize);
 
@@ -34,20 +36,20 @@ class Board {
   Board(const Board& b);
   Board& operator=(const Board& b);
 
+  void makeMove(Point* move);
+
  public:
   ~Board();
-
   void init();
 
   bool operator==(const Board &b);
 
-  // void initialize(Player computer);
   Board* clone();
 
-  bool isValidMove(const Point &move);
-  std::vector<Point> getNeighbors(const Point &p);
+  bool isValidMove(Point move);
+  std::vector<Point*> getNeighbors(Point *p);
   bool hasPathAStar(const Point &from, const Point &to);
-  bool hasPathDFS(const Point &from, const Point &to);
+  bool hasPathDFS(Point *from, Point *to);
 
   // Fuego
   void getSimpleScore(float* whiteScore, float* blackScore);
@@ -55,20 +57,26 @@ class Board {
 
   bool isGameOver(GameResult *result);
 
-  void updateStructures(const Point &move);
-  void updateEmptyGroups(const Point &move, 
-    const std::vector<Point> &capturedStones);
+  void updateStructures(Point *move);
+  void updateEmptyGroups(Point *move, 
+    const std::vector<Point*> &capturedStones);
 
-  unsigned int removeDeadStones(const Player &color, const Point &move);
+  unsigned int removeDeadStones(const Player &color, Point *move);
 
   void makeMove(Point move);
+
   void makeRandomMove();
   GameResult playRandomGame();
+
   void show();
-  bool isSuicide(const Point &move);
+
+  bool isSuicide(Point move);
+  bool isSuicide(Point* move);
 
   // private:
   void getPossibleMoves();
   void oldGetPossibleMoves();
+  
+  Point* getPoint(Point* p);
 };
 #endif  // BOARD_H_

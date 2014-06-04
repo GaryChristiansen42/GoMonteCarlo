@@ -13,6 +13,8 @@ class Group {
  public:
   std::vector<Point*> stones;
   Player color;
+  std::vector<Point*> liberties;
+  int numberLiberties;
 
   explicit Group(Player newColor);
 
@@ -20,11 +22,13 @@ class Group {
 
   void addStone(Point* p);
 
-  bool contains(const Point &p);
-  bool isAdjacent(const Point &p);
+  bool contains(Point *p);
+  bool isAdjacent(Point *p);
 
-  bool hasLiberties(const Board &state);
-  int numLiberties(const Board &state);
+  bool hasLiberties();
+  int numLiberties();
+
+  void recalculateLiberties();
 };
 
 void printGroup(Group* g);

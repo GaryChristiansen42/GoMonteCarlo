@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE( testBoard )
 
   for(int i = 0; i < b2.boardSize; i++)
     for(int j = 0; j < b2.boardSize; j++)
-      BOOST_CHECK_EQUAL(b2.positions[i][j], Empty);
+      BOOST_CHECK_EQUAL(b2.positions[i][j]->color, Empty);
   
   //Valid moves 
   for(int i = 0; i < b1.boardSize; i++)
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
   b1.makeMove(Point(8,1)); //White
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
 }
 
 BOOST_AUTO_TEST_CASE( testBoardKo )
@@ -91,7 +91,8 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   b1.makeMove(Point(1,1)); // Black
   b1.makeMove(Point(4,1)); // White
   b1.makeMove(Point(0,0)); // Black // Capture 1,0
-  BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
+  Point temp(1, 0);
+  BOOST_CHECK_EQUAL(b1.isValidMove(temp), false);
 
   Board b2(boardSize);
   b2.init();
@@ -306,9 +307,9 @@ BOOST_AUTO_TEST_CASE( testGroup )
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   b1.makeMove(Point(8,2)); //White
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0], Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0], Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1], Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
   
   BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
   BOOST_CHECK_EQUAL(b1.blackGroups.size(), 4);
@@ -341,7 +342,7 @@ bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = b1.blackGroups.at(0);
   Point p = Point(adjStoneX,adjStoneY);
-  return g->isAdjacent(p);
+  return g->isAdjacent(b1.getPoint(&p));
 }
 
 BOOST_AUTO_TEST_CASE( testGroupAdjacent )
@@ -378,19 +379,19 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
   b1.makeMove(Point(0, 0)); // Black
   Group* g = b1.blackGroups.at(0);
     
-  BOOST_CHECK_EQUAL(g->numLiberties(b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
     
   b1.makeMove(Point(0, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(b1), 1);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
   
   b1.makeMove(Point(1, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
     
   b1.makeMove(Point(1, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(b1), 1);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
     
   b1.makeMove(Point(2, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(b1), 2);
+  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
 }
 
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
@@ -400,7 +401,7 @@ bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = b1.blackGroups.at(0);
   Point p = Point(adjStoneX,adjStoneY);
-  return g->isAdjacent(p);
+  return g->isAdjacent(b1.getPoint(&p));
 }
 
 BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
@@ -476,7 +477,7 @@ void checkEmptyGroups(Board* b) {
   std::vector<Point> emptySpaces;
   for (int row = 0; row < b->boardSize; row++)
     for (int column = 0; column < b->boardSize; column++)
-      if (b->positions[row][column] == Empty)
+      if (b->positions[row][column]->color == Empty)
         emptySpaces.push_back(Point(row, column));
 
   for (Group* g : b->emptyGroups) {

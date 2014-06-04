@@ -77,17 +77,15 @@ UCTNode* getNewChild(UCTNode* node) {
         }
       }
     }*/
-    for(Point p : node->state->possibleMoves) {
-      UCTNode* child = new UCTNode(p, node->state, node);
-      child->state->makeMove(p);
+    for(Point *p : node->state->possibleMoves) {
+      UCTNode* child = new UCTNode(*p, node);
       node->possibleChildren.push_back(child);
     }
 
-    Point passMove(node->state->boardSize, node->state->boardSize);
-    if (!node->isChild(passMove)) {
+    Point pass(node->state->boardSize, node->state->boardSize);
+    if (!node->isChild(pass)) {
       // Add pass move to possible moves
-      UCTNode* passChild = new UCTNode(passMove, node->state, node);
-      passChild->state->makeMove(passMove);
+      UCTNode* passChild = new UCTNode(pass, node);
       node->possibleChildren.push_back(passChild);
     }
   }
@@ -106,6 +104,8 @@ UCTNode* getNewChild(UCTNode* node) {
     // node->possibleChildren.erase(&node->possibleChildren.begin()+choice);
     node->possibleChildren[choice] = node->possibleChildren.back();
     node->possibleChildren.pop_back();
+    if (chosenChild->visits == 0)
+      chosenChild->init();
     return chosenChild;
   //  }
 }
@@ -123,7 +123,7 @@ UCTNode* TreePolicy(UCTNode* node) {
   }
   Point pass(node->state->boardSize, node->state->boardSize);
   if (node->move != pass
-    && node->state->positions[node->move.row][node->move.column] != Empty) {
+    && node->move.color != Empty) {
     assert(false);
   }
   return node;
@@ -157,7 +157,7 @@ void backup(UCTNode* v, int reward) {
   }
 }
 
-UCTNode* UCTSearch(UCTNode* root, Board* state, int numSimulations) {
+UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root);
     int reward = DefaultPolicy(v);
@@ -176,11 +176,11 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, int numSimulations) {
 
   Point pass(root->state->boardSize, root->state->boardSize);
   if (!(best->move == pass)
-    && root->state->positions[best->move.row][best->move.column] != Empty) {
+    && best->move.color != Empty) {
     assert(false);
   }
   if (!(best->move == pass)
-    && state->positions[best->move.row][best->move.column] != Empty) {
+    && best->move.color != Empty) {
     assert(false);
   }
   return best;
@@ -223,7 +223,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
   Log(std::to_string(i).c_str());
 }
 
-UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
+UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
   simulationCount = 0;
 
   int numThreads = 4;
@@ -247,11 +247,11 @@ UCTNode* UCTSearch(UCTNode* root, Board* state, float millaSecondsToThink) {
 
   const Point pass(root->state->boardSize, root->state->boardSize);
   if (!(best->move == pass)
-    && root->state->positions[best->move.row][best->move.column] != Empty) {
+    && best->move.color != Empty) {
     assert(false);
   }
   if (!(best->move == pass)
-    && state->positions[best->move.row][best->move.column] != Empty) {
+    && best->move.color != Empty) {
     assert(false);
   }
   char buffer[100];
