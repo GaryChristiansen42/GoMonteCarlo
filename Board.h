@@ -31,6 +31,9 @@ class Board {
 
   std::list<Point*> possibleMoves;
 
+  unsigned long int hash;
+  std::list<unsigned long int> previousHashes;
+
   explicit Board(int newBoardSize);
 
  private:
@@ -59,6 +62,8 @@ class Board {
   void updateStructures(Point* move);
   unsigned int removeDeadStones(Player color, Point* move);
 
+  void calculateHash();
+
   void makeMove(Point move);
 
   void makeRandomMove();
@@ -68,6 +73,8 @@ class Board {
 
   bool isSuicide(Point move);
   bool isSuicide(Point* move);
+
+  bool isPositionalSuperKo(Point* p);
 
   // private:
   void getPossibleMoves();

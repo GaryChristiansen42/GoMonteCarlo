@@ -56,6 +56,25 @@ BOOST_AUTO_TEST_CASE( testBoard )
   
 }
 
+BOOST_AUTO_TEST_CASE( testBoardHash )
+{
+  int boardSize = 9;
+  Board b1(boardSize);
+  b1.init();
+  
+  Board b2(boardSize);
+  b2.init();
+
+  BOOST_CHECK_EQUAL(b1.hash, b2.hash);
+  
+  b1.makeMove(Point(0, 0));
+  BOOST_CHECK_EQUAL(b1.hash != b2.hash, true);
+
+  b2.makeMove(Point(0, 0));
+  BOOST_CHECK_EQUAL(b1.hash, b2.hash);
+}
+
+
 BOOST_AUTO_TEST_CASE( testCornerCapture )
 {
   int boardSize = 9;
@@ -172,6 +191,24 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   b3.makeMove(Point(3, 4)); // White
 
   b3.makeMove(Point(2, 4)); // Black
+}
+
+BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
+{
+  int boardSize = 9;
+  Board b1(boardSize);
+  b1.init();
+
+  b1.makeMove(Point(0,1)); // Black
+  b1.makeMove(Point(1,0)); // White
+  b1.makeMove(Point(1,1)); // Black
+  b1.makeMove(Point(2,1)); // White
+  b1.makeMove(Point(1,2)); // Black
+  b1.makeMove(Point(3,0)); // White
+  b1.makeMove(Point(0,2)); // Black
+  b1.makeMove(Point(0,0)); // Black
+  b1.makeMove(Point(2,0)); // White
+  BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
 }
 
 BOOST_AUTO_TEST_CASE( testIsSuicide )

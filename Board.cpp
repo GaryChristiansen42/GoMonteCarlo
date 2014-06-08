@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include <cstdio>
+#include <functional>
 #include <sstream>
 #include <stack>
 
@@ -18,7 +19,9 @@ Board::Board(int newBoardSize) :
   pass(new Point(newBoardSize, newBoardSize)),
   capturedBlack(0),
   capturedWhite(0),
-  possibleMoves(std::list<Point*>()) {
+  possibleMoves(std::list<Point*>()),
+  hash(0),
+  previousHashes(std::list<unsigned long int>()) {
   for (int row = 0; row < boardSize; row++) {
     positions[row] = new Point*[boardSize];
   }
@@ -219,6 +222,8 @@ Board* Board::clone() {
     gClone->recalculateLiberties();
     b->whiteGroups.push_back(gClone);
   }
+
+  b->hash = hash;
 
   return b;
 }
@@ -502,6 +507,17 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   return static_cast<unsigned int>(capturedStones.size());
 }
 
+void Board::calculateHash() {
+  previousHashes.push_back(hash);
+
+  std::string s;
+  for (int row = 0; row < boardSize; row++)
+    for (int column = 0; column < boardSize; column++)
+      s += (char)positions[row][column]->color;
+  std::hash<std::string> strHash;
+  hash = strHash(s);
+}
+
 void testPossibleMoves(Board* b) {
   std::list<Point*> oldPossibleMoves = b->possibleMoves;
   b->getPossibleMoves();
@@ -538,7 +554,7 @@ void Board::makeMove(Point move) {
 }
 
 void Board::makeMove(Point* move) {
-  // Don't place stone for passes
+  // Don't place stone for p asses
   if (!(*move == *pass)) {
     bool foundMove = false;
     for (Point *p : possibleMoves) {
@@ -570,6 +586,7 @@ void Board::makeMove(Point* move) {
       assert(false);
     }
     move->color = turn;
+
     std::list<Group*> decrementedGroups;
     if (move->north != NULL && move->north->color != Empty) {
       move->north->group->numberLiberties--;
@@ -638,6 +655,8 @@ void Board::makeMove(Point* move) {
       }
     }
 
+    calculateHash();
+
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko
     if (neighborOfSameColor) {
@@ -646,6 +665,7 @@ void Board::makeMove(Point* move) {
   } else {
     koPoint = NULL;
   }
+
 
   turn = (turn == Black ? White : Black);
 
@@ -776,6 +796,33 @@ void printPossibleMoves(Board* b) {
   }
 }
 
+bool Board::isPositionalSuperKo(Point* p) {
+  std::string s;
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
+      if (p != positions[r][c]) {
+        if (positions[r][c]->group != NULL
+          && positions[r][c]->group->isAdjacent(p)
+          && positions[r][c]->group->numLiberties() == 1) {
+          s += (char)Empty;
+        } else {
+          s += (char)positions[r][c]->color;
+        }
+      } else {
+        s += (char)turn;
+      }
+    }
+  }
+  std::hash<std::string> strHash;
+  unsigned long int pHash = strHash(s);
+  for (unsigned long int pastHash : previousHashes) {
+    if (pastHash == pHash) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Board::getPossibleMoves() {
   if (possibleMoves.size() > 0)
     possibleMoves.clear();
@@ -783,7 +830,8 @@ void Board::getPossibleMoves() {
     for (int c = 0; c < boardSize; c++)
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
-        && !isSuicide(positions[r][c]))
+        && !isSuicide(positions[r][c])
+        && !isPositionalSuperKo(positions[r][c]))
         possibleMoves.push_back(positions[r][c]);
   possibleMoves.push_back(pass);
 }
