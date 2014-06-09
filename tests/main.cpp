@@ -274,7 +274,6 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
   BOOST_CHECK_EQUAL(b2.isSuicide(Point(0,2)), false);
   
   b2.makeMove(Point(0,2)); //White
-  
   /* 11 captured, 13 territory, 12 stones
     _ _ W _ _
     _ _ _ _ _
@@ -285,7 +284,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
   
   Board* b2Clone = b2.clone();
   float score = b2Clone->getTaylorScore(0);
-  BOOST_CHECK_EQUAL(score, -36);
+  BOOST_CHECK_EQUAL(score, -25);
 }
 
 BOOST_AUTO_TEST_CASE( testGroup )
