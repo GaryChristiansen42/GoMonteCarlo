@@ -88,8 +88,8 @@ int main(void) {
   int boardSize = 9;
   // int numSimulations = 1000;
   float komi = 0;
-  // PlayerType player1 = RandomPlayer;
-  PlayerType player1 = MyMonteCarlo1Second;
+  PlayerType player1 = RandomPlayer;
+  // PlayerType player1 = MyMonteCarlo1Second;
   // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
   PlayerType player2 = MyMonteCarlo1HalfSecond;

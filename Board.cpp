@@ -24,79 +24,6 @@ Board::Board(int newBoardSize) :
   }
 }
 
-/*Board::Board(const Board& b) :
-  positions(new int*[BOARD_SIZE]),
-  blackGroups(std::vector<Group*>()),
-  whiteGroups(std::vector<Group*>()),
-  turn(b.turn), computer(b.computer),
-  lastMove(b.lastMove),
-  secondLastMove(b.secondLastMove)
-{
-  for(int r = 0; r < BOARD_SIZE; r++)
-  {
-    positions[r] = new int[BOARD_SIZE];
-    memcpy(positions[r], b.positions[r], BOARD_SIZE*sizeof(int));
-  }
-
-  for(Group* g : b.blackGroups)
-  {
-    Group* gClone = new Group(Black);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    blackGroups.push_back(gClone);
-  }
-  for(Group* g : b.whiteGroups)
-  {
-    Group* gClone = new Group(White);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    whiteGroups.push_back(gClone);
-  }
-}
-
-Board& Board::operator=(const Board& b)
-{
-  positions = new int*[BOARD_SIZE];
-  for(int r = 0; r < BOARD_SIZE; r++)
-  {
-    positions[r] = new int[BOARD_SIZE];
-    memcpy(positions[r], b.positions[r], BOARD_SIZE*sizeof(int));
-  }
-
-  turn = b.turn;
-  computer = b.computer;
-  lastMove = b.lastMove;
-  secondLastMove = b.secondLastMove;
-
-  for(Group* g : b.blackGroups)
-  {
-    Group* gClone = new Group(Black);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    blackGroups.push_back(gClone);
-  }
-  for(Group* g : b.whiteGroups)
-  {
-    Group* gClone = new Group(White);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    whiteGroups.push_back(gClone);
-  }
-  return *this;
-}*/
-
 Board::~Board() {
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
@@ -734,37 +661,33 @@ bool Board::isSuicide(Point move) {
 
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
 bool Board::isSuicide(Point* move) {
-  std::list<Point*> neighbors;
-  if (move->north != NULL)
-    neighbors.push_back(move->north);
-  if (move->east != NULL)
-    neighbors.push_back(move->east);
-  if (move->south != NULL)
-    neighbors.push_back(move->south);
-  if (move->west != NULL)
-    neighbors.push_back(move->west);
 
-  // Check for empty neighbors
-  for(Point *p : neighbors) {
-    if (p->color == Empty)
-      return false;
-  }
-
-  // Check for neighbors of same color with more than one liberty
-  for(Point *p : neighbors) {
-    Player sameColor = turn == Black ? Black : White;
-    if (p->group->color == sameColor)
-      if (p->group->numLiberties() > 1)
-        return false;
-  }
-
-  // Check for neighbors of opposite color with only one liberty
-  for(Point *p : neighbors) {
-    Player oppositeColor = turn == Black ? White : Black;
-    if (p->group->color == oppositeColor)
-      if (p->group->numLiberties() == 1)
-        return false;
-  }
+  Player sameColor = turn == Black ? Black : White;
+  Player oppositeColor = turn == Black ? White : Black;
+  // if neighbor != NULL
+  //   Check for empty neighbors
+  //   Check for neighbors of same color with more than one liberty
+  //   Check for neighbors of opposite color with only one liberty
+  if (move->north != NULL
+    && (move->north->color == Empty
+      || (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
+      || (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)))
+    return false;
+  if (move->east != NULL
+    && (move->east->color == Empty
+    || (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
+    || (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)))
+    return false;
+  if (move->south != NULL
+    && (move->south->color == Empty
+    || (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
+    || (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)))
+    return false;
+  if (move->west != NULL &&
+    (move->west->color == Empty
+    || (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
+    || (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)))
+    return false;
 
   return true;
 }
