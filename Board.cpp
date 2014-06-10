@@ -452,15 +452,8 @@ void testPossibleMoves(Board* b) {
 }
 
 void Board::makeMove(Point move) {
-  Point* movePointer = NULL;
-  for (Point* p : possibleMoves) {
-    if (*p == move) {
-      movePointer = p;
-      break;
-    }
-  }
-  if (movePointer == NULL)
-    assert(false);
+  Point* movePointer = getPoint(&move);
+  assert(movePointer != NULL);
   makeMove(movePointer);
 }
 
@@ -712,23 +705,11 @@ void Board::getPossibleMoves() {
 }
 
 Point* Board::getPoint(Point *p) {
-  Point* point = NULL;
-  if (p == NULL)
+  if (p == NULL) {
     return NULL;
-  if (*p == *pass)
-    point = pass;
-  else {
-    for (int row = 0; row < boardSize; row++) {
-      for (int column = 0; column < boardSize; column++) {
-        if (*positions[row][column] == *p) {
-          point = positions[row][column];
-          break;
-        }
-      }
-    }
+  } else if (*p == *pass) {
+    return pass;
+  } else {
+    return positions[p->row][p->column];
   }
-
-  if (point == NULL)
-    assert(false);
-  return point;
 }
