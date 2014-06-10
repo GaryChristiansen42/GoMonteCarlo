@@ -17,7 +17,7 @@ CFLAGS=-c -g -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	# -Wpadded -Wunsafe-loop-optimizations
+	#-Wpadded -Wunsafe-loop-optimizations
 
 all: GoMonteCarlo CheckStrength
 

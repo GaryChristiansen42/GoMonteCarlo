@@ -12,9 +12,9 @@ class Board;
 class Group {
  public:
   std::list<Point*> stones;
-  Player color;
   std::list<Point*> liberties;
   int numberLiberties;
+  Player color;
 
   explicit Group(Player newColor);
 

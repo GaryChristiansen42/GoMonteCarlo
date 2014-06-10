@@ -90,9 +90,9 @@ int main(void) {
   float komi = 0;
   PlayerType player1 = RandomPlayer;
   // PlayerType player1 = MyMonteCarlo1Second;
-  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo1HalfSecond;
+  // PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;

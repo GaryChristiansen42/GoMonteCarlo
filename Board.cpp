@@ -7,18 +7,18 @@
 #include <stack>
 
 Board::Board(int newBoardSize) :
-  boardSize(newBoardSize),
   positions(new Point**[newBoardSize]),
   blackGroups(std::list<Group*>()),
   whiteGroups(std::list<Group*>()),
-  turn(Black),
   lastMove(NULL),
   secondLastMove(NULL),
   koPoint(NULL),
   pass(new Point(newBoardSize, newBoardSize)),
   capturedBlack(0),
   capturedWhite(0),
-  possibleMoves(std::list<Point*>()) {
+  possibleMoves(std::list<Point*>()),
+  boardSize(newBoardSize),
+  turn(Black) {
   for (int row = 0; row < boardSize; row++) {
     positions[row] = new Point*[boardSize];
   }

@@ -11,25 +11,22 @@ class Group;
 
 class Board {
  public:
-  int boardSize;
   Point ***positions;
   std::list<Group*> blackGroups;
   std::list<Group*> whiteGroups;
-  Player turn;
 
   Point* lastMove;
   Point* secondLastMove;
-
   Point* koPoint;
-
   Point* pass;
 
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
-  // std::vector<Point> pointsToCheck;
-
   std::list<Point*> possibleMoves;
+
+  int boardSize;
+  Player turn;
 
   explicit Board(int newBoardSize);
 

@@ -5,9 +5,9 @@
 #include <vector>
 
 UCTNode::UCTNode(Point newMove, UCTNode* newParent) :
-  visits(0), totalRewards(0.0), move(newMove), state(NULL),
-  bestNode(NULL), child(NULL), sibling(NULL), parent(newParent),
-  possibleChildren(std::vector<UCTNode*>())
+  move(newMove), state(NULL), bestNode(NULL), child(NULL), sibling(NULL),
+  parent(newParent), possibleChildren(std::vector<UCTNode*>()),
+  totalRewards(0.0), visits(0.0)
 { }
 
 UCTNode::~UCTNode() {

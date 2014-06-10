@@ -7,9 +7,6 @@
 #include "Board.h"
 
 struct UCTNode {
-  int visits;
-  double totalRewards;
-
   Point move;
 
   Board* state;
@@ -20,6 +17,9 @@ struct UCTNode {
   UCTNode* parent;
 
   std::vector<UCTNode*> possibleChildren;
+
+  double totalRewards;
+  int visits;
 
   UCTNode(Point newMove, UCTNode* newParent);
   UCTNode(const UCTNode& n);

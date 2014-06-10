@@ -10,7 +10,6 @@ struct Point{
   int row;
   int column;
 
-  Player color;
   Group* group;
 
   Point* north;
@@ -18,6 +17,7 @@ struct Point{
   Point* south;
   Point* west;
 
+  Player color;
   bool marked;
 
   Point();
