@@ -46,39 +46,37 @@ int Group::numLiberties() {
 }
 
 void Group::recalculateLiberties() {
-  liberties.clear();
+  numberLiberties = 0;
   std::vector<Point*> marked;
   for(Point* stone : stones) {
     if (stone->north != NULL && stone->north->color == Empty
       && !stone->north->marked) {
-      liberties.push_back(stone->north);
       marked.push_back(stone->north);
+      numberLiberties++;
       stone->north->marked = true;
     }
     if (stone->east != NULL && stone->east->color == Empty
       && !stone->east->marked) {
-      liberties.push_back(stone->east);
       marked.push_back(stone->east);
+      numberLiberties++;
       stone->east->marked = true;
     }
     if (stone->south != NULL && stone->south->color == Empty
       && !stone->south->marked) {
-      liberties.push_back(stone->south);
       marked.push_back(stone->south);
+      numberLiberties++;
       stone->south->marked = true;
     }
     if (stone->west != NULL && stone->west->color == Empty
       && !stone->west->marked) {
-      liberties.push_back(stone->west);
       marked.push_back(stone->west);
+      numberLiberties++;
       stone->west->marked = true;
     }
   }
 
   for (Point* p : marked)
     p->marked = false;
-
-  numberLiberties = (int)liberties.size();
 }
 
 void printGroup(Group* g) {
