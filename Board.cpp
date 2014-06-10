@@ -454,6 +454,51 @@ void Board::makeMove(Point move) {
   makeMove(movePointer);
 }
 
+void decrementNeighborGroups(Point* move) {
+  std::list<Group*> decrementedGroups;
+  if (move->north != NULL && move->north->color != Empty) {
+    move->north->group->numberLiberties--;
+    decrementedGroups.push_back(move->north->group);
+  }
+  if (move->east != NULL && move->east->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->east->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->east->group->numberLiberties--;
+      decrementedGroups.push_back(move->east->group);
+    }
+  }
+  if (move->south != NULL && move->south->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->south->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->south->group->numberLiberties--;
+      decrementedGroups.push_back(move->south->group);
+    }
+  }
+  if (move->west != NULL && move->west->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->west->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->west->group->numberLiberties--;
+      decrementedGroups.push_back(move->west->group);
+    }
+  }
+}
+
+
 void Board::makeMove(Point* move) {
   // Don't place stone for passes
   if (!(*move == *pass)) {
@@ -480,48 +525,8 @@ void Board::makeMove(Point* move) {
       assert(false);
     }
     move->color = turn;
-    std::list<Group*> decrementedGroups;
-    if (move->north != NULL && move->north->color != Empty) {
-      move->north->group->numberLiberties--;
-      decrementedGroups.push_back(move->north->group);
-    }
-    if (move->east != NULL && move->east->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->east->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->east->group->numberLiberties--;
-        decrementedGroups.push_back(move->east->group);
-      }
-    }
-    if (move->south != NULL && move->south->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->south->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->south->group->numberLiberties--;
-        decrementedGroups.push_back(move->south->group);
-      }
-    }
-    if (move->west != NULL && move->west->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->west->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->west->group->numberLiberties--;
-        decrementedGroups.push_back(move->west->group);
-      }
-    }
 
+    decrementNeighborGroups(move);
     updateStructures(move);
     int numCaptured =
         removeDeadStones((turn == Black ? White : Black), move);
@@ -530,29 +535,14 @@ void Board::makeMove(Point* move) {
     else
       capturedBlack += numCaptured;
 
-    std::list<Point*> neighbors;
-    if (move->north != NULL)
-      neighbors.push_back(move->north);
-    if (move->east != NULL)
-      neighbors.push_back(move->east);
-    if (move->south != NULL)
-      neighbors.push_back(move->south);
-    if (move->west != NULL)
-      neighbors.push_back(move->west);
-
-    bool neighborOfSameColor = false;
-    for (Point *neighbor : neighbors) {
-      if (neighbor->color == move->color) {
-      neighborOfSameColor = true;
-      break;
-      }
-    }
-
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko
-    if (neighborOfSameColor) {
+    if ((move->north != NULL && move->north->color == move->color)
+      || (move->east != NULL && move->east->color == move->color)
+      || (move->south != NULL && move->south->color == move->color)
+      || (move->west != NULL && move->west->color == move->color))
       koPoint = NULL;
-    }
+
   } else {
     koPoint = NULL;
   }

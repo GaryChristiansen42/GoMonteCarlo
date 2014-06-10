@@ -19,7 +19,13 @@ CFLAGS=-c -g -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wvolatile-register-var  -Wwrite-strings \
 	#-Wpadded -Wunsafe-loop-optimizations
 
-all: GoMonteCarlo CheckStrength
+all: GoMonteCarlo CheckStrength Benchmark
+
+Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
+	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o Benchmark -lrt
+
+Benchmark.o: Benchmark.cpp
+	$(CC) $(CFLAGS) Benchmark.cpp
 
 CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
 	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength -lrt
