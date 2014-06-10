@@ -23,8 +23,6 @@ class Board {
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
-  std::list<Point*> possibleMoves;
-
   int boardSize;
   Player turn;
 
@@ -56,6 +54,7 @@ class Board {
   void updateStructures(Point* move);
   unsigned int removeDeadStones(Player color, Point* move);
 
+  Point* getRandomMove();
   void makeMove(Point move);
 
   void makeRandomMove();

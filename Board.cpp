@@ -16,7 +16,6 @@ Board::Board(int newBoardSize) :
   pass(new Point(newBoardSize, newBoardSize)),
   capturedBlack(0),
   capturedWhite(0),
-  possibleMoves(std::list<Point*>()),
   boardSize(newBoardSize),
   turn(Black) {
   for (int row = 0; row < boardSize; row++) {
@@ -94,7 +93,7 @@ Board* Board::clone() {
     for (int column = 0; column < boardSize; column++) {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
-        NULL, NULL, NULL, NULL, NULL);
+        NULL, NULL, NULL, NULL, NULL, p->legal);
     }
   }
   for (int row = 0; row < boardSize; row++) {
@@ -109,10 +108,6 @@ Board* Board::clone() {
         b->positions[row][column]->west = b->positions[row][column-1];
     }
   }
-
-  b->possibleMoves.clear();
-  for (Point* p : possibleMoves)
-    b->possibleMoves.push_back(b->getPoint(p));
 
   b->turn = turn;
 
@@ -151,11 +146,13 @@ Board* Board::clone() {
 }
 
 bool Board::isValidMove(Point move) {
-  for(Point *p : possibleMoves) {
-    if (*p == move)
-      return true;
-  }
-  return false;
+  if (move == *pass)
+    return true;
+  if (move.row < 0 || move.row >= boardSize)
+    return false;
+  if (move.column < 0 || move.column >= boardSize)
+    return false;
+  return positions[move.row][move.column]->legal;
 }
 
 // Fuego
@@ -429,7 +426,7 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   return static_cast<unsigned int>(capturedStones.size());
 }
 
-void testPossibleMoves(Board* b) {
+/*void testPossibleMoves(Board* b) {
   std::list<Point*> oldPossibleMoves = b->possibleMoves;
   b->getPossibleMoves();
   if (oldPossibleMoves.size() != b->possibleMoves.size()) {
@@ -449,7 +446,7 @@ void testPossibleMoves(Board* b) {
     printf("  %d %d\n", b->koPoint->row, b->koPoint->column);
     assert(oldPossibleMoves.size() == b->possibleMoves.size());
   }
-}
+}*/
 
 void Board::makeMove(Point move) {
   Point* movePointer = getPoint(&move);
@@ -460,26 +457,19 @@ void Board::makeMove(Point move) {
 void Board::makeMove(Point* move) {
   // Don't place stone for passes
   if (!(*move == *pass)) {
-    bool foundMove = false;
-    for (Point *p : possibleMoves) {
-      if (p == move) {
-        // possibleMoves[i] = possibleMoves.back();
-        // possibleMoves.pop_back();
-        foundMove = true;
-        break;
-      }
-    }
-    if (!foundMove) {
+    if (!move->legal) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n",
         move->row, move->column);
-      printf("Ko Point Row: %d Column: %d\n",
-        koPoint->row, koPoint->column);
-      for(Point* p : possibleMoves) {
-        printf("  PossibleMove Row: %d Column: %d\n",
-          p->row, p->column);
-      }
+      if (koPoint != NULL)
+        printf("Ko Point Row: %d Column: %d\n",
+          koPoint->row, koPoint->column);
+      for (int row = 0; row < boardSize; row++)
+        for (int column = 0; column < boardSize; column++)
+          if (positions[row][column]->legal)
+            printf("  PossibleMove Row: %d Column: %d\n",
+              row, column);
       show();
-      assert(foundMove);
+      assert(move->legal);
     }
 
 
@@ -578,20 +568,48 @@ void Board::makeMove(Point* move) {
   #endif
 }
 
-void Board::makeRandomMove() {
+Point* Board::getRandomMove() {
+  int numPossibleMoves = 1;
+  for (int r = 0; r < boardSize; r++)
+    for (int c = 0; c < boardSize; c++)
+      if (positions[r][c]->legal)
+        numPossibleMoves++;
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
-  unsigned int choice = rand_r(&seed) %
-    static_cast<unsigned int>(possibleMoves.size());
-  Point *chosenMove = NULL;
-  for (Point* p : possibleMoves) {
+  unsigned int choice = rand_r(&seed) % numPossibleMoves;
+  int row = 0;
+  int column = 0;
+  while (true) {
     if (choice == 0) {
-      chosenMove = p;
-      break;
+      if (row == boardSize && column == boardSize) {
+        return pass;
+      } else if (positions[row][column]->legal) {
+        return positions[row][column];
+      }
+    } else {
+      if (row < boardSize && column < boardSize) {
+        if (positions[row][column]->legal) {
+          choice--;
+        }
+      } else {
+        choice--;
+      }
     }
-    choice--;
+
+    column++;
+    if (column == boardSize) {
+      row++;
+      if (row != boardSize) {
+        column = 0;
+      }
+    } else if (column == boardSize + 1) {
+      column = 0;
+      row = 0;
+    }
   }
-  assert(chosenMove != NULL);
-  makeMove(chosenMove);
+}
+
+void Board::makeRandomMove() {
+  makeMove(getRandomMove());
 }
 
 GameResult Board::playRandomGame() {
@@ -685,23 +703,26 @@ bool Board::isSuicide(Point* move) {
   return true;
 }
 
-void printPossibleMoves(Board* b) {
+/*void printPossibleMoves(Board* b) {
   printf("Possible Moves: \n");
   for(Point* p : b->possibleMoves) {
     printf("  R: %d C: %d\n", p->row, p->column);
   }
-}
+}*/
 
 void Board::getPossibleMoves() {
-  if (possibleMoves.size() > 0)
-    possibleMoves.clear();
-  for (int r = 0; r < boardSize; r++)
-    for (int c = 0; c < boardSize; c++)
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
-        && !isSuicide(positions[r][c]))
-        possibleMoves.push_back(positions[r][c]);
-  possibleMoves.push_back(pass);
+        && !isSuicide(positions[r][c])) {
+        positions[r][c]->legal = true;
+      } else {
+        positions[r][c]->legal = false;
+      }
+    }
+  }
+  pass->legal = true;
 }
 
 Point* Board::getPoint(Point *p) {

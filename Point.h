@@ -19,11 +19,12 @@ struct Point{
 
   Player color;
   bool marked;
+  bool legal;
 
   Point();
   Point(int newRow, int newColumn);
   Point(int newRow, int newColumn, Player color, Group* group,
-    Point* north, Point* east, Point* south, Point* west);
+    Point* north, Point* east, Point* south, Point* west, bool legal);
 
   bool operator==(const Point &p);
   bool operator!=(const Point &p);

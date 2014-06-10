@@ -24,7 +24,7 @@ UCTNode::~UCTNode() {
 
 void UCTNode::init() {
   state = parent->state->clone();
-  state->makeMove(move);
+  state->makeMove(*parent->state->getPoint(&move));
 }
 
 void UCTNode::addChild(UCTNode* newChild) {
