@@ -20,7 +20,7 @@ class Group {
 
   ~Group();
 
-  void addStone(Point* p);
+  void addStone(Board* b, Point* p);
 
   bool contains(Point* p);
   bool isAdjacent(Point* p);
@@ -28,7 +28,7 @@ class Group {
   bool hasLiberties();
   int numLiberties();
 
-  void recalculateLiberties();
+  void recalculateLiberties(Board* b);
 };
 
 void printGroup(Group* g);

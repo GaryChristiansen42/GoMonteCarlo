@@ -62,10 +62,10 @@ void Board::init() {
   }
 
   for (Group* g : blackGroups) {
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
   }
   for (Group* g : whiteGroups) {
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
   }
 
   getPossibleMoves();
@@ -127,7 +127,7 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties();
+    gClone->recalculateLiberties(b);
     b->blackGroups.push_back(gClone);
   }
   for(Group* g : whiteGroups) {
@@ -138,7 +138,7 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties();
+    gClone->recalculateLiberties(b);
     b->whiteGroups.push_back(gClone);
   }
 
@@ -254,27 +254,27 @@ void Board::updateStructures(Point* move) {
   std::list<Group*> groupsToCombine;
   bool inGroup = false;
   if (move->north != NULL && move->north->color == move->color) {
-    move->north->group->addStone(move);
+    move->north->group->addStone(this, move);
     groupsToCombine.push_back(move->north->group);
     inGroup = true;
   }
   if (move->east != NULL && move->east->color == move->color) {
     if (!inGroup) {
-      move->east->group->addStone(move);
+      move->east->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->east->group);
   }
   if (move->south != NULL && move->south->color == move->color) {
     if (!inGroup) {
-      move->south->group->addStone(move);
+      move->south->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->south->group);
   }
   if (move->west != NULL && move->west->color == move->color) {
     if (!inGroup) {
-      move->west->group->addStone(move);
+      move->west->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->west->group);
@@ -285,7 +285,7 @@ void Board::updateStructures(Point* move) {
     (move->color == Black) ? &blackGroups : &whiteGroups;
   if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
-    group->addStone(move);
+    group->addStone(this, move);
     groupsSameColor->push_back(group);
   }
 
@@ -319,7 +319,7 @@ void Board::updateStructures(Point* move) {
       toDelete.remove(toDelete.front()); 
     }
 
-    move->group->recalculateLiberties();
+    move->group->recalculateLiberties(this);
   }
 }
 
@@ -421,7 +421,7 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   }
 
   for (Group* g : neighborGroupsToBeUpdated)
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
 
   return static_cast<unsigned int>(capturedStones.size());
 }
