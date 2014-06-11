@@ -12,7 +12,6 @@ class Board;
 class Group {
  public:
   std::list<Point*> stones;
-  std::list<Point*> liberties;
   int numberLiberties;
   Player color;
 
