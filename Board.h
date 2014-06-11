@@ -12,6 +12,10 @@ class Group;
 class Board {
  public:
   Point ***positions;
+
+  Point* legalMoves[82];
+  int numLegalMoves;
+
   std::list<Group*> blackGroups;
   std::list<Group*> whiteGroups;
 

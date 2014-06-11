@@ -8,6 +8,7 @@
 
 Board::Board(int newBoardSize) :
   positions(new Point**[newBoardSize]),
+  numLegalMoves(0),
   blackGroups(std::list<Group*>()),
   whiteGroups(std::list<Group*>()),
   lastMove(NULL),
@@ -89,11 +90,16 @@ bool Board::operator==(const Board &b) {
 
 Board* Board::clone() {
   Board* b = new Board(boardSize);
+
+  b->legalMoves[b->numLegalMoves++] = b->pass;
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
         NULL, NULL, NULL, NULL, NULL, p->legal);
+      if (p->legal) {
+        b->legalMoves[b->numLegalMoves++] = b->positions[row][column];
+      }
     }
   }
   for (int row = 0; row < boardSize; row++) {
@@ -559,43 +565,9 @@ void Board::makeMove(Point* move) {
 }
 
 Point* Board::getRandomMove() {
-  int numPossibleMoves = 1;
-  for (int r = 0; r < boardSize; r++)
-    for (int c = 0; c < boardSize; c++)
-      if (positions[r][c]->legal)
-        numPossibleMoves++;
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
-  unsigned int choice = rand_r(&seed) % numPossibleMoves;
-  int row = 0;
-  int column = 0;
-  while (true) {
-    if (choice == 0) {
-      if (row == boardSize && column == boardSize) {
-        return pass;
-      } else if (positions[row][column]->legal) {
-        return positions[row][column];
-      }
-    } else {
-      if (row < boardSize && column < boardSize) {
-        if (positions[row][column]->legal) {
-          choice--;
-        }
-      } else {
-        choice--;
-      }
-    }
-
-    column++;
-    if (column == boardSize) {
-      row++;
-      if (row != boardSize) {
-        column = 0;
-      }
-    } else if (column == boardSize + 1) {
-      column = 0;
-      row = 0;
-    }
-  }
+  unsigned int choice = rand_r(&seed) % numLegalMoves;
+  return legalMoves[choice];
 }
 
 void Board::makeRandomMove() {
@@ -701,18 +673,21 @@ bool Board::isSuicide(Point* move) {
 }*/
 
 void Board::getPossibleMoves() {
+  numLegalMoves = 0;
+  pass->legal = true;
+  legalMoves[numLegalMoves++] = pass;
   for (int r = 0; r < boardSize; r++) {
     for (int c = 0; c < boardSize; c++) {
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
         && !isSuicide(positions[r][c])) {
         positions[r][c]->legal = true;
+        legalMoves[numLegalMoves++] = positions[r][c];
       } else {
         positions[r][c]->legal = false;
       }
     }
   }
-  pass->legal = true;
 }
 
 Point* Board::getPoint(Point *p) {
