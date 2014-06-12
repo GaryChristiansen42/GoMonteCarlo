@@ -72,9 +72,6 @@ void doGenMove() {
   UCTNode* currentMove = new UCTNode(Point(-1, -1), NULL);
   currentMove->state = b->clone();
   Point bestMove = UCTSearch(currentMove, millaSecondsToThink)->move;
-  delete currentMove;
-
-  b->makeMove(bestMove);
 
   char rowChar = (char)(bestMove.row+'a');
   if (bestMove.row > 7)
@@ -87,6 +84,11 @@ void doGenMove() {
   char buffer[100];
   sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
   Log(buffer);
+  
+  // Takes a long time, print out message to send to server first
+  delete currentMove;
+
+  b->makeMove(bestMove);
 }
 
 void doBoardSize() {
@@ -150,8 +152,8 @@ int main() {
       printf("\n\n");
     } else if (!strcmp(command, "show_moves")) {
       b->getPossibleMoves();
-      for(Point *p : b->possibleMoves)
-        printf("%d%d ", p->row, p->column);
+      for (int i = 0; i < b->numLegalMoves; i++)
+        printf("%d%d ", b->legalMoves[i]->row, b->legalMoves[i]->column);
       printf("\n\n");
     } else if (!strcmp(command, "time_left")) {
       char throwawayColor[10];
