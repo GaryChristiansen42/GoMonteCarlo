@@ -130,7 +130,14 @@ int main() {
       printf("= \n\n");
     } else if (!strcmp(command, "exit")) {
       exit(0);
+    } else if (!strcmp(command, "final_status_list")) {
+      char throwaway[200];
+      std::cin >> throwaway;
+      printf("= \n\n");
+      Log(throwaway);
     } else if (!strcmp(command, "genmove")) {
+      doGenMove();
+    } else if (!strcmp(command, "kgs-genmove_cleanup")) {
       doGenMove();
     } else if (!strcmp(command, "komi")) {
       float throwaway;
