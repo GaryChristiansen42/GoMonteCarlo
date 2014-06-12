@@ -16,7 +16,7 @@ UCTNode* getNewChild(UCTNode* node);
 
 UCTNode* TreePolicy(UCTNode* node);
 
-int DefaultPolicy(UCTNode* node);
+int DefaultPolicy(UCTNode* node, Board* clone);
 
 void backup(UCTNode* v, int reward);
 

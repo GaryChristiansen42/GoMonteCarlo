@@ -133,10 +133,16 @@ UCTNode* TreePolicy(UCTNode* node) {
   return node;
 }
 
-int DefaultPolicy(UCTNode* node) {
-  Board* clone = node->state->clone();
+int DefaultPolicy(UCTNode* node, Board* clone) {
+  for (Group* g : clone->blackGroups)
+    delete g;
+  clone->blackGroups.clear();
+  for (Group* g : clone->whiteGroups)
+    delete g;
+  clone->whiteGroups.clear();
+
+  node->state->cloneInto(clone);
   GameResult r = clone->playRandomGame();
-  delete clone;
   if ((node->state->turn == Black ? White : Black) == static_cast<int>(r))
     return 1;
   else if (r != Draw)
@@ -162,14 +168,18 @@ void backup(UCTNode* v, int reward) {
 }
 
 UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
+  Board* clone = new Board(root->state->boardSize);
+  clone->init();
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root);
-    int reward = DefaultPolicy(v);
+    int reward = DefaultPolicy(v, clone);
     backup(v, reward);
 
     if (i % 1000 == 0 && i != 0)
       printf("%d\n", i);
   }
+  delete clone;
+
   UCTNode* best = root->child;
   UCTNode* next = root->child;
   while (next != NULL) {
@@ -197,8 +207,8 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 
   int i = 0;
 
-  // if (rand() % 2 == 0)
-    // usleep(15000000);
+  Board* clone = new Board(root->state->boardSize);
+  clone->init();
 
   while (diffclock(end, start) < millaSecondsToThink) {
     simulationCount++;
@@ -208,7 +218,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
     UCTNode* v = TreePolicy(root);
     treePolicyMutex.unlock();
 
-    int reward = DefaultPolicy(v);
+    int reward = DefaultPolicy(v, clone);
 
     backUpMutex.lock();
     backup(v, reward);
@@ -224,13 +234,14 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
     // end = clock();
     clock_gettime(CLOCK_MONOTONIC, &end);
   }
+  delete clone;
   Log(std::to_string(i).c_str());
 }
 
 UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 1;
+  int numThreads = 4;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,

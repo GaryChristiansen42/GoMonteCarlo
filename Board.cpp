@@ -63,13 +63,6 @@ void Board::init() {
     }
   }
 
-  for (Group* g : blackGroups) {
-    g->recalculateLiberties(this);
-  }
-  for (Group* g : whiteGroups) {
-    g->recalculateLiberties(this);
-  }
-
   getPossibleMoves();
 }
 
@@ -98,21 +91,37 @@ Board* Board::clone() {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
         NULL, NULL, NULL, NULL, NULL, p->legal);
-      if (p->legal) {
-        b->legalMoves[b->numLegalMoves++] = b->positions[row][column];
+    }
+  }
+
+  cloneInto(b);
+
+  return b;
+}
+
+void Board::cloneInto(Board* b) {
+  b->numLegalMoves = 0;
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
+      b->positions[r][c]->group = NULL;
+      b->positions[r][c]->color = positions[r][c]->color;
+      b->positions[r][c]->legal = positions[r][c]->legal;
+      if (positions[r][c]->legal) {
+        b->legalMoves[b->numLegalMoves++] = b->positions[r][c];
       }
     }
   }
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
-      if (row + 1 < boardSize)
-        b->positions[row][column]->north = b->positions[row+1][column];
-      if (column + 1 < boardSize)
-        b->positions[row][column]->east = b->positions[row][column+1];
-      if (row - 1 >= 0)
-        b->positions[row][column]->south = b->positions[row-1][column];
-      if (column - 1 >= 0)
-        b->positions[row][column]->west = b->positions[row][column-1];
+
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
+      if (r + 1 < boardSize)
+        b->positions[r][c]->north = b->positions[r+1][c];
+      if (c + 1 < boardSize)
+        b->positions[r][c]->east = b->positions[r][c+1];
+      if (r - 1 >= 0)
+        b->positions[r][c]->south = b->positions[r-1][c];
+      if (c - 1 >= 0)
+        b->positions[r][c]->west = b->positions[r][c-1];
     }
   }
 
@@ -134,7 +143,7 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties(b);
+    gClone->numberLiberties = g->numberLiberties;
     b->blackGroups.push_back(gClone);
   }
   for(Group* g : whiteGroups) {
@@ -145,11 +154,9 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties(b);
+    gClone->numberLiberties = g->numberLiberties;
     b->whiteGroups.push_back(gClone);
   }
-
-  return b;
 }
 
 bool Board::isValidMove(Point move) {
@@ -303,8 +310,7 @@ void Board::updateStructures(Point* move) {
         continue;
       }
       while (g->stones.size() > 0) {
-        move->group->stones.push_back(*g->stones.begin());
-        (*g->stones.begin())->group = move->group;
+        move->group->addStone(*g->stones.begin());
         g->stones.pop_front();
       }
 
@@ -325,8 +331,6 @@ void Board::updateStructures(Point* move) {
       assert(found);
       toDelete.remove(toDelete.front()); 
     }
-
-    move->group->recalculateLiberties(this);
   }
 }
 
@@ -349,7 +353,6 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
       stone->color = Empty;
       stone->group = NULL;
       capturedStones.push_back(stone);
-      // possibleMoves.push_back(Point(stone->row, stone->column));
     }
 
     for (std::list<Group*>::iterator groupIterator = firstGroups->begin();
@@ -360,8 +363,6 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
       }
     }
     delete deadGroup;
-    // deadGroups.erase(it);
-    // goto beg1;
   }
 
   if (capturedStones.size() == 1) {

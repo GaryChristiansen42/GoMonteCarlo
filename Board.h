@@ -46,6 +46,7 @@ class Board {
 
   // void initialize(Player computer);
   Board* clone();
+  void cloneInto(Board* clone);
 
   bool isValidMove(Point move);
 
