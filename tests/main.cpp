@@ -65,13 +65,13 @@ BOOST_AUTO_TEST_CASE( testBoardHash )
   Board b2(boardSize);
   b2.init();
 
-  BOOST_CHECK_EQUAL(b1.hash, b2.hash);
+  BOOST_CHECK_EQUAL(b1.getHash(), b2.getHash());
   
   b1.makeMove(Point(0, 0));
-  BOOST_CHECK_EQUAL(b1.hash != b2.hash, true);
+  BOOST_CHECK_EQUAL(b1.getHash() != b2.getHash(), true);
 
   b2.makeMove(Point(0, 0));
-  BOOST_CHECK_EQUAL(b1.hash, b2.hash);
+  BOOST_CHECK_EQUAL(b1.getHash(), b2.getHash());
 }
 
 
@@ -199,15 +199,37 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
   Board b1(boardSize);
   b1.init();
 
+  std::list<unsigned long int> previousHashes;
+  previousHashes.push_back(b1.getHash());
+
   b1.makeMove(Point(0,1)); // Black
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(1,0)); // White
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(1,1)); // Black
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(2,1)); // White
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(1,2)); // Black
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(3,0)); // White
+  previousHashes.push_back(b1.getHash());
+  
   b1.makeMove(Point(0,2)); // Black
+  previousHashes.push_back(b1.getHash());
+
   b1.makeMove(Point(0,0)); // Black
+  previousHashes.push_back(b1.getHash());
+
   b1.makeMove(Point(2,0)); // White
+  previousHashes.push_back(b1.getHash());
+
+  b1.eliminatePositionalSuperKo(previousHashes);
   BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
 }
 
@@ -311,7 +333,6 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
   BOOST_CHECK_EQUAL(b2.isSuicide(Point(0,2)), false);
   
   b2.makeMove(Point(0,2)); //White
-  
   /* 11 captured, 13 territory, 12 stones
     _ _ W _ _
     _ _ _ _ _
@@ -322,7 +343,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
   
   Board* b2Clone = b2.clone();
   float score = b2Clone->getTaylorScore(0);
-  BOOST_CHECK_EQUAL(score, -36);
+  BOOST_CHECK_EQUAL(score, -25);
 }
 
 BOOST_AUTO_TEST_CASE( testGroup )

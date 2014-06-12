@@ -1,12 +1,12 @@
-CC=g++ -pthread 
-  CFLAGS=-c -g -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CC=g++ -pthread -march=native
+CFLAGS=-c -g -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
 	-Wformat-nonliteral -Wformat-security  \
 	-Wformat-y2k -Wimport  -Winit-self  -Winline \
-	-Winvalid-pch -Wunsafe-loop-optimizations  \
-	-Wlong-long -Wmissing-braces -Wmissing-field-initializers \
+	-Winvalid-pch -Wlong-long -Wmissing-braces \
+  -Wmissing-field-initializers \
 	-Wmissing-format-attribute -Wmissing-include-dirs \
 	-Wmissing-noreturn -Wpacked  -Wparentheses  \
 	-Wpointer-arith -Wredundant-decls -Wreturn-type \
@@ -17,9 +17,15 @@ CC=g++ -pthread
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	#-Wpadded
+	#-Wpadded -Wunsafe-loop-optimizations
 
-all: GoMonteCarlo CheckStrength
+all: GoMonteCarlo CheckStrength Benchmark
+
+Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
+	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o Benchmark -lrt
+
+Benchmark.o: Benchmark.cpp
+	$(CC) $(CFLAGS) Benchmark.cpp
 
 CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
 	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength -lrt

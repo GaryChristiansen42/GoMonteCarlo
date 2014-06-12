@@ -4,17 +4,17 @@
 #include <cstdio>
 
 Group::Group(Player newColor) :
-  stones(std::list<Point*>()), color(newColor),
-  liberties(std::list<Point*>()), numberLiberties(0)
+  stones(std::list<Point*>()),
+  numberLiberties(0), color(newColor)
 { }
 
 Group::~Group() {
 }
 
-void Group::addStone(Point* p) {
+void Group::addStone(Board* b, Point* p) {
   p->group = this;
   stones.push_back(p);
-  recalculateLiberties();
+  recalculateLiberties(b);
 }
 
 bool Group::contains(Point* p) {
@@ -45,40 +45,34 @@ int Group::numLiberties() {
   return numberLiberties;
 }
 
-void Group::recalculateLiberties() {
-  liberties.clear();
-  std::vector<Point*> marked;
+void Group::recalculateLiberties(Board* b) {
+  numberLiberties = 0;
   for(Point* stone : stones) {
     if (stone->north != NULL && stone->north->color == Empty
       && !stone->north->marked) {
-      liberties.push_back(stone->north);
-      marked.push_back(stone->north);
+      numberLiberties++;
       stone->north->marked = true;
     }
     if (stone->east != NULL && stone->east->color == Empty
       && !stone->east->marked) {
-      liberties.push_back(stone->east);
-      marked.push_back(stone->east);
+      numberLiberties++;
       stone->east->marked = true;
     }
     if (stone->south != NULL && stone->south->color == Empty
       && !stone->south->marked) {
-      liberties.push_back(stone->south);
-      marked.push_back(stone->south);
+      numberLiberties++;
       stone->south->marked = true;
     }
     if (stone->west != NULL && stone->west->color == Empty
       && !stone->west->marked) {
-      liberties.push_back(stone->west);
-      marked.push_back(stone->west);
+      numberLiberties++;
       stone->west->marked = true;
     }
   }
 
-  for (Point* p : marked)
-    p->marked = false;
-
-  numberLiberties = (int)liberties.size();
+  for (int r = 0; r < b->boardSize; r++)
+    for (int c = 0; c < b->boardSize; c++)
+      b->positions[r][c]->marked = false;
 }
 
 void printGroup(Group* g) {

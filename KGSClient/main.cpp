@@ -14,6 +14,7 @@ char name[] = "TestGoBot";
 char version[] = "3.5.11";
 
 Board* b = NULL;
+std::list<unsigned long int> previousHashes;
 
 void switchTurnTo(Player color) {
   if (b->turn == color) {
@@ -55,6 +56,7 @@ void doPlay() {
 
   switchTurnTo(color);
   b->makeMove(Point(row, column));
+  previousHashes.push_back(b->getHash());
   printf("=\n\n");
 
   char buffer[100];
@@ -69,12 +71,11 @@ void doGenMove() {
 
   switchTurnTo(color);
 
+  b->eliminatePositionalSuperKo(previousHashes);
+
   UCTNode* currentMove = new UCTNode(Point(-1, -1), NULL);
   currentMove->state = b->clone();
   Point bestMove = UCTSearch(currentMove, millaSecondsToThink)->move;
-  delete currentMove;
-
-  b->makeMove(bestMove);
 
   char rowChar = (char)(bestMove.row+'a');
   if (bestMove.row > 7)
@@ -87,13 +88,22 @@ void doGenMove() {
   char buffer[100];
   sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
   Log(buffer);
+  
+  // Takes a long time, print out message to send to server first
+  delete currentMove;
+
+  b->makeMove(bestMove);
+  previousHashes.push_back(b->getHash());
 }
 
 void doBoardSize() {
   std::cin >> boardSize;
   delete b;
+  previousHashes.clear();
   b = new Board(boardSize);
   b->init();
+
+  previousHashes.push_back(b->getHash());
 
   printf("= \n\n");
 }
@@ -101,6 +111,8 @@ void doBoardSize() {
 int main() {
   b = new Board(boardSize);
   b->init();
+
+  previousHashes.push_back(b->getHash());
   //currentMove = new UCTNode(Point(-1, -1), b, NULL);
 
   while (true) {
@@ -150,8 +162,8 @@ int main() {
       printf("\n\n");
     } else if (!strcmp(command, "show_moves")) {
       b->getPossibleMoves();
-      for(Point *p : b->possibleMoves)
-        printf("%d%d ", p->row, p->column);
+      for (int i = 0; i < b->numLegalMoves; i++)
+        printf("%d%d ", b->legalMoves[i]->row, b->legalMoves[i]->column);
       printf("\n\n");
     } else if (!strcmp(command, "time_left")) {
       char throwawayColor[10];

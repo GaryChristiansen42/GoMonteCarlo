@@ -12,15 +12,14 @@ class Board;
 class Group {
  public:
   std::list<Point*> stones;
-  Player color;
-  std::list<Point*> liberties;
   int numberLiberties;
+  Player color;
 
   explicit Group(Player newColor);
 
   ~Group();
 
-  void addStone(Point* p);
+  void addStone(Board* b, Point* p);
 
   bool contains(Point* p);
   bool isAdjacent(Point* p);
@@ -28,7 +27,7 @@ class Group {
   bool hasLiberties();
   int numLiberties();
 
-  void recalculateLiberties();
+  void recalculateLiberties(Board* b);
 };
 
 void printGroup(Group* g);

@@ -77,9 +77,13 @@ UCTNode* getNewChild(UCTNode* node) {
         }
       }
     }*/
-    for(Point *p : node->state->possibleMoves) {
-      UCTNode* child = new UCTNode(*p, node);
-      node->possibleChildren.push_back(child);
+    for (int row = 0; row < node->state->boardSize; row++) {
+      for (int column = 0; column < node->state->boardSize; column++) {
+        if (node->state->positions[row][column]->legal) {
+          UCTNode* child = new UCTNode(*node->state->positions[row][column], node);
+          node->possibleChildren.push_back(child);
+        }
+      }
     }
 
     Point pass(node->state->boardSize, node->state->boardSize);

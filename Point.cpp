@@ -3,20 +3,20 @@
 #include <cstdlib>
 
 Point::Point() :
-  row(0), column(0), color(Empty), group(NULL),
-  north(NULL), east(NULL), south(NULL), west(NULL), marked(false)
+  row(0), column(0), group(NULL), north(NULL), east(NULL), south(NULL),
+  west(NULL), color(Empty), marked(false), legal(false)
 { }
 
 Point::Point(int newRow, int newColumn) :
-  row(newRow), column(newColumn), color(Empty), group(NULL),
-  north(NULL), east(NULL), south(NULL), west(NULL), marked(false)
+  row(newRow), column(newColumn), group(NULL), north(NULL), east(NULL),
+  south(NULL), west(NULL), color(Empty), marked(false), legal(false)
 { }
 
 Point::Point(int newRow, int newColumn, Player newColor, Group* newGroup,
-  Point* newNorth, Point* newEast, Point* newSouth, Point* newWest) :
-  row(newRow), column(newColumn), color(newColor), group(newGroup),
-  north(newNorth), east(newEast), south(newSouth), west(newWest),
-  marked(false)
+  Point* newNorth, Point* newEast, Point* newSouth, Point* newWest, bool newLegal) :
+  row(newRow), column(newColumn), group(newGroup), north(newNorth),
+  east(newEast), south(newSouth), west(newWest), color(newColor), marked(false),
+  legal(newLegal)
 { }
 
 bool Point::operator==(const Point &p) {

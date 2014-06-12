@@ -1,12 +1,12 @@
 CC=g++
-CFLAGS=-c -g -std=c++0x -Wall -Wextra #-Weffc++ -Werror -pedantic \
-	#-Wdisabled-optimization -Wcast-align \
+CFLAGS=-c -g -std=c++0x -Ofast -Wall -Wextra -Weffc++ -Werror -pedantic \
+	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
 	-Wformat-nonliteral -Wformat-security  \
 	-Wformat-y2k -Wimport  -Winit-self  -Winline \
-	-Winvalid-pch -Wunsafe-loop-optimizations  \
-	-Wlong-long -Wmissing-braces -Wmissing-field-initializers \
+	-Winvalid-pch -Wlong-long -Wmissing-braces \
+  -Wmissing-field-initializers \
 	-Wmissing-format-attribute -Wmissing-include-dirs \
 	-Wmissing-noreturn -Wpacked  -Wparentheses  \
 	-Wpointer-arith -Wredundant-decls -Wreturn-type \
@@ -17,7 +17,7 @@ CFLAGS=-c -g -std=c++0x -Wall -Wextra #-Weffc++ -Werror -pedantic \
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	#-Wpadded
+	#-Wpadded -Wunsafe-loop-optimizations 
 
 GTPClient: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
 	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GTPClient -lrt

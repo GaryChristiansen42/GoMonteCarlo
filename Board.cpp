@@ -8,97 +8,22 @@
 #include <stack>
 
 Board::Board(int newBoardSize) :
-  boardSize(newBoardSize),
   positions(new Point**[newBoardSize]),
+  numLegalMoves(0),
   blackGroups(std::list<Group*>()),
   whiteGroups(std::list<Group*>()),
-  turn(Black),
   lastMove(NULL),
   secondLastMove(NULL),
   koPoint(NULL),
   pass(new Point(newBoardSize, newBoardSize)),
   capturedBlack(0),
   capturedWhite(0),
-  possibleMoves(std::list<Point*>()),
-  hash(0),
-  previousHashes(std::list<unsigned long int>()) {
+  boardSize(newBoardSize),
+  turn(Black) {
   for (int row = 0; row < boardSize; row++) {
     positions[row] = new Point*[boardSize];
   }
 }
-
-/*Board::Board(const Board& b) :
-  positions(new int*[BOARD_SIZE]),
-  blackGroups(std::vector<Group*>()),
-  whiteGroups(std::vector<Group*>()),
-  turn(b.turn), computer(b.computer),
-  lastMove(b.lastMove),
-  secondLastMove(b.secondLastMove)
-{
-  for(int r = 0; r < BOARD_SIZE; r++)
-  {
-    positions[r] = new int[BOARD_SIZE];
-    memcpy(positions[r], b.positions[r], BOARD_SIZE*sizeof(int));
-  }
-
-  for(Group* g : b.blackGroups)
-  {
-    Group* gClone = new Group(Black);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    blackGroups.push_back(gClone);
-  }
-  for(Group* g : b.whiteGroups)
-  {
-    Group* gClone = new Group(White);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    whiteGroups.push_back(gClone);
-  }
-}
-
-Board& Board::operator=(const Board& b)
-{
-  positions = new int*[BOARD_SIZE];
-  for(int r = 0; r < BOARD_SIZE; r++)
-  {
-    positions[r] = new int[BOARD_SIZE];
-    memcpy(positions[r], b.positions[r], BOARD_SIZE*sizeof(int));
-  }
-
-  turn = b.turn;
-  computer = b.computer;
-  lastMove = b.lastMove;
-  secondLastMove = b.secondLastMove;
-
-  for(Group* g : b.blackGroups)
-  {
-    Group* gClone = new Group(Black);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    blackGroups.push_back(gClone);
-  }
-  for(Group* g : b.whiteGroups)
-  {
-    Group* gClone = new Group(White);
-    for(Point* p : g->stones)
-    {
-      Point* pClone = new Point(p->row, p->column);
-      gClone->addStone(pClone);
-    }
-    whiteGroups.push_back(gClone);
-  }
-  return *this;
-}*/
 
 Board::~Board() {
   for (int row = 0; row < boardSize; row++) {
@@ -139,10 +64,10 @@ void Board::init() {
   }
 
   for (Group* g : blackGroups) {
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
   }
   for (Group* g : whiteGroups) {
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
   }
 
   getPossibleMoves();
@@ -166,11 +91,16 @@ bool Board::operator==(const Board &b) {
 
 Board* Board::clone() {
   Board* b = new Board(boardSize);
+
+  b->legalMoves[b->numLegalMoves++] = b->pass;
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
-        NULL, NULL, NULL, NULL, NULL);
+        NULL, NULL, NULL, NULL, NULL, p->legal);
+      if (p->legal) {
+        b->legalMoves[b->numLegalMoves++] = b->positions[row][column];
+      }
     }
   }
   for (int row = 0; row < boardSize; row++) {
@@ -185,10 +115,6 @@ Board* Board::clone() {
         b->positions[row][column]->west = b->positions[row][column-1];
     }
   }
-
-  b->possibleMoves.clear();
-  for (Point* p : possibleMoves)
-    b->possibleMoves.push_back(b->getPoint(p));
 
   b->turn = turn;
 
@@ -208,7 +134,7 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties();
+    gClone->recalculateLiberties(b);
     b->blackGroups.push_back(gClone);
   }
   for(Group* g : whiteGroups) {
@@ -219,21 +145,21 @@ Board* Board::clone() {
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
-    gClone->recalculateLiberties();
+    gClone->recalculateLiberties(b);
     b->whiteGroups.push_back(gClone);
   }
-
-  b->hash = hash;
 
   return b;
 }
 
 bool Board::isValidMove(Point move) {
-  for(Point *p : possibleMoves) {
-    if (*p == move)
-      return true;
-  }
-  return false;
+  if (move == *pass)
+    return true;
+  if (move.row < 0 || move.row >= boardSize)
+    return false;
+  if (move.column < 0 || move.column >= boardSize)
+    return false;
+  return positions[move.row][move.column]->legal;
 }
 
 // Fuego
@@ -252,8 +178,8 @@ void Board::getSimpleScore(float* whiteScore, float* blackScore) {
 
 float Board::getTaylorScore(float komi) {
   float score = -komi;  // score = blackScore - whiteScore
-  score += static_cast<float>(capturedWhite) -
-    static_cast<float>(capturedBlack);
+  // score += static_cast<float>(capturedWhite) -
+    // static_cast<float>(capturedBlack);
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       if (positions[row][column]->color == Black) {
@@ -335,27 +261,27 @@ void Board::updateStructures(Point* move) {
   std::list<Group*> groupsToCombine;
   bool inGroup = false;
   if (move->north != NULL && move->north->color == move->color) {
-    move->north->group->addStone(move);
+    move->north->group->addStone(this, move);
     groupsToCombine.push_back(move->north->group);
     inGroup = true;
   }
   if (move->east != NULL && move->east->color == move->color) {
     if (!inGroup) {
-      move->east->group->addStone(move);
+      move->east->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->east->group);
   }
   if (move->south != NULL && move->south->color == move->color) {
     if (!inGroup) {
-      move->south->group->addStone(move);
+      move->south->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->south->group);
   }
   if (move->west != NULL && move->west->color == move->color) {
     if (!inGroup) {
-      move->west->group->addStone(move);
+      move->west->group->addStone(this, move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->west->group);
@@ -366,7 +292,7 @@ void Board::updateStructures(Point* move) {
     (move->color == Black) ? &blackGroups : &whiteGroups;
   if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
-    group->addStone(move);
+    group->addStone(this, move);
     groupsSameColor->push_back(group);
   }
 
@@ -400,7 +326,7 @@ void Board::updateStructures(Point* move) {
       toDelete.remove(toDelete.front()); 
     }
 
-    move->group->recalculateLiberties();
+    move->group->recalculateLiberties(this);
   }
 }
 
@@ -502,23 +428,21 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   }
 
   for (Group* g : neighborGroupsToBeUpdated)
-    g->recalculateLiberties();
+    g->recalculateLiberties(this);
 
   return static_cast<unsigned int>(capturedStones.size());
 }
 
-void Board::calculateHash() {
-  previousHashes.push_back(hash);
-
+unsigned long int Board::getHash() {
   std::string s;
   for (int row = 0; row < boardSize; row++)
     for (int column = 0; column < boardSize; column++)
       s += (char)positions[row][column]->color;
   std::hash<std::string> strHash;
-  hash = strHash(s);
+  return strHash(s);
 }
 
-void testPossibleMoves(Board* b) {
+/*void testPossibleMoves(Board* b) {
   std::list<Point*> oldPossibleMoves = b->possibleMoves;
   b->getPossibleMoves();
   if (oldPossibleMoves.size() != b->possibleMoves.size()) {
@@ -538,44 +462,75 @@ void testPossibleMoves(Board* b) {
     printf("  %d %d\n", b->koPoint->row, b->koPoint->column);
     assert(oldPossibleMoves.size() == b->possibleMoves.size());
   }
-}
+}*/
 
 void Board::makeMove(Point move) {
-  Point* movePointer = NULL;
-  for (Point* p : possibleMoves) {
-    if (*p == move) {
-      movePointer = p;
-      break;
-    }
-  }
-  if (movePointer == NULL)
-    assert(false);
+  Point* movePointer = getPoint(&move);
+  assert(movePointer != NULL);
   makeMove(movePointer);
 }
+
+void decrementNeighborGroups(Point* move) {
+  std::list<Group*> decrementedGroups;
+  if (move->north != NULL && move->north->color != Empty) {
+    move->north->group->numberLiberties--;
+    decrementedGroups.push_back(move->north->group);
+  }
+  if (move->east != NULL && move->east->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->east->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->east->group->numberLiberties--;
+      decrementedGroups.push_back(move->east->group);
+    }
+  }
+  if (move->south != NULL && move->south->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->south->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->south->group->numberLiberties--;
+      decrementedGroups.push_back(move->south->group);
+    }
+  }
+  if (move->west != NULL && move->west->color != Empty) {
+    bool found = false;
+    for (Group* g : decrementedGroups) {
+      if (g == move->west->group) {
+        found = true;
+      }
+    }
+    if (!found) {
+      move->west->group->numberLiberties--;
+      decrementedGroups.push_back(move->west->group);
+    }
+  }
+}
+
 
 void Board::makeMove(Point* move) {
   // Don't place stone for p asses
   if (!(*move == *pass)) {
-    bool foundMove = false;
-    for (Point *p : possibleMoves) {
-      if (p == move) {
-        // possibleMoves[i] = possibleMoves.back();
-        // possibleMoves.pop_back();
-        foundMove = true;
-        break;
-      }
-    }
-    if (!foundMove) {
+    if (!move->legal) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n",
         move->row, move->column);
-      printf("Ko Point Row: %d Column: %d\n",
-        koPoint->row, koPoint->column);
-      for(Point* p : possibleMoves) {
-        printf("  PossibleMove Row: %d Column: %d\n",
-          p->row, p->column);
-      }
+      if (koPoint != NULL)
+        printf("Ko Point Row: %d Column: %d\n",
+          koPoint->row, koPoint->column);
+      for (int row = 0; row < boardSize; row++)
+        for (int column = 0; column < boardSize; column++)
+          if (positions[row][column]->legal)
+            printf("  PossibleMove Row: %d Column: %d\n",
+              row, column);
       show();
-      assert(foundMove);
+      assert(move->legal);
     }
 
 
@@ -587,48 +542,7 @@ void Board::makeMove(Point* move) {
     }
     move->color = turn;
 
-    std::list<Group*> decrementedGroups;
-    if (move->north != NULL && move->north->color != Empty) {
-      move->north->group->numberLiberties--;
-      decrementedGroups.push_back(move->north->group);
-    }
-    if (move->east != NULL && move->east->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->east->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->east->group->numberLiberties--;
-        decrementedGroups.push_back(move->east->group);
-      }
-    }
-    if (move->south != NULL && move->south->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->south->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->south->group->numberLiberties--;
-        decrementedGroups.push_back(move->south->group);
-      }
-    }
-    if (move->west != NULL && move->west->color != Empty) {
-      bool found = false;
-      for (Group* g : decrementedGroups) {
-        if (g == move->west->group) {
-          found = true;
-        }
-      }
-      if (!found) {
-        move->west->group->numberLiberties--;
-        decrementedGroups.push_back(move->west->group);
-      }
-    }
-
+    decrementNeighborGroups(move);
     updateStructures(move);
     int numCaptured =
         removeDeadStones((turn == Black ? White : Black), move);
@@ -637,31 +551,14 @@ void Board::makeMove(Point* move) {
     else
       capturedBlack += numCaptured;
 
-    std::list<Point*> neighbors;
-    if (move->north != NULL)
-      neighbors.push_back(move->north);
-    if (move->east != NULL)
-      neighbors.push_back(move->east);
-    if (move->south != NULL)
-      neighbors.push_back(move->south);
-    if (move->west != NULL)
-      neighbors.push_back(move->west);
-
-    bool neighborOfSameColor = false;
-    for (Point *neighbor : neighbors) {
-      if (neighbor->color == move->color) {
-      neighborOfSameColor = true;
-      break;
-      }
-    }
-
-    calculateHash();
-
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko
-    if (neighborOfSameColor) {
+    if ((move->north != NULL && move->north->color == move->color)
+      || (move->east != NULL && move->east->color == move->color)
+      || (move->south != NULL && move->south->color == move->color)
+      || (move->west != NULL && move->west->color == move->color))
       koPoint = NULL;
-    }
+
   } else {
     koPoint = NULL;
   }
@@ -678,20 +575,14 @@ void Board::makeMove(Point* move) {
   #endif
 }
 
-void Board::makeRandomMove() {
+Point* Board::getRandomMove() {
   static unsigned int seed = static_cast<unsigned int>(time(NULL));
-  unsigned int choice = rand_r(&seed) %
-    static_cast<unsigned int>(possibleMoves.size());
-  Point *chosenMove = NULL;
-  for (Point* p : possibleMoves) {
-    if (choice == 0) {
-      chosenMove = p;
-      break;
-    }
-    choice--;
-  }
-  assert(chosenMove != NULL);
-  makeMove(chosenMove);
+  unsigned int choice = rand_r(&seed) % numLegalMoves;
+  return legalMoves[choice];
+}
+
+void Board::makeRandomMove() {
+  makeMove(getRandomMove());
 }
 
 GameResult Board::playRandomGame() {
@@ -754,49 +645,56 @@ bool Board::isSuicide(Point move) {
 
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
 bool Board::isSuicide(Point* move) {
-  std::list<Point*> neighbors;
-  if (move->north != NULL)
-    neighbors.push_back(move->north);
-  if (move->east != NULL)
-    neighbors.push_back(move->east);
-  if (move->south != NULL)
-    neighbors.push_back(move->south);
-  if (move->west != NULL)
-    neighbors.push_back(move->west);
 
-  // Check for empty neighbors
-  for(Point *p : neighbors) {
-    if (p->color == Empty)
-      return false;
-  }
-
-  // Check for neighbors of same color with more than one liberty
-  for(Point *p : neighbors) {
-    Player sameColor = turn == Black ? Black : White;
-    if (p->group->color == sameColor)
-      if (p->group->numLiberties() > 1)
-        return false;
-  }
-
-  // Check for neighbors of opposite color with only one liberty
-  for(Point *p : neighbors) {
-    Player oppositeColor = turn == Black ? White : Black;
-    if (p->group->color == oppositeColor)
-      if (p->group->numLiberties() == 1)
-        return false;
-  }
+  Player sameColor = turn == Black ? Black : White;
+  Player oppositeColor = turn == Black ? White : Black;
+  // if neighbor != NULL
+  //   Check for empty neighbors
+  //   Check for neighbors of same color with more than one liberty
+  //   Check for neighbors of opposite color with only one liberty
+  if (move->north != NULL
+    && (move->north->color == Empty
+      || (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
+      || (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)))
+    return false;
+  if (move->east != NULL
+    && (move->east->color == Empty
+    || (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
+    || (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)))
+    return false;
+  if (move->south != NULL
+    && (move->south->color == Empty
+    || (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
+    || (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)))
+    return false;
+  if (move->west != NULL &&
+    (move->west->color == Empty
+    || (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
+    || (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)))
+    return false;
 
   return true;
 }
 
-void printPossibleMoves(Board* b) {
+/*void printPossibleMoves(Board* b) {
   printf("Possible Moves: \n");
   for(Point* p : b->possibleMoves) {
     printf("  R: %d C: %d\n", p->row, p->column);
   }
+}*/
+
+void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes) {
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
+      if (positions[r][c]->legal
+        && isPositionalSuperKo(positions[r][c], previousHashes)) {
+        positions[r][c]->legal = false;
+      }
+    }
+  }
 }
 
-bool Board::isPositionalSuperKo(Point* p) {
+bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes) {
   std::string s;
   for (int r = 0; r < boardSize; r++) {
     for (int c = 0; c < boardSize; c++) {
@@ -824,36 +722,29 @@ bool Board::isPositionalSuperKo(Point* p) {
 }
 
 void Board::getPossibleMoves() {
-  if (possibleMoves.size() > 0)
-    possibleMoves.clear();
-  for (int r = 0; r < boardSize; r++)
-    for (int c = 0; c < boardSize; c++)
+  numLegalMoves = 0;
+  pass->legal = true;
+  legalMoves[numLegalMoves++] = pass;
+  for (int r = 0; r < boardSize; r++) {
+    for (int c = 0; c < boardSize; c++) {
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
-        && !isSuicide(positions[r][c])
-        && !isPositionalSuperKo(positions[r][c]))
-        possibleMoves.push_back(positions[r][c]);
-  possibleMoves.push_back(pass);
-}
-
-Point* Board::getPoint(Point *p) {
-  Point* point = NULL;
-  if (p == NULL)
-    return NULL;
-  if (*p == *pass)
-    point = pass;
-  else {
-    for (int row = 0; row < boardSize; row++) {
-      for (int column = 0; column < boardSize; column++) {
-        if (*positions[row][column] == *p) {
-          point = positions[row][column];
-          break;
-        }
+        && !isSuicide(positions[r][c])) {
+        positions[r][c]->legal = true;
+        legalMoves[numLegalMoves++] = positions[r][c];
+      } else {
+        positions[r][c]->legal = false;
       }
     }
   }
+}
 
-  if (point == NULL)
-    assert(false);
-  return point;
+Point* Board::getPoint(Point *p) {
+  if (p == NULL) {
+    return NULL;
+  } else if (*p == *pass) {
+    return pass;
+  } else {
+    return positions[p->row][p->column];
+  }
 }

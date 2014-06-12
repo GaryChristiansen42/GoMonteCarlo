@@ -17,8 +17,12 @@ enum PlayerType {
   GnuGo
 };
 
-const char * playerTypeStrings[3] = {
-  "MyMonteCarlo",
+const char * playerTypeStrings[7] = {
+  "MyMonteCarlo1HalfSecond",
+  "MyMonteCarlo1Second",
+  "MyMonteCarlo5Seconds",
+  "MyMonteCarlo10Seconds",
+  "MyMonteCarlo14AndHalfSeconds",
   "RandomPlayer",
   "GnuGo"
 };
@@ -55,18 +59,7 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
-  static unsigned int seed = static_cast<unsigned int>(time(NULL));
-  unsigned int choice = rand_r(&seed) %
-    static_cast<unsigned int>(b->possibleMoves.size());
-  Point *chosenMove = NULL;
-  for (Point* p : b->possibleMoves) {
-    if (choice == 0) {
-      chosenMove = p;
-      break;
-    }
-    choice--;
-  }
-  assert(chosenMove != NULL);
+  Point *chosenMove = b->getRandomMove();
 
   UCTNode* newCurrentNode = new UCTNode(*chosenMove, *currentNode);
   if (newCurrentNode->parent != NULL)
@@ -85,11 +78,12 @@ int main(void) {
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
-  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player1 = MyMonteCarlo1Second;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo1HalfSecond;
+  // PlayerType player2 = MyMonteCarlo1HalfSecond;
 
-  for (int x = 0; x < 2; x++) {
+  for (int x = 0; x < 1; x++) {
     int player1Wins = 0;
     int player2Wins = 0;
 
@@ -102,7 +96,6 @@ int main(void) {
       node->state = b->clone();
 
       GameResult r;
-      int k = 0;
       while (!b->isGameOver(&r)) {
         PlayerType currentPlayer = b->turn == Black ? player1 : player2;
         switch (currentPlayer) {
@@ -129,10 +122,7 @@ int main(void) {
           assert(false);
           break;
         }
-        b->show();
-        k++;
-        if (k > 2000)
-          exit(0);
+        // b->show();
       }
 
       if (static_cast<Player>(r) == Black) {

@@ -11,28 +11,24 @@ class Group;
 
 class Board {
  public:
-  int boardSize;
   Point ***positions;
+
+  Point* legalMoves[82];
+  int numLegalMoves;
+
   std::list<Group*> blackGroups;
   std::list<Group*> whiteGroups;
-  Player turn;
 
   Point* lastMove;
   Point* secondLastMove;
-
   Point* koPoint;
-
   Point* pass;
 
   unsigned int capturedBlack;
   unsigned int capturedWhite;
 
-  // std::vector<Point> pointsToCheck;
-
-  std::list<Point*> possibleMoves;
-
-  unsigned long int hash;
-  std::list<unsigned long int> previousHashes;
+  int boardSize;
+  Player turn;
 
   explicit Board(int newBoardSize);
 
@@ -62,8 +58,9 @@ class Board {
   void updateStructures(Point* move);
   unsigned int removeDeadStones(Player color, Point* move);
 
-  void calculateHash();
+  unsigned long int getHash();
 
+  Point* getRandomMove();
   void makeMove(Point move);
 
   void makeRandomMove();
@@ -74,7 +71,8 @@ class Board {
   bool isSuicide(Point move);
   bool isSuicide(Point* move);
 
-  bool isPositionalSuperKo(Point* p);
+  void eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes);
+  bool isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes);
 
   // private:
   void getPossibleMoves();
