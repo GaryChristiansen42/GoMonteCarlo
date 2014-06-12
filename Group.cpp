@@ -11,10 +11,31 @@ Group::Group(Player newColor) :
 Group::~Group() {
 }
 
-void Group::addStone(Board* b, Point* p) {
+void Group::addStone(Point* p) {
   p->group = this;
   stones.push_back(p);
-  recalculateLiberties(b);
+  // recalculateLiberties(b);
+
+  if (!(p->north == NULL || p->north->color != Empty
+    || (p->north->north != NULL && p->north->north->group == this)
+    || (p->north->east != NULL && p->north->east->group == this)
+    || (p->north->west != NULL && p->north->west->group == this)))
+    numberLiberties++;
+  if (!(p->east == NULL || p->east->color != Empty
+    || (p->east->north != NULL && p->east->north->group == this)
+    || (p->east->east != NULL && p->east->east->group == this)
+    || (p->east->south != NULL && p->east->south->group == this)))
+    numberLiberties++;
+  if (!(p->south == NULL || p->south->color != Empty
+    || (p->south->east != NULL && p->south->east->group == this)
+    || (p->south->south != NULL && p->south->south->group == this)
+    || (p->south->west != NULL && p->south->west->group == this)))
+    numberLiberties++;
+  if (!(p->west == NULL || p->west->color != Empty
+    || (p->west->north != NULL && p->west->north->group == this)
+    || (p->west->south != NULL && p->west->south->group == this)
+    || (p->west->west != NULL && p->west->west->group == this)))
+    numberLiberties++;
 }
 
 bool Group::contains(Point* p) {

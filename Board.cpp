@@ -261,27 +261,27 @@ void Board::updateStructures(Point* move) {
   std::list<Group*> groupsToCombine;
   bool inGroup = false;
   if (move->north != NULL && move->north->color == move->color) {
-    move->north->group->addStone(this, move);
+    move->north->group->addStone(move);
     groupsToCombine.push_back(move->north->group);
     inGroup = true;
   }
   if (move->east != NULL && move->east->color == move->color) {
     if (!inGroup) {
-      move->east->group->addStone(this, move);
+      move->east->group->addStone(move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->east->group);
   }
   if (move->south != NULL && move->south->color == move->color) {
     if (!inGroup) {
-      move->south->group->addStone(this, move);
+      move->south->group->addStone(move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->south->group);
   }
   if (move->west != NULL && move->west->color == move->color) {
     if (!inGroup) {
-      move->west->group->addStone(this, move);
+      move->west->group->addStone(move);
       inGroup = true;
     }
     groupsToCombine.push_back(move->west->group);
@@ -292,7 +292,7 @@ void Board::updateStructures(Point* move) {
     (move->color == Black) ? &blackGroups : &whiteGroups;
   if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
-    group->addStone(this, move);
+    group->addStone(move);
     groupsSameColor->push_back(group);
   }
 

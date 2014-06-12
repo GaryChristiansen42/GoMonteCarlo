@@ -19,7 +19,7 @@ class Group {
 
   ~Group();
 
-  void addStone(Board* b, Point* p);
+  void addStone(Point* p);
 
   bool contains(Point* p);
   bool isAdjacent(Point* p);
