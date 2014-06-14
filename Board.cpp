@@ -85,7 +85,6 @@ bool Board::operator==(const Board &b) {
 Board* Board::clone() {
   Board* b = new Board(boardSize);
 
-  b->legalMoves[b->numLegalMoves++] = b->pass;
   for (int row = 0; row < boardSize; row++) {
     for (int column = 0; column < boardSize; column++) {
       Point * p = positions[row][column];
@@ -101,6 +100,7 @@ Board* Board::clone() {
 
 void Board::cloneInto(Board* b) {
   b->numLegalMoves = 0;
+  b->legalMoves[b->numLegalMoves++] = b->pass;
   for (int r = 0; r < boardSize; r++) {
     for (int c = 0; c < boardSize; c++) {
       b->positions[r][c]->group = NULL;
@@ -690,6 +690,12 @@ void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHash
       if (positions[r][c]->legal
         && isPositionalSuperKo(positions[r][c], previousHashes)) {
         positions[r][c]->legal = false;
+        for (int i = 0; i < numLegalMoves; i++) {
+          if (legalMoves[i] == positions[r][c]) {
+            legalMoves[i] = legalMoves[numLegalMoves-1];
+            numLegalMoves--;
+          }
+        }
       }
     }
   }
