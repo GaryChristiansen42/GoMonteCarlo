@@ -231,6 +231,78 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
 
   b1.eliminatePositionalSuperKo(previousHashes);
   BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
+
+
+  // Shouldn't fail here
+  boardSize = 5;
+  Board b2(boardSize);
+  b2.init();
+
+  previousHashes.clear();
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(2,2)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(2,3)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(1,3)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(1,2)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(3,3)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(2,1)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(3,1)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(1,1)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(3,2)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(3,0)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(0,0)); // Black
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(2,4)); // White
+  previousHashes.push_back(b2.getHash());
+  b2.eliminatePositionalSuperKo(previousHashes);
+
+  b2.makeMove(Point(1,4)); // Black
+  previousHashes.push_back(b2.getHash());
+
+  /*printf("before\n");
+  for (int i = 0; i < b2.numLegalMoves; i++)
+    printf("%d %d %d\n", b2.legalMoves[i]->row, b2.legalMoves[i]->column, b2.legalMoves[i]->legal);
+  b2.eliminatePositionalSuperKo(previousHashes);
+  printf("after\n");
+  for (int i = 0; i < b2.numLegalMoves; i++)
+    printf("%d %d %d\n", b2.legalMoves[i]->row, b2.legalMoves[i]->column, b2.legalMoves[i]->legal);
+  BOOST_CHECK_EQUAL(b2.isValidMove(Point(3,4)), true);
+
+  b2.show();*/
 }
 
 BOOST_AUTO_TEST_CASE( testIsSuicide )
