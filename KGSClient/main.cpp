@@ -38,6 +38,19 @@ Player readColor() {
   }
 }
 
+char* pointToKGSPosition(Point p) {
+  char rowChar = (char)(p.row+'a');
+  if (p.row > 7)
+    rowChar++;
+  char* buffer = new char[32];
+  if (p == *b->pass)
+    snprintf(buffer, 32, "pass");
+  else
+    snprintf(buffer, 32, "%c%d", 
+      rowChar, p.column+1);
+  return buffer;
+}
+
 void doPlay() {
   Player color = readColor();
   if (color == Empty)
@@ -77,13 +90,9 @@ void doGenMove() {
   currentMove->state = b->clone();
   Point bestMove = UCTSearch(currentMove, millaSecondsToThink)->move;
 
-  char rowChar = (char)(bestMove.row+'a');
-  if (bestMove.row > 7)
-    rowChar++;
-  if (bestMove == *b->pass)
-    printf("= pass\n\n");
-  else
-    printf("= %c%d\n\n", rowChar, bestMove.column+1);
+  char* output = pointToKGSPosition(bestMove);
+  printf("= %s\n\n", output);
+  delete output;
 
   char buffer[100];
   sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
@@ -133,7 +142,16 @@ int main() {
     } else if (!strcmp(command, "final_status_list")) {
       char throwaway[200];
       std::cin >> throwaway;
-      printf("= \n\n");
+      std::string aliveStones = "";
+      /*for (int r = 0; r < b->boardSize; r++) {
+        for (int c = 0; c < b->boardSize; c++) {
+          if (b->positions[r][c]->color != Empty) {
+            aliveStones += " ";
+            aliveStones += pointToKGSPosition(*b->positions[r][c]);
+          }
+        }
+      }*/
+      printf("= %s\n\n", aliveStones.c_str());
       Log(throwaway);
     } else if (!strcmp(command, "genmove")) {
       doGenMove();
@@ -146,7 +164,9 @@ int main() {
     } else if (!strcmp(command, "list_commands")) {
       printf("= boardsize\n");
       printf("clear_board\n");
+      printf("final_status_list\n");
       printf("genmove\n");
+      printf("kgs-genmove_cleanup\n");
       printf("komi\n");
       printf("list_commands\n");
       printf("name\n");
