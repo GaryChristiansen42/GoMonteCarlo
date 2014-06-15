@@ -3,13 +3,14 @@
 #include <string.h>
 #include <cstdlib>
 #include <fstream>
+#include <unistd.h>
 
 #include "../UCT.h"
 #include "../Common.h"
 
 //UCTNode *currentMove;
 int boardSize = 9;
-float millaSecondsToThink = 14000;
+float millaSecondsToThink = 14500;
 char name[] = "TestGoBot";
 char version[] = "3.5.11";
 
@@ -88,21 +89,26 @@ void doGenMove() {
 
   UCTNode* currentMove = new UCTNode(Point(-1, -1), NULL);
   currentMove->state = b->clone();
-  Point bestMove = UCTSearch(currentMove, millaSecondsToThink)->move;
+  UCTNode* bestMoveNode = UCTSearch(currentMove, millaSecondsToThink);
+  if ((1.0*bestMoveNode->totalRewards)/bestMoveNode->visits < (-0.9)) {
+    printf("= resign\n\n");
+  } else {
+    Point bestMove = bestMoveNode->move;
+    char* output = pointToKGSPosition(bestMove);
+    printf("= %s\n\n", output);
+    delete output;
 
-  char* output = pointToKGSPosition(bestMove);
-  printf("= %s\n\n", output);
-  delete output;
+    char buffer[100];
+    sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
+    Log(buffer);
 
-  char buffer[100];
-  sprintf(buffer, "GenMove %d %d", bestMove.row, bestMove.column);
-  Log(buffer);
-  
+    b->makeMove(bestMove);
+    previousHashes.push_back(b->getHash());
+  }   
   // Takes a long time, print out message to send to server first
+  usleep(1000);
   delete currentMove;
 
-  b->makeMove(bestMove);
-  previousHashes.push_back(b->getHash());
 }
 
 void doBoardSize() {
