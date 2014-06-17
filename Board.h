@@ -69,8 +69,8 @@ class Board {
 
   void show();
 
-  bool isSuicide(Point move);
-  bool isSuicide(Point* move);
+  bool isSuicide(Point move, const Player &sameColor, const Player &oppositeColor);
+  bool isSuicide(Point* move, const Player &sameColor, const Player &oppositeColor);
 
   void eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes);
   bool isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes);

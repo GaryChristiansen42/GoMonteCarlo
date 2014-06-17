@@ -640,40 +640,49 @@ void Board::show() {
   printf("%s", boardString.str().c_str());
 }
 
-bool Board::isSuicide(Point move) {
-  return isSuicide(getPoint(&move));
+bool Board::isSuicide(Point move, const Player &sameColor, const Player &oppositeColor) {
+  return isSuicide(getPoint(&move), sameColor, oppositeColor);
 }
 
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
-bool Board::isSuicide(Point* move) {
+bool Board::isSuicide(Point* move, const Player &sameColor, const Player &oppositeColor) {
 
-  Player sameColor = turn == Black ? Black : White;
-  Player oppositeColor = turn == Black ? White : Black;
   // if neighbor != NULL
   //   Check for empty neighbors
   //   Check for neighbors of same color with more than one liberty
   //   Check for neighbors of opposite color with only one liberty
-  if (move->north != NULL
-    && (move->north->color == Empty
-      || (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
-      || (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)))
-    return false;
-  if (move->east != NULL
-    && (move->east->color == Empty
-    || (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
-    || (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)))
-    return false;
-  if (move->south != NULL
-    && (move->south->color == Empty
-    || (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
-    || (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)))
-    return false;
-  if (move->west != NULL &&
-    (move->west->color == Empty
-    || (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
-    || (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)))
-    return false;
-
+  if (move->north != NULL) {
+    if (move->north->color == Empty)
+      return false;
+    if (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
+      return false;
+    if (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)
+      return false;
+  }
+  if (move->east != NULL) {
+    if (move->east->color == Empty)
+      return false;
+    if (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
+      return false;
+    if (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)
+      return false;
+  }
+  if (move->south != NULL) {
+    if (move->south->color == Empty)
+      return false;
+    if (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
+      return false;
+    if (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)
+      return false;
+  }
+  if (move->west != NULL) {
+    if (move->west->color == Empty)
+      return false;
+    if (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
+      return false;
+    if (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)
+      return false;
+  }
   return true;
 }
 
@@ -729,16 +738,20 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
 }
 
 void Board::getPossibleMoves() {
+  Player sameColor = turn == Black ? Black : White;
+  Player oppositeColor = turn == Black ? White : Black;
   numLegalMoves = 0;
   pass->legal = true;
-  legalMoves[numLegalMoves++] = pass;
-  for (int r = 0; r < boardSize; r++) {
-    for (int c = 0; c < boardSize; c++) {
+  legalMoves[numLegalMoves] = pass;
+  ++numLegalMoves;
+  for (int r = 0; r < boardSize; ++r) {
+    for (int c = 0; c < boardSize; ++c) {
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
-        && !isSuicide(positions[r][c])) {
+        && !isSuicide(positions[r][c], sameColor, oppositeColor)) {
         positions[r][c]->legal = true;
-        legalMoves[numLegalMoves++] = positions[r][c];
+        legalMoves[numLegalMoves] = positions[r][c];
+        ++numLegalMoves;
       } else {
         positions[r][c]->legal = false;
       }
