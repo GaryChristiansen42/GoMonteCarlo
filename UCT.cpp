@@ -77,8 +77,8 @@ UCTNode* getNewChild(UCTNode* node) {
         }
       }
     }*/
-    for (int row = 0; row < node->state->boardSize; row++) {
-      for (int column = 0; column < node->state->boardSize; column++) {
+    for (int row = 0; row < BOARD_SIZE; ++row) {
+      for (int column = 0; column < BOARD_SIZE; ++column) {
         if (node->state->positions[row][column]->legal) {
           UCTNode* child = new UCTNode(*node->state->positions[row][column], node);
           node->possibleChildren.push_back(child);
@@ -86,7 +86,7 @@ UCTNode* getNewChild(UCTNode* node) {
       }
     }
 
-    Point pass(node->state->boardSize, node->state->boardSize);
+    Point pass(BOARD_SIZE, BOARD_SIZE);
     if (!node->isChild(pass)) {
       // Add pass move to possible moves
       UCTNode* passChild = new UCTNode(pass, node);
@@ -125,7 +125,7 @@ UCTNode* TreePolicy(UCTNode* node) {
       node = bestChild(node);
     }
   }
-  Point pass(node->state->boardSize, node->state->boardSize);
+  Point pass(BOARD_SIZE, BOARD_SIZE);
   if (node->move != pass
     && node->move.color != Empty) {
     assert(false);
@@ -168,7 +168,7 @@ void backup(UCTNode* v, int reward) {
 }
 
 UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
-  Board* clone = new Board(root->state->boardSize);
+  Board* clone = new Board();
   clone->init();
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root);
@@ -188,7 +188,7 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
     next = next->sibling;
   }
 
-  Point pass(root->state->boardSize, root->state->boardSize);
+  Point pass(BOARD_SIZE, BOARD_SIZE);
   if (!(best->move == pass)
     && best->move.color != Empty) {
     assert(false);
@@ -207,7 +207,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 
   int i = 0;
 
-  Board* clone = new Board(root->state->boardSize);
+  Board* clone = new Board();
   clone->init();
 
   while (diffclock(end, start) < millaSecondsToThink) {
@@ -260,7 +260,7 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
     next = next->sibling;
   }
 
-  Point pass(root->state->boardSize, root->state->boardSize);
+  Point pass(BOARD_SIZE, BOARD_SIZE);
   if (!(best->move == pass)
     && best->move.color != Empty) {
     assert(false);

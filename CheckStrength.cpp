@@ -43,8 +43,8 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   b->makeMove((*currentNode)->move);
 
   // check if b == currentNode->state
-  for (int row = 0; row < b->boardSize; row++)
-    for (int column = 0; column < b->boardSize; column++)
+  for (int row = 0; row < BOARD_SIZE; ++row)
+    for (int column = 0; column < BOARD_SIZE; ++column)
       if (*b->positions[row][column]
         != *(*currentNode)->state->positions[row][column]) {
         printf("Problem at %d %d\n", row, column);
@@ -74,7 +74,6 @@ int main(void) {
   printf("Running...\n");
 
   int numTrials = 1;
-  int boardSize = 9;
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = RandomPlayer;
@@ -90,7 +89,7 @@ int main(void) {
     for (int i = 0; i < numTrials; i++) {
       if (i % 10 == 0 && i != 0)
         printf("\nTrial Number: %d\n", i);
-      Board* b = new Board(boardSize);
+      Board* b = new Board();
       b->init();
       UCTNode *node = new UCTNode(Point(-1, -1), NULL);
       node->state = b->clone();

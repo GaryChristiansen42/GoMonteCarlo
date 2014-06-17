@@ -7,27 +7,24 @@
 #include <sstream>
 #include <stack>
 
-Board::Board(int newBoardSize) :
-  positions(new Point**[newBoardSize]),
+Board::Board() :
+  positions(new Point**[BOARD_SIZE]),
   numLegalMoves(0),
   blackGroups(std::list<Group*>()),
   whiteGroups(std::list<Group*>()),
   lastMove(NULL),
   secondLastMove(NULL),
   koPoint(NULL),
-  pass(new Point(newBoardSize, newBoardSize)),
-  capturedBlack(0),
-  capturedWhite(0),
-  boardSize(newBoardSize),
+  pass(new Point(BOARD_SIZE, BOARD_SIZE)),
   turn(Black) {
-  for (int row = 0; row < boardSize; row++) {
-    positions[row] = new Point*[boardSize];
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    positions[row] = new Point*[BOARD_SIZE];
   }
 }
 
 Board::~Board() {
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    for (int column = 0; column < BOARD_SIZE; ++column) {
       delete positions[row][column];
     }
     delete[] positions[row];
@@ -44,17 +41,16 @@ Board::~Board() {
 }
 
 void Board::init() {
-  for (int row = 0; row < boardSize; row++) {
-    // memset(positions[row], 0, boardSize*sizeof(Point*));
-    for (int column = 0; column < boardSize; column++) {
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    for (int column = 0; column < BOARD_SIZE; ++column) {
       positions[row][column] = new Point(row, column);
     }
   }
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
-      if (row + 1 < boardSize)
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    for (int column = 0; column < BOARD_SIZE; ++column) {
+      if (row + 1 < BOARD_SIZE)
         positions[row][column]->north = positions[row+1][column];
-      if (column + 1 < boardSize)
+      if (column + 1 < BOARD_SIZE)
         positions[row][column]->east = positions[row][column+1];
       if (row - 1 >= 0)
         positions[row][column]->south = positions[row-1][column];
@@ -67,10 +63,8 @@ void Board::init() {
 }
 
 bool Board::operator==(const Board &b) {
-  if (boardSize != b.boardSize)
-    return false;
-  for (int row = 0; row < boardSize; row++)
-    for (int column = 0; column < boardSize; column++)
+  for (int row = 0; row < BOARD_SIZE; row++)
+    for (int column = 0; column < BOARD_SIZE; column++)
       if (*positions[row][column] != *b.positions[row][column])
         return false;
   if (secondLastMove == NULL && b.secondLastMove == NULL
@@ -83,10 +77,10 @@ bool Board::operator==(const Board &b) {
 }
 
 Board* Board::clone() {
-  Board* b = new Board(boardSize);
+  Board* b = new Board();
 
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int column = 0; column < BOARD_SIZE; column++) {
       Point * p = positions[row][column];
       b->positions[row][column] = new Point(p->row, p->column, p->color,
         NULL, NULL, NULL, NULL, NULL, p->legal);
@@ -101,8 +95,8 @@ Board* Board::clone() {
 void Board::cloneInto(Board* b) {
   b->numLegalMoves = 0;
   b->legalMoves[b->numLegalMoves++] = b->pass;
-  for (int r = 0; r < boardSize; r++) {
-    for (int c = 0; c < boardSize; c++) {
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
       b->positions[r][c]->group = NULL;
       b->positions[r][c]->color = positions[r][c]->color;
       b->positions[r][c]->legal = positions[r][c]->legal;
@@ -112,11 +106,11 @@ void Board::cloneInto(Board* b) {
     }
   }
 
-  for (int r = 0; r < boardSize; r++) {
-    for (int c = 0; c < boardSize; c++) {
-      if (r + 1 < boardSize)
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
+      if (r + 1 < BOARD_SIZE)
         b->positions[r][c]->north = b->positions[r+1][c];
-      if (c + 1 < boardSize)
+      if (c + 1 < BOARD_SIZE)
         b->positions[r][c]->east = b->positions[r][c+1];
       if (r - 1 >= 0)
         b->positions[r][c]->south = b->positions[r-1][c];
@@ -131,9 +125,6 @@ void Board::cloneInto(Board* b) {
   b->secondLastMove = b->getPoint(secondLastMove);
 
   b->koPoint = b->getPoint(koPoint);
-
-  b->capturedBlack = capturedBlack;
-  b->capturedWhite = capturedWhite;
 
   for(Group* g : blackGroups) {
     Group* gClone = new Group(Black);
@@ -162,17 +153,17 @@ void Board::cloneInto(Board* b) {
 bool Board::isValidMove(Point move) {
   if (move == *pass)
     return true;
-  if (move.row < 0 || move.row >= boardSize)
+  if (move.row < 0 || move.row >= BOARD_SIZE)
     return false;
-  if (move.column < 0 || move.column >= boardSize)
+  if (move.column < 0 || move.column >= BOARD_SIZE)
     return false;
   return positions[move.row][move.column]->legal;
 }
 
 // Fuego
 void Board::getSimpleScore(float* whiteScore, float* blackScore) {
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int column = 0; column < BOARD_SIZE; column++) {
       if (positions[row][column]->color == White) {
         *whiteScore = *whiteScore + 1;
       } else if (positions[row][column]->color == Black) {
@@ -187,8 +178,8 @@ float Board::getTaylorScore(float komi) {
   float score = -komi;  // score = blackScore - whiteScore
   // score += static_cast<float>(capturedWhite) -
     // static_cast<float>(capturedBlack);
-  for (int row = 0; row < boardSize; ++row) {
-    for (int column = 0; column < boardSize; ++column) {
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    for (int column = 0; column < BOARD_SIZE; ++column) {
       if (positions[row][column]->marked) {
         // Already visited empty space territory
         continue;
@@ -236,8 +227,8 @@ float Board::getTaylorScore(float komi) {
     }
   }
 
-  for (int r = 0; r < boardSize; ++r)
-    for (int c = 0; c < boardSize; ++c)
+  for (int r = 0; r < BOARD_SIZE; ++r)
+    for (int c = 0; c < BOARD_SIZE; ++c)
       positions[r][c]->marked = false;
   return score;
 }
@@ -429,8 +420,8 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
 
 unsigned long int Board::getHash() {
   std::string s;
-  for (int row = 0; row < boardSize; row++)
-    for (int column = 0; column < boardSize; column++)
+  for (int row = 0; row < BOARD_SIZE; row++)
+    for (int column = 0; column < BOARD_SIZE; column++)
       s += (char)positions[row][column]->color;
   std::hash<std::string> strHash;
   return strHash(s);
@@ -519,8 +510,8 @@ void Board::makeMove(Point* move) {
       if (koPoint != NULL)
         printf("Ko Point Row: %d Column: %d\n",
           koPoint->row, koPoint->column);
-      for (int row = 0; row < boardSize; row++)
-        for (int column = 0; column < boardSize; column++)
+      for (int row = 0; row < BOARD_SIZE; row++)
+        for (int column = 0; column < BOARD_SIZE; column++)
           if (positions[row][column]->legal)
             printf("  PossibleMove Row: %d Column: %d\n",
               row, column);
@@ -539,12 +530,7 @@ void Board::makeMove(Point* move) {
 
     decrementNeighborGroups(move);
     updateStructures(move);
-    int numCaptured =
-        removeDeadStones((turn == Black ? White : Black), move);
-    if (turn == Black)
-      capturedWhite += numCaptured;
-    else
-      capturedBlack += numCaptured;
+    removeDeadStones((turn == Black ? White : Black), move);
 
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko
@@ -591,13 +577,13 @@ GameResult Board::playRandomGame() {
 void Board::show() {
   std::stringstream boardString;
 
-  for (int row = 0; row < boardSize+1; row++) {
-    for (int column = 0; column < boardSize+1; column++) {
-      if (row == boardSize && column == boardSize) {
+  for (int row = 0; row < BOARD_SIZE+1; row++) {
+    for (int column = 0; column < BOARD_SIZE+1; column++) {
+      if (row == BOARD_SIZE && column == BOARD_SIZE) {
         boardString << "  ";
-      } else if (row == boardSize) {
+      } else if (row == BOARD_SIZE) {
         boardString << column+1 << " ";
-      } else if (column == boardSize) {
+      } else if (column == BOARD_SIZE) {
         boardString << static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
           << " ";
       } else {
@@ -688,8 +674,8 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
 }*/
 
 void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes) {
-  for (int r = 0; r < boardSize; r++) {
-    for (int c = 0; c < boardSize; c++) {
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
       if (positions[r][c]->legal
         && isPositionalSuperKo(positions[r][c], previousHashes)) {
         positions[r][c]->legal = false;
@@ -706,8 +692,8 @@ void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHash
 
 bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes) {
   std::string s;
-  for (int r = 0; r < boardSize; r++) {
-    for (int c = 0; c < boardSize; c++) {
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
       if (p != positions[r][c]) {
         if (positions[r][c]->group != NULL
           && positions[r][c]->group->isAdjacent(p)
@@ -738,8 +724,8 @@ void Board::getPossibleMoves() {
   pass->legal = true;
   legalMoves[numLegalMoves] = pass;
   ++numLegalMoves;
-  for (int r = 0; r < boardSize; ++r) {
-    for (int c = 0; c < boardSize; ++c) {
+  for (int r = 0; r < BOARD_SIZE; ++r) {
+    for (int c = 0; c < BOARD_SIZE; ++c) {
       if (positions[r][c]->color == Empty
         && positions[r][c] != koPoint
         && !isSuicide(positions[r][c], sameColor, oppositeColor)) {

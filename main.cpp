@@ -78,8 +78,8 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   (*currentNode) = newCurrentNode;
   b->makeMove((*currentNode)->move);
   // check if b == currentNode->state
-  for (int row = 0; row < b->boardSize; row++)
-    for (int column = 0; column < b->boardSize; column++)
+  for (int row = 0; row < BOARD_SIZE; ++row)
+    for (int column = 0; column < BOARD_SIZE; ++column)
       if (b->positions[row][column]
         != (*currentNode)->state->positions[row][column]) {
         printf("Problem at %d %d\n", row, column);
@@ -110,11 +110,10 @@ void randomMove(UCTNode** currentNode, Board* b) {
 int main(void) {
   printf("Go MonteCarloAI\n");
 
-  int boardSize = 5;
   int numSimulations = 0;
   float millaSecondsToThink = 1000;
 
-  Board* b = new Board(boardSize);
+  Board* b = new Board();
 
   UCTNode *currentNode;
   root = new UCTNode(Point(-1, -1), NULL);

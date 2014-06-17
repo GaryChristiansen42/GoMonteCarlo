@@ -24,13 +24,9 @@ class Board {
   Point* koPoint;
   Point* pass;
 
-  unsigned int capturedBlack;
-  unsigned int capturedWhite;
-
-  int boardSize;
   Player turn;
 
-  explicit Board(int newBoardSize);
+  explicit Board();
 
  private:
   Board(const Board& b);

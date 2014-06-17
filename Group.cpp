@@ -91,8 +91,8 @@ void Group::recalculateLiberties(Board* b) {
     }
   }
 
-  for (int r = 0; r < b->boardSize; r++)
-    for (int c = 0; c < b->boardSize; c++)
+  for (int r = 0; r < BOARD_SIZE; ++r)
+    for (int c = 0; c < BOARD_SIZE; ++c)
       b->positions[r][c]->marked = false;
 }
 
