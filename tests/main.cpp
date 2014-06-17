@@ -5,23 +5,20 @@
 
 BOOST_AUTO_TEST_CASE( testBoard )
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
-  BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
   
-  Board b2(boardSize);
+  Board b2;
   b2.init();
-  BOOST_CHECK_EQUAL(b2.boardSize, boardSize);
 
-  for(int i = 0; i < b2.boardSize; i++)
-    for(int j = 0; j < b2.boardSize; j++)
-      BOOST_CHECK_EQUAL(b2.positions[i][j]->color, Empty);
+  for(int i = 0; i < BOARD_SIZE; i++)
+    for(int j = 0; j < BOARD_SIZE; j++)
+      BOOST_CHECK_EQUAL(b2.positions[i][j].color, Empty);
   
   //Valid moves 
-  for(int i = 0; i < b1.boardSize; i++)
+  for(int i = 0; i < BOARD_SIZE; i++)
   {
-    for(int j = 0; j < b1.boardSize; j++)
+    for(int j = 0; j < BOARD_SIZE; j++)
     {
       Point validMove(i, j);
       BOOST_CHECK_EQUAL(b1.isValidMove(validMove), true);
@@ -29,20 +26,20 @@ BOOST_AUTO_TEST_CASE( testBoard )
   }
   
   //Pass
-  Point pass(b1.boardSize, b1.boardSize);
+  Point pass(BOARD_SIZE, BOARD_SIZE);
   BOOST_CHECK_EQUAL(b1.isValidMove(pass), true);
   
   //Invalid moves
-  Point invalidMove = Point(b1.boardSize+1, b1.boardSize);
+  Point invalidMove = Point(BOARD_SIZE+1, BOARD_SIZE);
   BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
   
-  invalidMove = Point(b1.boardSize, b1.boardSize+1);
+  invalidMove = Point(BOARD_SIZE, BOARD_SIZE+1);
   BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
   
-  invalidMove = Point(0, b1.boardSize);
+  invalidMove = Point(0, BOARD_SIZE);
   BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
   
-  invalidMove = Point(b1.boardSize, 0);
+  invalidMove = Point(BOARD_SIZE, 0);
   BOOST_CHECK_EQUAL(b1.isValidMove(invalidMove), false);
   
   invalidMove = Point(0, -1);
@@ -58,11 +55,10 @@ BOOST_AUTO_TEST_CASE( testBoard )
 
 BOOST_AUTO_TEST_CASE( testBoardHash )
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
   
-  Board b2(boardSize);
+  Board b2;
   b2.init();
 
   BOOST_CHECK_EQUAL(b1.getHash(), b2.getHash());
@@ -77,10 +73,8 @@ BOOST_AUTO_TEST_CASE( testBoardHash )
 
 BOOST_AUTO_TEST_CASE( testCornerCapture )
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
-  BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
 
   b1.makeMove(Point(0,0)); //Black
   b1.makeMove(Point(1,0)); //White
@@ -92,15 +86,14 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
   b1.makeMove(Point(8,1)); //White
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0].color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1].color, Empty);
 }
 
 BOOST_AUTO_TEST_CASE( testBoardKo )
 {
-  int boardSize = 5;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
 
   b1.makeMove(Point(0,0)); // Black
@@ -112,7 +105,7 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   b1.makeMove(Point(0,0)); // Black // Capture 1,0
   BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
 
-  Board b2(boardSize);
+  Board b2;
   b2.init();
   b2.makeMove(Point(1, 0)); // Black
   b2.makeMove(Point(0, 0)); // White
@@ -164,8 +157,16 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   --B-B
   */
 
-  Board b3(boardSize);
+/*
+  Board b3;
   b3.init();
+
+  b3.makeMove(Point(3, 5)); // Black
+  b3.makeMove(Point(BOARD_SIZE, BOARD_SIZE)); // White
+
+  b3.makeMove(Point(5, 4)); // Black
+  b3.makeMove(Point(BOARD_SIZE, BOARD_SIZE)); // White
+
   b3.makeMove(Point(4, 2)); // Black
   b3.makeMove(Point(1, 2)); // White
 
@@ -190,13 +191,12 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   b3.makeMove(Point(1, 4)); // Black
   b3.makeMove(Point(3, 4)); // White
 
-  b3.makeMove(Point(2, 4)); // Black
+  b3.makeMove(Point(2, 4)); // Black*/
 }
 
 BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
 
   std::list<unsigned long int> previousHashes;
@@ -234,8 +234,7 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
 
 
   // Shouldn't fail here
-  boardSize = 5;
-  Board b2(boardSize);
+  Board b2;
   b2.init();
 
   previousHashes.clear();
@@ -307,45 +306,44 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
 
 BOOST_AUTO_TEST_CASE( testIsSuicide )
 {
-  int boardSize = 6;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
     
   //Black
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), Black, White), false);
   b1.makeMove(Point(0,1)); 
     
   //White
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), White, Black), false);
   b1.makeMove(Point(0,2));
     
   //Black
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), Black, White), false);
   b1.makeMove(Point(1,0));
     
   //White
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), true);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), White, Black), true);
   b1.makeMove(Point(1,1));
     
   //Black
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
-  b1.makeMove(Point(5,5));
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), Black, White), false);
+  b1.makeMove(Point(4,4));
     
   //White
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), White, Black), false);
   b1.makeMove(Point(2,0));
     
   //Black
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), true);
-  b1.makeMove(Point(4,5));
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), Black, White), true);
+  b1.makeMove(Point(3,4));
     
   //White
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0)), false);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,0), White, Black), false);
   b1.makeMove(Point(0,0));
     
   //Black
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(1,0)), true);
-  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,1)), true);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(1,0), Black, White), true);
+  BOOST_CHECK_EQUAL(b1.isSuicide(Point(0,1), Black, White), true);
     
   /*  
     W _ W _ _
@@ -355,8 +353,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
     _ _ _ _ B
   */
     
-  boardSize = 5;
-  Board b2(boardSize);
+  Board b2;
   b2.init();
     
   b2.makeMove(Point(0,0)); //Black
@@ -401,8 +398,18 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
     W W W W W
     W _ W _ W
   */
+
+  b2.makeMove(Point(0, 5)); // White
+  b2.makeMove(Point(BOARD_SIZE, BOARD_SIZE)); // Black
+
+  b2.makeMove(Point(1, 5)); // White
+  b2.makeMove(Point(BOARD_SIZE, BOARD_SIZE)); // Black
+
+  b2.makeMove(Point(2, 5)); // White
+  b2.makeMove(Point(BOARD_SIZE, BOARD_SIZE)); // Black
+
   //White
-  BOOST_CHECK_EQUAL(b2.isSuicide(Point(0,2)), false);
+  BOOST_CHECK_EQUAL(b2.isSuicide(Point(0,2), White, Black), false);
   
   b2.makeMove(Point(0,2)); //White
   /* 11 captured, 13 territory, 12 stones
@@ -420,10 +427,8 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
 
 BOOST_AUTO_TEST_CASE( testGroup )
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
-  BOOST_CHECK_EQUAL(b1.boardSize, boardSize);
 
   b1.makeMove(Point(0,0)); //Black
   b1.makeMove(Point(1,0)); //White
@@ -436,9 +441,9 @@ BOOST_AUTO_TEST_CASE( testGroup )
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   b1.makeMove(Point(8,2)); //White
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0]->color, Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0]->color, Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1]->color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][0].color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1][0].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0][1].color, Empty);
   
   BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
   BOOST_CHECK_EQUAL(b1.blackGroups.size(), 4);
@@ -465,8 +470,7 @@ BOOST_AUTO_TEST_CASE( testGroup )
 
 bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 {
-  int boardSize = 9;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = *b1.blackGroups.begin();
@@ -503,8 +507,7 @@ BOOST_AUTO_TEST_CASE( testGroupAdjacent )
 
 BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
 {
-  int boardSize = 5;
-  Board b1(boardSize);
+  Board b1;
   b1.init();
   b1.makeMove(Point(0, 0)); // Black
   Group* g = *b1.blackGroups.begin();
@@ -526,7 +529,7 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
 
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 {
-  Board b1(Black);
+  Board b1;
   b1.init();
   b1.makeMove(Point(stoneX,stoneY));
   Group* g = *b1.blackGroups.begin();
@@ -537,26 +540,25 @@ bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 
 BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
 {
-  int boardSize = 9;
-  for(int row = 0; row < boardSize; row++)
+  for(int row = 0; row < BOARD_SIZE; row++)
   {
-    for(int column = 0; column < boardSize; column++)
+    for(int column = 0; column < BOARD_SIZE; column++)
     {
       //above
       if(row > 0)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
       //below
-      if(row < boardSize-1)
+      if(row < BOARD_SIZE-1)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
       //left
       if(column > 0)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
       //above
-      if(column < boardSize-1)
+      if(column < BOARD_SIZE-1)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
       
       //pass
-      BOOST_CHECK_EQUAL(testAdjacent(row, column, boardSize, boardSize), false);
+      BOOST_CHECK_EQUAL(testAdjacent(row, column, BOARD_SIZE, BOARD_SIZE), false);
     }
   }
 }
@@ -564,8 +566,7 @@ BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
 
 BOOST_AUTO_TEST_CASE( testBoardClone )
 {
-  int boardSize = 9;
-  Board* b1 = new Board(boardSize);
+  Board* b1 = new Board();
   b1->init();
   b1->makeMove(Point(1,1));
 
@@ -584,11 +585,11 @@ BOOST_AUTO_TEST_CASE( testBoardClone )
 BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
 {
   int boardSize = 9;
-  Board* b1 = new Board(boardSize);
+  Board* b1 = new Board();
   b1->init();
-  for(int row = 0; row < boardSize-1; row++)
+  for(int row = 0; row < BOARD_SIZE-1; row++)
   {
-    for(int column = 0; column < boardSize; column++)
+    for(int column = 0; column < BOARD_SIZE; column++)
     {
       b1->makeMove(Point(row, column));
       b1->makeMove(Point(boardSize, boardSize));

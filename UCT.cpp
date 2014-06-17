@@ -79,8 +79,8 @@ UCTNode* getNewChild(UCTNode* node) {
     }*/
     for (int row = 0; row < BOARD_SIZE; ++row) {
       for (int column = 0; column < BOARD_SIZE; ++column) {
-        if (node->state->positions[row][column]->legal) {
-          UCTNode* child = new UCTNode(*node->state->positions[row][column], node);
+        if (node->state->positions[row][column].legal) {
+          UCTNode* child = new UCTNode(node->state->positions[row][column], node);
           node->possibleChildren.push_back(child);
         }
       }

@@ -93,7 +93,7 @@ void Group::recalculateLiberties(Board* b) {
 
   for (int r = 0; r < BOARD_SIZE; ++r)
     for (int c = 0; c < BOARD_SIZE; ++c)
-      b->positions[r][c]->marked = false;
+      b->positions[r][c].marked = false;
 }
 
 void printGroup(Group* g) {
