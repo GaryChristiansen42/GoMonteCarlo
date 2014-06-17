@@ -187,16 +187,16 @@ float Board::getTaylorScore(float komi) {
   float score = -komi;  // score = blackScore - whiteScore
   // score += static_cast<float>(capturedWhite) -
     // static_cast<float>(capturedBlack);
-  for (int row = 0; row < boardSize; row++) {
-    for (int column = 0; column < boardSize; column++) {
-      if (positions[row][column]->color == Black) {
-        score++;
+  for (int row = 0; row < boardSize; ++row) {
+    for (int column = 0; column < boardSize; ++column) {
+      if (positions[row][column]->marked) {
+        // Already visited empty space territory
+        continue;
+      } else if (positions[row][column]->color == Black) {
+        ++score;
         continue;
       } else if (positions[row][column]->color == White) {
-        score--;
-        continue;
-      } else if (positions[row][column]->color == Mark) {
-        // Already visited empty space territory
+        --score;
         continue;
       }
 
@@ -213,18 +213,18 @@ float Board::getTaylorScore(float komi) {
           adjacentToBlack = true;
         } else if (p->color == White) {
           adjacentToWhite = true;
-        } else if (p->color == Empty) {
-          if (p->north != NULL)
+        } else if (p->color == Empty && !p->marked) {
+          if (p->north != NULL && !p->north->marked)
             s.push(p->north);
-          if (p->east != NULL)
+          if (p->east != NULL && !p->east->marked)
             s.push(p->east);
-          if (p->south != NULL)
+          if (p->south != NULL && !p->south->marked)
             s.push(p->south);
-          if (p->west != NULL)
+          if (p->west != NULL && !p->west->marked)
             s.push(p->west);
           sizeOfEmptySpace++;
 
-          p->color = Mark;
+          p->marked = true;
         }
       }
 
@@ -235,24 +235,17 @@ float Board::getTaylorScore(float komi) {
       }
     }
   }
+
+  for (int r = 0; r < boardSize; ++r)
+    for (int c = 0; c < boardSize; ++c)
+      positions[r][c]->marked = false;
   return score;
 }
 
 bool Board::isGameOver(GameResult *result) {
   if (lastMove == pass && secondLastMove == pass) {
-    /*float whiteScore = 0;
-    float blackScore = 0;
-    getSimpleScore(&whiteScore, &blackScore);
-    if (whiteScore > blackScore)
-      *result = WhiteWon;
-    else if (blackScore > whiteScore)
-      *result = BlackWon;
-    else
-      *result = Draw;*/
     float komi = 7.5;
-    Board* temp = clone();
-    float score = temp->getTaylorScore(komi);
-    delete temp;
+    float score = getTaylorScore(komi);
     if (score > 0)
       *result = BlackWon;
     else if (score < 0)
@@ -472,6 +465,7 @@ void Board::makeMove(Point move) {
 }
 
 void decrementNeighborGroups(Point* move) {
+  // TODO(GaryChristiansen): Optimize this, maybe add 'marked' for groups and eliminate decrementedGroups?
   std::list<Group*> decrementedGroups;
   if (move->north != NULL && move->north->color != Empty) {
     move->north->group->numberLiberties--;
