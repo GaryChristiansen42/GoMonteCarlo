@@ -3,12 +3,12 @@
 #include <assert.h>
 
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <sstream>
 #include <stack>
 
 Board::Board() :
-  positions(new Point**[BOARD_SIZE]),
   numLegalMoves(0),
   blackGroups(std::list<Group*>()),
   whiteGroups(std::list<Group*>()),
@@ -17,9 +17,6 @@ Board::Board() :
   koPoint(NULL),
   pass(new Point(BOARD_SIZE, BOARD_SIZE)),
   turn(Black) {
-  for (int row = 0; row < BOARD_SIZE; ++row) {
-    positions[row] = new Point*[BOARD_SIZE];
-  }
 }
 
 Board::~Board() {
@@ -27,9 +24,7 @@ Board::~Board() {
     for (int column = 0; column < BOARD_SIZE; ++column) {
       delete positions[row][column];
     }
-    delete[] positions[row];
   }
-  delete[] positions;
 
   for(Group* g : blackGroups)
     delete g;

@@ -11,7 +11,7 @@ class Group;
 
 class Board {
  public:
-  Point ***positions;
+  Point *positions[9][9];
 
   Point* legalMoves[82];
   int numLegalMoves;
