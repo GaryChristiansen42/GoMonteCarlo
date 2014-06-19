@@ -308,7 +308,6 @@ void Board::updateStructures(Point* move) {
   }
 
   if (numGroupsToCombine > 1) {
-    std::list<Group*> toDelete;
     for (unsigned char i = 0; i < numGroupsToCombine; ++i) {
       Group* g = groupsToCombine[i];
       if (g == move->group) {  // move's group will survive, others removed
@@ -319,14 +318,10 @@ void Board::updateStructures(Point* move) {
         g->stones.pop_front();
       }
 
-      toDelete.push_back(g);
-
-    }
-    while(toDelete.size() > 0) {
       bool found = false;
       for (auto it = groupsSameColor->begin(); it != groupsSameColor->end();
         ++it) {
-        if (toDelete.front() == *it) {
+        if (g == *it) {
           delete (*it);
           groupsSameColor->erase(it);
           found = true;
@@ -334,7 +329,6 @@ void Board::updateStructures(Point* move) {
         }
       }
       assert(found);
-      toDelete.remove(toDelete.front()); 
     }
   }
 }
