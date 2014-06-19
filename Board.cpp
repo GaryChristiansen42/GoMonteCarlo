@@ -472,45 +472,48 @@ void Board::makeMove(Point move) {
 
 void decrementNeighborGroups(Point* move) {
   // TODO(GaryChristiansen): Optimize this, maybe add 'marked' for groups and eliminate decrementedGroups?
-  std::list<Group*> decrementedGroups;
+  Group* decrementedGroups[4];
+  unsigned char numDecrementedGroups = 0;
   if (move->north != NULL && move->north->color != Empty) {
     move->north->group->numberLiberties--;
-    decrementedGroups.push_back(move->north->group);
+    decrementedGroups[0] = move->north->group;
+    ++numDecrementedGroups;
   }
   if (move->east != NULL && move->east->color != Empty) {
     bool found = false;
-    for (Group* g : decrementedGroups) {
-      if (g == move->east->group) {
+    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
+      if (decrementedGroups[i] == move->east->group) {
         found = true;
       }
     }
     if (!found) {
       move->east->group->numberLiberties--;
-      decrementedGroups.push_back(move->east->group);
+      decrementedGroups[numDecrementedGroups] = move->east->group;
+      ++numDecrementedGroups;
     }
   }
   if (move->south != NULL && move->south->color != Empty) {
     bool found = false;
-    for (Group* g : decrementedGroups) {
-      if (g == move->south->group) {
+    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
+      if (decrementedGroups[i] == move->south->group) {
         found = true;
       }
     }
     if (!found) {
       move->south->group->numberLiberties--;
-      decrementedGroups.push_back(move->south->group);
+      decrementedGroups[numDecrementedGroups] = move->south->group;
+      ++numDecrementedGroups;
     }
   }
   if (move->west != NULL && move->west->color != Empty) {
     bool found = false;
-    for (Group* g : decrementedGroups) {
-      if (g == move->west->group) {
+    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
+      if (decrementedGroups[i] == move->west->group) {
         found = true;
       }
     }
     if (!found) {
       move->west->group->numberLiberties--;
-      decrementedGroups.push_back(move->west->group);
     }
   }
 }
