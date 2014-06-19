@@ -44,6 +44,7 @@ void printNode(UCTNode* n, char* spaces) {
 }
 
 UCTNode* bestChild(UCTNode* node) {
+  node->mutex.lock();
   const double c = 1;  // / sqrt(static_cast<float>(2));
   // const double c = 1;
   UCTNode* bestChild = node->child;
@@ -58,25 +59,13 @@ UCTNode* bestChild(UCTNode* node) {
     }
     next = next->sibling;
   }
+  node->mutex.unlock();
   return bestChild;
 }
 
 UCTNode* getNewChild(UCTNode* node) {
-  if (node->possibleChildren.size() == 0 && node->child == NULL) {
-    // vector<UCTNode*> possibleChildren;
-    /*for (int r = 0; r < node->state->boardSize; r++) {
-      for (int c = 0; c < node->state->boardSize; c++) {
-        if (node->state->positions[r][c] == Empty) {
-          Point move(r, c);
-          UCTNode* child = new UCTNode(move, node->state, node);
-          child->state->makeMove(move);
-          // if(!node->isChild(move))
-            node->possibleChildren.push_back(child);
-          // else
-          //  delete child;
-        }
-      }
-    }*/
+  node->mutex.lock();
+  if (node->possibleChildren.empty() && node->child == NULL) {
     for (int row = 0; row < BOARD_SIZE; ++row) {
       for (int column = 0; column < BOARD_SIZE; ++column) {
         if (node->state->positions[row][column].legal) {
@@ -87,15 +76,14 @@ UCTNode* getNewChild(UCTNode* node) {
     }
 
     Point pass(BOARD_SIZE, BOARD_SIZE);
-    if (!node->isChild(pass)) {
-      // Add pass move to possible moves
-      UCTNode* passChild = new UCTNode(pass, node);
-      node->possibleChildren.push_back(passChild);
-    }
+    UCTNode* passChild = new UCTNode(pass, node);
+    node->possibleChildren.push_back(passChild);
   }
 
-  if (node->possibleChildren.size() == 0)
+  if (node->possibleChildren.size() == 0) {
+    node->mutex.unlock();
     return NULL;
+  }
   // else //Pick random child
   // {
     static unsigned int seed = static_cast<unsigned int>(time(NULL));
@@ -108,6 +96,7 @@ UCTNode* getNewChild(UCTNode* node) {
     // node->possibleChildren.erase(&node->possibleChildren.begin()+choice);
     node->possibleChildren[choice] = node->possibleChildren.back();
     node->possibleChildren.pop_back();
+    node->mutex.unlock();
     if (chosenChild->visits == 0)
       chosenChild->init();
     return chosenChild;
@@ -157,11 +146,13 @@ void backup(UCTNode* v, int reward) {
   // If not me, then its updating opponent
   bool me = true;
   while (v != NULL) {
+    v->mutex.lock();
     v->visits++;
     if (me)
       v->totalRewards += reward;
     else
       v->totalRewards -= reward;
+    v->mutex.unlock();
     v = v->parent;
     me = !me;
   }
@@ -214,15 +205,11 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
     simulationCount++;
     i++;
 
-    treePolicyMutex.lock();
     UCTNode* v = TreePolicy(root);
-    treePolicyMutex.unlock();
 
     int reward = DefaultPolicy(v, clone);
 
-    backUpMutex.lock();
     backup(v, reward);
-    backUpMutex.unlock();
 
     /*if (i % 100 == 0 && i != 0) {
       char buffer[100];

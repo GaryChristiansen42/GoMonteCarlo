@@ -1,6 +1,7 @@
 #ifndef UCTNODE_H_
 #define UCTNODE_H_
 
+#include <mutex>
 #include <vector>
 
 #include "Point.h"
@@ -20,6 +21,7 @@ struct UCTNode {
 
   double totalRewards;
   int visits;
+  std::mutex mutex;
 
   UCTNode(Point newMove, UCTNode* newParent);
   UCTNode(const UCTNode& n);
