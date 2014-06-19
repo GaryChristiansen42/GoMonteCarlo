@@ -260,24 +260,42 @@ void Board::updateStructures(Point* move) {
       move->east->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine[numGroupsToCombine] = move->east->group;
-    ++numGroupsToCombine;
+    bool found = false;
+    for (unsigned char i = 0; i < numGroupsToCombine; ++i)
+      if (groupsToCombine[i] == move->east->group)
+        found = true;
+    if (!found) {
+      groupsToCombine[numGroupsToCombine] = move->east->group;
+      ++numGroupsToCombine;
+    }
   }
   if (move->south != NULL && move->south->color == move->color) {
     if (!inGroup) {
       move->south->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine[numGroupsToCombine] = move->south->group;
-    ++numGroupsToCombine;
+    bool found = false;
+    for (unsigned char i = 0; i < numGroupsToCombine; ++i)
+      if (groupsToCombine[i] == move->south->group)
+        found = true;
+    if (!found) {
+      groupsToCombine[numGroupsToCombine] = move->south->group;
+      ++numGroupsToCombine;
+    }
   }
   if (move->west != NULL && move->west->color == move->color) {
     if (!inGroup) {
       move->west->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine[numGroupsToCombine] = move->west->group;
-    ++numGroupsToCombine;
+    bool found = false;
+    for (unsigned char i = 0; i < numGroupsToCombine; ++i)
+      if (groupsToCombine[i] == move->west->group)
+        found = true;
+    if (!found) {
+      groupsToCombine[numGroupsToCombine] = move->west->group;
+      ++numGroupsToCombine;
+    }
   }
 
 
