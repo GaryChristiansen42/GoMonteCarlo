@@ -246,11 +246,13 @@ bool Board::isGameOver(GameResult *result) {
 }
 
 void Board::updateStructures(Point* move) {
-  std::list<Group*> groupsToCombine;
+  Group* groupsToCombine[4];
+  unsigned char numGroupsToCombine = 0;
   bool inGroup = false;
   if (move->north != NULL && move->north->color == move->color) {
     move->north->group->addStone(move);
-    groupsToCombine.push_back(move->north->group);
+    groupsToCombine[0] = move->north->group;
+    ++numGroupsToCombine;
     inGroup = true;
   }
   if (move->east != NULL && move->east->color == move->color) {
@@ -258,21 +260,24 @@ void Board::updateStructures(Point* move) {
       move->east->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine.push_back(move->east->group);
+    groupsToCombine[numGroupsToCombine] = move->east->group;
+    ++numGroupsToCombine;
   }
   if (move->south != NULL && move->south->color == move->color) {
     if (!inGroup) {
       move->south->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine.push_back(move->south->group);
+    groupsToCombine[numGroupsToCombine] = move->south->group;
+    ++numGroupsToCombine;
   }
   if (move->west != NULL && move->west->color == move->color) {
     if (!inGroup) {
       move->west->group->addStone(move);
       inGroup = true;
     }
-    groupsToCombine.push_back(move->west->group);
+    groupsToCombine[numGroupsToCombine] = move->west->group;
+    ++numGroupsToCombine;
   }
 
 
@@ -284,9 +289,10 @@ void Board::updateStructures(Point* move) {
     groupsSameColor->push_back(group);
   }
 
-  if (groupsToCombine.size() > 1) {
+  if (numGroupsToCombine > 1) {
     std::list<Group*> toDelete;
-    for (Group* g : groupsToCombine) {
+    for (unsigned char i = 0; i < numGroupsToCombine; ++i) {
+      Group* g = groupsToCombine[i];
       if (g == move->group) {  // move's group will survive, others removed
         continue;
       }
