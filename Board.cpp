@@ -742,11 +742,11 @@ void Board::getPossibleMoves() {
   pass->legal = true;
   legalMoves[numLegalMoves] = pass;
   ++numLegalMoves;
-  for (int r = 0; r < BOARD_SIZE; ++r) {
-    for (int c = 0; c < BOARD_SIZE; ++c) {
+  for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
+    for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (positions[r][c].color == Empty
-        && &positions[r][c] != koPoint
-        && !isSuicide(&positions[r][c], sameColor, oppositeColor)) {
+        && !isSuicide(&positions[r][c], sameColor, oppositeColor)
+        && &positions[r][c] != koPoint) {
         positions[r][c].legal = true;
         legalMoves[numLegalMoves] = &positions[r][c];
         ++numLegalMoves;
