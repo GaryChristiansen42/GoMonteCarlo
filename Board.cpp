@@ -314,7 +314,7 @@ void Board::updateStructures(Point* move) {
       if (g == move->group) {  // move's group will survive, others removed
         continue;
       }
-      while (g->stones.size() > 0) {
+      while (!g->stones.empty()) {
         move->group->addStone(*g->stones.begin());
         g->stones.pop_front();
       }
