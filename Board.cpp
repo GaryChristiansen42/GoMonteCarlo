@@ -30,14 +30,20 @@ Board::~Board() {
 }
 
 void Board::init() {
-  for (int row = 0; row < BOARD_SIZE; ++row) {
-    for (int column = 0; column < BOARD_SIZE; ++column) {
+  numLegalMoves = 1;
+  legalMoves[0] = pass;
+  pass->legal = true;
+  for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
+    for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       positions[row][column].row = row;
       positions[row][column].column = column;
+      positions[row][column].legal = true;
+      legalMoves[numLegalMoves] = &positions[row][column];
+      ++numLegalMoves;
     }
   }
-  for (int row = 0; row < BOARD_SIZE; ++row) {
-    for (int column = 0; column < BOARD_SIZE; ++column) {
+  for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
+    for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       if (row + 1 < BOARD_SIZE)
         positions[row][column].north = &positions[row+1][column];
       if (column + 1 < BOARD_SIZE)
@@ -48,8 +54,6 @@ void Board::init() {
         positions[row][column].west = &positions[row][column-1];
     }
   }
-
-  getPossibleMoves();
 }
 
 bool Board::operator==(const Board &b) {
@@ -69,8 +73,8 @@ bool Board::operator==(const Board &b) {
 Board* Board::clone() {
   Board* b = new Board();
 
-  for (int row = 0; row < BOARD_SIZE; row++) {
-    for (int column = 0; column < BOARD_SIZE; column++) {
+  for (unsigned char row = 0; row < BOARD_SIZE; row++) {
+    for (unsigned char column = 0; column < BOARD_SIZE; column++) {
       b->positions[row][column].row = row;
       b->positions[row][column].column = column;
     }
@@ -84,8 +88,8 @@ Board* Board::clone() {
 void Board::cloneInto(Board* b) {
   b->numLegalMoves = 0;
   b->legalMoves[b->numLegalMoves++] = b->pass;
-  for (int r = 0; r < BOARD_SIZE; r++) {
-    for (int c = 0; c < BOARD_SIZE; c++) {
+  for (unsigned char r = 0; r < BOARD_SIZE; r++) {
+    for (unsigned char c = 0; c < BOARD_SIZE; c++) {
       b->positions[r][c].group = NULL;
       b->positions[r][c].color = positions[r][c].color;
       b->positions[r][c].legal = positions[r][c].legal;
@@ -95,8 +99,8 @@ void Board::cloneInto(Board* b) {
     }
   }
 
-  for (int r = 0; r < BOARD_SIZE; ++r) {
-    for (int c = 0; c < BOARD_SIZE; ++c) {
+  for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
+    for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (r + 1 < BOARD_SIZE)
         b->positions[r][c].north = &b->positions[r+1][c];
       else
@@ -471,7 +475,6 @@ void Board::makeMove(Point move) {
 }
 
 void decrementNeighborGroups(Point* move) {
-  // TODO(GaryChristiansen): Optimize this, maybe add 'marked' for groups and eliminate decrementedGroups?
   Group* decrementedGroups[4];
   unsigned char numDecrementedGroups = 0;
   if (move->north != NULL && move->north->color != Empty) {
@@ -520,7 +523,7 @@ void decrementNeighborGroups(Point* move) {
 
 
 void Board::makeMove(Point* move) {
-  // Don't place stone for p asses
+  // Don't place stone for passes
   if (!(*move == *pass)) {
     if (!move->legal) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n",
