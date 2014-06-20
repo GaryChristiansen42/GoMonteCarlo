@@ -337,12 +337,12 @@ void Board::updateStructures(Point* move) {
   }
 }
 
-unsigned int Board::removeDeadStones(Player color, Point* move) {
-  std::list<Point*> capturedStones;
-
+void Board::removeDeadStones(Player color) {
   std::list<Group*>* firstGroups =
     (color == Black) ? &blackGroups : &whiteGroups;
   // vector<Group*> secondGroup = (turn == Black) ? blackGroups : whiteGroups;
+
+  unsigned int numDeadStones = 0;
 
   std::list<Group*> deadGroups;
   for(Group* group : *firstGroups)
@@ -352,11 +352,12 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   // beg1:
   for(Group* deadGroup : deadGroups) {
     // remove dead stones on board
-    for(Point* stone : deadGroup->stones) {
-      stone->color = Empty;
-      stone->group = NULL;
-      capturedStones.push_back(stone);
+    unsigned int numStones = (unsigned int)deadGroup->stones.size();
+    if (numStones == 1) {
+      koPoint = *deadGroup->stones.begin();
     }
+    numDeadStones += numStones;
+    deadGroup->removeStones();
 
     for (std::list<Group*>::iterator groupIterator = firstGroups->begin();
       groupIterator != firstGroups->end(); ++groupIterator) {
@@ -368,17 +369,10 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
     delete deadGroup;
   }
 
-  if (capturedStones.size() == 1) {
-    for (Point* p : capturedStones) {
-      if (move->isAdjacent(*p)) {
-        koPoint = p;
-        break;
-      }
-    }
-  } else {
+  if (numDeadStones != 1) {
     koPoint = NULL;
   }
-
+/*
   std::list<Group*> neighborGroupsToBeUpdated;
   for (Point* p : capturedStones) {
     bool found;
@@ -432,9 +426,7 @@ unsigned int Board::removeDeadStones(Player color, Point* move) {
   }
 
   for (Group* g : neighborGroupsToBeUpdated)
-    g->recalculateLiberties(this);
-
-  return static_cast<unsigned int>(capturedStones.size());
+    g->recalculateLiberties(this);*/
 }
 
 unsigned long int Board::getHash() {
@@ -474,54 +466,6 @@ void Board::makeMove(Point move) {
   makeMove(movePointer);
 }
 
-void decrementNeighborGroups(Point* move) {
-  Group* decrementedGroups[4];
-  unsigned char numDecrementedGroups = 0;
-  if (move->north != NULL && move->north->color != Empty) {
-    move->north->group->numberLiberties--;
-    decrementedGroups[0] = move->north->group;
-    ++numDecrementedGroups;
-  }
-  if (move->east != NULL && move->east->color != Empty) {
-    bool found = false;
-    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
-      if (decrementedGroups[i] == move->east->group) {
-        found = true;
-      }
-    }
-    if (!found) {
-      move->east->group->numberLiberties--;
-      decrementedGroups[numDecrementedGroups] = move->east->group;
-      ++numDecrementedGroups;
-    }
-  }
-  if (move->south != NULL && move->south->color != Empty) {
-    bool found = false;
-    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
-      if (decrementedGroups[i] == move->south->group) {
-        found = true;
-      }
-    }
-    if (!found) {
-      move->south->group->numberLiberties--;
-      decrementedGroups[numDecrementedGroups] = move->south->group;
-      ++numDecrementedGroups;
-    }
-  }
-  if (move->west != NULL && move->west->color != Empty) {
-    bool found = false;
-    for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
-      if (decrementedGroups[i] == move->west->group) {
-        found = true;
-      }
-    }
-    if (!found) {
-      move->west->group->numberLiberties--;
-    }
-  }
-}
-
-
 void Board::makeMove(Point* move) {
   // Don't place stone for passes
   if (!(*move == *pass)) {
@@ -549,9 +493,9 @@ void Board::makeMove(Point* move) {
     }
     move->color = turn;
 
-    decrementNeighborGroups(move);
+    move->decrementNeighborGroups();
     updateStructures(move);
-    removeDeadStones((turn == Black ? White : Black), move);
+    removeDeadStones((turn == Black ? White : Black));
 
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko

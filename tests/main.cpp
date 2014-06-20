@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( testBoardKo )
   WWBB-
   --B-B
   */
-  b2.makeMove(Point(1, 2)); // White
+  b2.makeMove(Point(1, 2)); // Black
   /*
   WWW--
   BBBWW

@@ -30,5 +30,8 @@ struct Point{
   bool operator!=(const Point &p);
 
   bool isAdjacent(const Point &p);
+
+  void decrementNeighborGroups();
+  void incrementNeighborGroups();
 };
 #endif  // POINT_H_

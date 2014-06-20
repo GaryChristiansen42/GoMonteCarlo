@@ -21,13 +21,15 @@ class Group {
 
   void addStone(Point* p);
 
+  void removeStones();
+
   bool contains(Point* p);
   bool isAdjacent(Point* p);
 
   bool hasLiberties();
   int numLiberties();
 
-  void recalculateLiberties(Board* b);
+  // void recalculateLiberties(Board* b);
 };
 
 void printGroup(Group* g);
