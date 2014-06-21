@@ -33,12 +33,10 @@ Board::~Board() {
 void Board::init() {
   numLegalMoves = 1;
   legalMoves[0] = pass;
-  pass->legal = true;
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       positions[row][column].row = row;
       positions[row][column].column = column;
-      positions[row][column].legal = true;
       legalMoves[numLegalMoves] = &positions[row][column];
       ++numLegalMoves;
     }
@@ -93,12 +91,11 @@ void Board::cloneInto(Board* b) {
     for (unsigned char c = 0; c < BOARD_SIZE; c++) {
       b->positions[r][c].group = NULL;
       b->positions[r][c].color = positions[r][c].color;
-      b->positions[r][c].legal = positions[r][c].legal;
-      if (positions[r][c].legal) {
-        b->legalMoves[b->numLegalMoves++] = &b->positions[r][c];
-      }
     }
   }
+
+  for (unsigned char i = 0; i < numLegalMoves; ++i)
+    b->legalMoves[b->numLegalMoves++] = b->getPoint(legalMoves[i]);
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
@@ -128,6 +125,10 @@ void Board::cloneInto(Board* b) {
 
   b->koPoint = b->getPoint(koPoint);
 
+  cloneGroupsInto(b);
+}
+
+void Board::cloneGroupsInto(Board* b) {
   for(Group* g : blackGroups) {
     Group* gClone = new Group(Black);
     for(Point* p : g->stones) {
@@ -159,7 +160,10 @@ bool Board::isValidMove(Point move) {
     return false;
   if (move.column < 0 || move.column >= BOARD_SIZE)
     return false;
-  return positions[move.row][move.column].legal;
+  for (unsigned char i = 0; i < numLegalMoves; ++i)
+    if (*legalMoves[i] == move)
+      return true;
+  return false;
 }
 
 // Fuego
@@ -477,7 +481,7 @@ void Board::makeMove(Point move) {
 void Board::makeMove(Point* move) {
   // Don't place stone for passes
   if (!(*move == *pass)) {
-    if (!move->legal) {
+    /*if (!move->legal) {
       printf("Illegal Move\nRow: %d\nColumn: %d\n",
         move->row, move->column);
       if (koPoint != NULL)
@@ -490,7 +494,7 @@ void Board::makeMove(Point* move) {
               row, column);
       show();
       assert(move->legal);
-    }
+    }*/
 
 
     if (move->color != Empty) {
@@ -647,18 +651,11 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
 }*/
 
 void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes) {
-  for (int r = 0; r < BOARD_SIZE; r++) {
-    for (int c = 0; c < BOARD_SIZE; c++) {
-      if (positions[r][c].legal
-        && isPositionalSuperKo(&positions[r][c], previousHashes)) {
-        positions[r][c].legal = false;
-        for (int i = 0; i < numLegalMoves; i++) {
-          if (legalMoves[i] == &positions[r][c]) {
-            legalMoves[i] = legalMoves[numLegalMoves-1];
-            numLegalMoves--;
-          }
-        }
-      }
+  for (unsigned char i = 0; i < numLegalMoves; ++i) {
+    if (isPositionalSuperKo(legalMoves[i], previousHashes)) {
+      legalMoves[i] = legalMoves[numLegalMoves-1];
+      numLegalMoves--;
+      --i;
     }
   }
 }
@@ -694,7 +691,6 @@ void Board::getPossibleMoves() {
   Player sameColor = turn == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
   numLegalMoves = 0;
-  pass->legal = true;
   legalMoves[numLegalMoves] = pass;
   ++numLegalMoves;
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
@@ -702,11 +698,8 @@ void Board::getPossibleMoves() {
       if (positions[r][c].color == Empty
         && !isSuicide(&positions[r][c], sameColor, oppositeColor)
         && &positions[r][c] != koPoint) {
-        positions[r][c].legal = true;
         legalMoves[numLegalMoves] = &positions[r][c];
         ++numLegalMoves;
-      } else {
-        positions[r][c].legal = false;
       }
     }
   }

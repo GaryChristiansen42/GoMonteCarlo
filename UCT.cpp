@@ -66,13 +66,9 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == NULL) {
-    for (int row = 0; row < BOARD_SIZE; ++row) {
-      for (int column = 0; column < BOARD_SIZE; ++column) {
-        if (node->state->positions[row][column].legal) {
-          UCTNode* child = new UCTNode(node->state->positions[row][column], node);
-          node->possibleChildren.push_back(child);
-        }
-      }
+    for (int i = 0; i  < node->state->numLegalMoves; ++i) {
+      UCTNode* child = new UCTNode(*node->state->legalMoves[i], node);
+      node->possibleChildren.push_back(child);
     }
 
     Point pass(BOARD_SIZE, BOARD_SIZE);

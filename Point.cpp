@@ -6,19 +6,18 @@
 
 Point::Point() :
   row(0), column(0), group(NULL), north(NULL), east(NULL), south(NULL),
-  west(NULL), color(Empty), marked(false), legal(false)
+  west(NULL), color(Empty), marked(false)
 { }
 
 Point::Point(int newRow, int newColumn) :
   row(newRow), column(newColumn), group(NULL), north(NULL), east(NULL),
-  south(NULL), west(NULL), color(Empty), marked(false), legal(false)
+  south(NULL), west(NULL), color(Empty), marked(false)
 { }
 
 Point::Point(int newRow, int newColumn, Player newColor, Group* newGroup,
-  Point* newNorth, Point* newEast, Point* newSouth, Point* newWest, bool newLegal) :
+  Point* newNorth, Point* newEast, Point* newSouth, Point* newWest) :
   row(newRow), column(newColumn), group(newGroup), north(newNorth),
-  east(newEast), south(newSouth), west(newWest), color(newColor), marked(false),
-  legal(newLegal)
+  east(newEast), south(newSouth), west(newWest), color(newColor), marked(false)
 { }
 
 bool Point::operator==(const Point &p) {
