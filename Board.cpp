@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <functional>
@@ -10,8 +11,8 @@
 
 Board::Board() :
   numLegalMoves(0),
-  blackGroups(std::list<Group*>()),
-  whiteGroups(std::list<Group*>()),
+  blackGroups(std::vector<Group*>()),
+  whiteGroups(std::vector<Group*>()),
   lastMove(NULL),
   secondLastMove(NULL),
   koPoint(NULL),
@@ -303,7 +304,7 @@ void Board::updateStructures(Point* move) {
   }
 
 
-  std::list<Group*>* groupsSameColor =
+  std::vector<Group*>* groupsSameColor =
     (move->color == Black) ? &blackGroups : &whiteGroups;
   if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
@@ -322,6 +323,10 @@ void Board::updateStructures(Point* move) {
         g->stones.pop_front();
       }
 
+      std::remove(groupsSameColor->begin(), groupsSameColor->end(), g);
+      groupsSameColor->pop_back();
+      delete g;
+      /*
       bool found = false;
       for (auto it = groupsSameColor->begin(); it != groupsSameColor->end();
         ++it) {
@@ -332,19 +337,19 @@ void Board::updateStructures(Point* move) {
           break;
         }
       }
-      assert(found);
+      assert(found);*/
     }
   }
 }
 
 void Board::removeDeadStones(Player color) {
-  std::list<Group*>* firstGroups =
+  std::vector<Group*>* firstGroups =
     (color == Black) ? &blackGroups : &whiteGroups;
   // vector<Group*> secondGroup = (turn == Black) ? blackGroups : whiteGroups;
 
   unsigned int numDeadStones = 0;
 
-  std::list<Group*> deadGroups;
+  std::vector<Group*> deadGroups;
   for(Group* group : *firstGroups)
     if (!(group->hasLiberties()))
       deadGroups.push_back(group);
@@ -359,13 +364,16 @@ void Board::removeDeadStones(Player color) {
     numDeadStones += numStones;
     deadGroup->removeStones();
 
-    for (std::list<Group*>::iterator groupIterator = firstGroups->begin();
+    std::remove(firstGroups->begin(), firstGroups->end(), deadGroup);
+    firstGroups->pop_back();
+    /*
+    for (std::vector<Group*>::iterator groupIterator = firstGroups->begin();
       groupIterator != firstGroups->end(); ++groupIterator) {
       if (deadGroup == (*groupIterator)) {
         firstGroups->erase(groupIterator);
         break;
       }
-    }
+    }*/
     delete deadGroup;
   }
 

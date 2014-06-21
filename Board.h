@@ -3,7 +3,7 @@
 
 #define RUNNING_TESTS
 
-#include <list>
+#include <vector>
 
 #include "Group.h"
 
@@ -14,10 +14,10 @@ class Board {
   Point positions[9][9];
 
   Point* legalMoves[82];
-  int numLegalMoves;
+  unsigned char numLegalMoves;
 
-  std::list<Group*> blackGroups;
-  std::list<Group*> whiteGroups;
+  std::vector<Group*> blackGroups;
+  std::vector<Group*> whiteGroups;
 
   Point* lastMove;
   Point* secondLastMove;
