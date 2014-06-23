@@ -85,17 +85,12 @@ Board* Board::clone() {
 }
 
 void Board::cloneInto(Board* b) {
-  b->numLegalMoves = 0;
-  b->legalMoves[b->numLegalMoves++] = b->pass;
   for (unsigned char r = 0; r < BOARD_SIZE; r++) {
     for (unsigned char c = 0; c < BOARD_SIZE; c++) {
       b->positions[r][c].group = NULL;
       b->positions[r][c].color = positions[r][c].color;
     }
   }
-
-  for (unsigned char i = 0; i < numLegalMoves; ++i)
-    b->legalMoves[b->numLegalMoves++] = b->getPoint(legalMoves[i]);
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
