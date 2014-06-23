@@ -66,7 +66,7 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == NULL) {
-    for (int i = 0; i  < node->state->numLegalMoves; ++i) {
+    for (unsigned short i = 0; i < node->state->numLegalMoves; ++i) {
       UCTNode* child = new UCTNode(*node->state->legalMoves[i], node);
       node->possibleChildren.push_back(child);
     }

@@ -481,26 +481,25 @@ bool testAdjacent(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
 
 BOOST_AUTO_TEST_CASE( testGroupAdjacent )
 {
-  int boardSize = 9;
-  for(int row = 0; row < boardSize; row++)
+  for(int row = 0; row < BOARD_SIZE; row++)
   {
-    for(int column = 0; column < boardSize; column++)
+    for(int column = 0; column < BOARD_SIZE; column++)
     {
       //above
       if(row > 0)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
       //below
-      if(row < boardSize-1)
+      if(row < BOARD_SIZE-1)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
       //left
       if(column > 0)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
       //above
-      if(column < boardSize-1)
+      if(column < BOARD_SIZE-1)
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
       
       //pass
-      BOOST_CHECK_EQUAL(testAdjacent(row, column, boardSize, boardSize), false);
+      BOOST_CHECK_EQUAL(testAdjacent(row, column, BOARD_SIZE, BOARD_SIZE), false);
     }
   }
 }
@@ -584,7 +583,6 @@ BOOST_AUTO_TEST_CASE( testBoardClone )
 
 BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
 {
-  int boardSize = 9;
   Board* b1 = new Board();
   b1->init();
   for(int row = 0; row < BOARD_SIZE-1; row++)
@@ -592,15 +590,15 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
     for(int column = 0; column < BOARD_SIZE; column++)
     {
       b1->makeMove(Point(row, column));
-      b1->makeMove(Point(boardSize, boardSize));
+      b1->makeMove(Point(BOARD_SIZE, BOARD_SIZE));
     }
   }
   
   Board* b1Clone = b1->clone();
   float score = b1Clone->getTaylorScore(4.5);
-  BOOST_CHECK_EQUAL(score, 76.5);
+  BOOST_CHECK_EQUAL(score, BOARD_SIZE*BOARD_SIZE-4.5);
   
   Board* b1Clone2 = b1->clone();
   score = b1Clone2->getTaylorScore(0.5);
-  BOOST_CHECK_EQUAL(score, 80.5);
+  BOOST_CHECK_EQUAL(score, BOARD_SIZE*BOARD_SIZE-0.5);
 }

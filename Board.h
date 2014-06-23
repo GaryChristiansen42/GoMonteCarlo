@@ -14,7 +14,7 @@ class Board {
   Point positions[BOARD_SIZE][BOARD_SIZE];
 
   Point* legalMoves[BOARD_SIZE*BOARD_SIZE+1];
-  unsigned char numLegalMoves;
+  unsigned short numLegalMoves;
 
   std::vector<Group*> blackGroups;
   std::vector<Group*> whiteGroups;

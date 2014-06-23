@@ -7,8 +7,12 @@ class Group;
 
 // (BOARD_SIZE, BOARD_SIZE) is pass
 struct Point{
-  int row;
-  int column;
+  Player color;
+
+  char row;
+  char column;
+
+  bool marked;
 
   Group* group;
 
@@ -17,12 +21,9 @@ struct Point{
   Point* south;
   Point* west;
 
-  Player color;
-  bool marked;
-
   Point();
-  Point(int newRow, int newColumn);
-  Point(int newRow, int newColumn, Player color, Group* group,
+  Point(char newRow, char newColumn);
+  Point(char newRow, char newColumn, Player color, Group* group,
     Point* north, Point* east, Point* south, Point* west);
 
   bool operator==(const Point &p);

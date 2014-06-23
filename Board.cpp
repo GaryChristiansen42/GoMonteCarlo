@@ -118,6 +118,10 @@ void Board::cloneInto(Board* b) {
     }
   }
 
+  for (unsigned short i = 0; i < numLegalMoves; ++i)
+    b->legalMoves[i] = b->getPoint(legalMoves[i]);
+  b->numLegalMoves = numLegalMoves;
+
   b->turn = turn;
 
   b->lastMove = b->getPoint(lastMove);
@@ -160,8 +164,8 @@ bool Board::isValidMove(Point move) {
     return false;
   if (move.column < 0 || move.column >= BOARD_SIZE)
     return false;
-  for (unsigned char i = 0; i < numLegalMoves; ++i)
-    if (*legalMoves[i] == move)
+  for (unsigned short i = 0; i < numLegalMoves; ++i)
+    if (move == *legalMoves[i])
       return true;
   return false;
 }
@@ -651,11 +655,11 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
 }*/
 
 void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes) {
-  for (unsigned char i = 0; i < numLegalMoves; ++i) {
+  for (unsigned short i = 0; i < numLegalMoves; ++i) {
     if (isPositionalSuperKo(legalMoves[i], previousHashes)) {
       legalMoves[i] = legalMoves[numLegalMoves-1];
       numLegalMoves--;
-      --i;
+      i--;
     }
   }
 }
@@ -711,6 +715,6 @@ Point* Board::getPoint(Point *p) {
   } else if (*p == *pass) {
     return pass;
   } else {
-    return &positions[p->row][p->column];
+    return &positions[(unsigned char)p->row][(unsigned char)p->column];
   }
 }
