@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include <cstdio>
 #include <string.h>
 #include <cstdlib>
@@ -9,7 +10,6 @@
 #include "../Common.h"
 
 //UCTNode *currentMove;
-int boardSize = 9;
 float millaSecondsToThink = 14500;
 char name[] = "TestGoBot";
 char version[] = "3.5.11";
@@ -22,7 +22,7 @@ void switchTurnTo(Player color) {
     return;
   } else {
     // Pass
-    b->makeMove(Point(boardSize, boardSize));
+    b->makeMove(Point(BOARD_SIZE, BOARD_SIZE));
   }
 }
 
@@ -59,13 +59,13 @@ void doPlay() {
 
   char moveStr[10];
   std::cin >> moveStr;
-  int row = boardSize, column = boardSize;
+  unsigned char row = BOARD_SIZE, column = BOARD_SIZE;
   if (strcmp(moveStr, "pass")) {
-    row = moveStr[0] - 'a';
+    row = (unsigned char)(moveStr[0] - 'a');
     if (moveStr[0] >= 'i') {
       row--;
     }
-    column = atoi(moveStr+1)-1;
+    column = (unsigned char)(atoi(moveStr+1)-1);
   }
 
   switchTurnTo(color);
@@ -112,10 +112,12 @@ void doGenMove() {
 }
 
 void doBoardSize() {
+  int boardSize;
   std::cin >> boardSize;
+  assert(boardSize == BOARD_SIZE);
   delete b;
   previousHashes.clear();
-  b = new Board(boardSize);
+  b = new Board();
   b->init();
 
   previousHashes.push_back(b->getHash());
@@ -124,7 +126,7 @@ void doBoardSize() {
 }
 
 int main() {
-  b = new Board(boardSize);
+  b = new Board();
   b->init();
 
   previousHashes.push_back(b->getHash());
@@ -140,7 +142,7 @@ int main() {
       doBoardSize();
     } else if (!strcmp(command, "clear_board")) {
       delete b;
-      b = new Board(boardSize);
+      b = new Board();
       b->init();
       printf("= \n\n");
     } else if (!strcmp(command, "exit")) {
@@ -188,7 +190,7 @@ int main() {
     } else if (!strcmp(command, "quit")) {
       printf("= \n\n");
     } else if (!strcmp(command, "special")) {
-      printf("%d\n", b->isSuicide(Point(4,1)));
+      // printf("%d\n", b->isSuicide(Point(4,1)));
       printf("%d %d\n", b->koPoint->row, b->koPoint->column);
     } else if (!strcmp(command, "show_board")) {
       b->show();
