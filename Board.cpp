@@ -17,6 +17,9 @@ Board::Board() :
   secondLastMove(NULL),
   koPoint(NULL),
   pass(new Point(BOARD_SIZE, BOARD_SIZE)),
+  outOfBoundsGroup(new Group(OutOfBounds)),
+  outOfBoundsPoint(new Point(-1, -1, OutOfBounds, outOfBoundsGroup,
+    NULL, NULL, NULL, NULL)),
   turn(Black) {
 }
 
@@ -28,6 +31,10 @@ Board::~Board() {
 
   if (pass != NULL)
     delete pass;
+  if (outOfBoundsGroup != NULL)
+    delete outOfBoundsGroup;
+  if (outOfBoundsPoint != NULL)
+    delete outOfBoundsPoint;
 }
 
 void Board::init() {
@@ -45,12 +52,20 @@ void Board::init() {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       if (row + 1 < BOARD_SIZE)
         positions[row][column].north = &positions[row+1][column];
+      else
+        positions[row][column].north = outOfBoundsPoint;
       if (column + 1 < BOARD_SIZE)
         positions[row][column].east = &positions[row][column+1];
+      else
+        positions[row][column].east = outOfBoundsPoint;
       if (row - 1 >= 0)
         positions[row][column].south = &positions[row-1][column];
+      else
+        positions[row][column].south = outOfBoundsPoint;
       if (column - 1 >= 0)
         positions[row][column].west = &positions[row][column-1];
+      else
+        positions[row][column].west = outOfBoundsPoint;
     }
   }
 }
@@ -97,19 +112,19 @@ void Board::cloneInto(Board* b) {
       if (r + 1 < BOARD_SIZE)
         b->positions[r][c].north = &b->positions[r+1][c];
       else
-        b->positions[r][c].north = NULL;
+        b->positions[r][c].north = outOfBoundsPoint;
       if (c + 1 < BOARD_SIZE)
         b->positions[r][c].east = &b->positions[r][c+1];
       else
-        b->positions[r][c].east = NULL;
+        b->positions[r][c].east = outOfBoundsPoint;
       if (r - 1 >= 0)
         b->positions[r][c].south = &b->positions[r-1][c];
       else
-        b->positions[r][c].south = NULL;
+        b->positions[r][c].south = outOfBoundsPoint;
       if (c - 1 >= 0)
         b->positions[r][c].west = &b->positions[r][c-1];
       else
-        b->positions[r][c].west = NULL;
+        b->positions[r][c].west = outOfBoundsPoint;
     }
   }
 
@@ -210,13 +225,13 @@ float Board::getTaylorScore(float komi) {
         } else if (p->color == White) {
           adjacentToWhite = true;
         } else if (p->color == Empty && !p->marked) {
-          if (p->north != NULL && !p->north->marked)
+          if (!p->north->marked)
             s.push(p->north);
-          if (p->east != NULL && !p->east->marked)
+          if (!p->east->marked)
             s.push(p->east);
-          if (p->south != NULL && !p->south->marked)
+          if (!p->south->marked)
             s.push(p->south);
-          if (p->west != NULL && !p->west->marked)
+          if (!p->west->marked)
             s.push(p->west);
           sizeOfEmptySpace++;
 
@@ -257,13 +272,13 @@ void Board::updateStructures(Point* move) {
   Group* groupsToCombine[4];
   unsigned char numGroupsToCombine = 0;
   bool inGroup = false;
-  if (move->north != NULL && move->north->color == move->color) {
+  if (move->north->color == move->color) {
     move->north->group->addStone(move);
     groupsToCombine[0] = move->north->group;
     ++numGroupsToCombine;
     inGroup = true;
   }
-  if (move->east != NULL && move->east->color == move->color) {
+  if (move->east->color == move->color) {
     if (!inGroup) {
       move->east->group->addStone(move);
       inGroup = true;
@@ -277,7 +292,7 @@ void Board::updateStructures(Point* move) {
       ++numGroupsToCombine;
     }
   }
-  if (move->south != NULL && move->south->color == move->color) {
+  if (move->south->color == move->color) {
     if (!inGroup) {
       move->south->group->addStone(move);
       inGroup = true;
@@ -291,7 +306,7 @@ void Board::updateStructures(Point* move) {
       ++numGroupsToCombine;
     }
   }
-  if (move->west != NULL && move->west->color == move->color) {
+  if (move->west->color == move->color) {
     if (!inGroup) {
       move->west->group->addStone(move);
       inGroup = true;
@@ -352,6 +367,7 @@ void Board::removeDeadStones(Player color) {
 
   unsigned int numDeadStones = 0;
 
+  // TODO(GaryChristiansen): only check neighbors instead of all groups?
   std::vector<Group*> deadGroups;
   for(Group* group : *firstGroups)
     if (!(group->hasLiberties()))
@@ -510,10 +526,10 @@ void Board::makeMove(Point* move) {
 
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko
-    if ((move->north != NULL && move->north->color == move->color)
-      || (move->east != NULL && move->east->color == move->color)
-      || (move->south != NULL && move->south->color == move->color)
-      || (move->west != NULL && move->west->color == move->color))
+    if ((move->north->color == move->color)
+      || (move->east->color == move->color)
+      || (move->south->color == move->color)
+      || (move->west->color == move->color))
       koPoint = NULL;
 
   } else {
@@ -573,8 +589,8 @@ void Board::show() {
         case Black:
           boardString << "B ";
           break;
-        case Mark:
-          boardString << "M ";
+        case OutOfBounds:
+          boardString << "O ";
           break;
         default:
           assert(false);
@@ -607,38 +623,38 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
   //   Check for empty neighbors
   //   Check for neighbors of same color with more than one liberty
   //   Check for neighbors of opposite color with only one liberty
-  if (move->north != NULL) {
+  // if (move->north != NULL) {
     if (move->north->color == Empty)
       return false;
     if (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
       return false;
     if (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)
       return false;
-  }
-  if (move->east != NULL) {
+  // }
+  // if (move->east != NULL) {
     if (move->east->color == Empty)
       return false;
     if (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
       return false;
     if (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)
       return false;
-  }
-  if (move->south != NULL) {
+  // }
+  // if (move->south != NULL) {
     if (move->south->color == Empty)
       return false;
     if (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
       return false;
     if (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)
       return false;
-  }
-  if (move->west != NULL) {
+  // }
+  // if (move->west != NULL) {
     if (move->west->color == Empty)
       return false;
     if (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
       return false;
     if (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)
       return false;
-  }
+  // }
   return true;
 }
 

@@ -24,6 +24,9 @@ class Board {
   Point* koPoint;
   Point* pass;
 
+  Group* outOfBoundsGroup;
+  Point* outOfBoundsPoint;
+
   Player turn;
 
   explicit Board();

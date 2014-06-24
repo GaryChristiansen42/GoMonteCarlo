@@ -54,12 +54,12 @@ bool Point::isAdjacent(const Point &p) {
 void Point::decrementNeighborGroups() {
   Group* decrementedGroups[4];
   unsigned char numDecrementedGroups = 0;
-  if (north != NULL && north->color != Empty) {
+  if (north->color == Black || north->color == White) {
     north->group->numberLiberties--;
     decrementedGroups[0] = north->group;
     ++numDecrementedGroups;
   }
-  if (east != NULL && east->color != Empty) {
+  if (east->color == Black || east->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
       if (decrementedGroups[i] == east->group) {
@@ -72,7 +72,7 @@ void Point::decrementNeighborGroups() {
       ++numDecrementedGroups;
     }
   }
-  if (south != NULL && south->color != Empty) {
+  if (south->color == Black || south->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
       if (decrementedGroups[i] == south->group) {
@@ -85,7 +85,7 @@ void Point::decrementNeighborGroups() {
       ++numDecrementedGroups;
     }
   }
-  if (west != NULL && west->color != Empty) {
+  if (west->color == Black || west->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numDecrementedGroups; ++i) {
       if (decrementedGroups[i] == west->group) {
@@ -101,12 +101,12 @@ void Point::decrementNeighborGroups() {
 void Point::incrementNeighborGroups() {
   Group* incrementedGroups[4];
   unsigned char numIncrementedGroups = 0;
-  if (north != NULL && north->color != Empty) {
+  if (north->color == Black || north->color == White) {
     north->group->numberLiberties++;
     incrementedGroups[0] = north->group;
     ++numIncrementedGroups;
   }
-  if (east != NULL && east->color != Empty) {
+  if (east->color == Black || east->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numIncrementedGroups; ++i) {
       if (incrementedGroups[i] == east->group) {
@@ -119,7 +119,7 @@ void Point::incrementNeighborGroups() {
       ++numIncrementedGroups;
     }
   }
-  if (south != NULL && south->color != Empty) {
+  if (south->color == Black || south->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numIncrementedGroups; ++i) {
       if (incrementedGroups[i] == south->group) {
@@ -132,7 +132,7 @@ void Point::incrementNeighborGroups() {
       ++numIncrementedGroups;
     }
   }
-  if (west != NULL && west->color != Empty) {
+  if (west->color == Black || west->color == White) {
     bool found = false;
     for (unsigned char i = 0; i < numIncrementedGroups; ++i) {
       if (incrementedGroups[i] == west->group) {

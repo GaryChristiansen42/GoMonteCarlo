@@ -68,7 +68,7 @@ int main(void) {
       computerMove(&node, b, 0, 500);
       break;
      case Empty:
-     case Mark:
+     case OutOfBounds:
      default:
       assert(false);
     }

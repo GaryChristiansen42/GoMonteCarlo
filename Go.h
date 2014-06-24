@@ -14,6 +14,6 @@ enum Player {
   Empty = 0,
   White = 1,
   Black = 2,
-  Mark = 3
+  OutOfBounds = 3
 };
 #endif  // GO_H_
