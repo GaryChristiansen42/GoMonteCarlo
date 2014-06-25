@@ -1,5 +1,5 @@
-CC=g++
-CFLAGS=-c -g -std=c++0x -Ofast -Wall -Wextra -Weffc++ -Werror -pedantic \
+CC=g++ -march=native -mtune=native
+CFLAGS=-c -g -std=c++0x -Ofast -funroll-loops -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
