@@ -11,6 +11,7 @@
 #include <atomic>
 
 #include "Common.h"
+#include "Patterns.h"
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -21,6 +22,8 @@
 std::mutex treePolicyMutex;
 std::mutex backUpMutex;
 std::atomic<int> simulationCount;
+
+Patterns patterns;
 
 double diffclock(timespec start, timespec finish) {
   double elapsed = static_cast<double>(finish.tv_sec - start.tv_sec);
@@ -224,7 +227,10 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
   simulationCount = 0;
 
-  int numThreads = 4;
+  patterns.init("patterns.pat");
+
+
+  int numThreads = 1;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,

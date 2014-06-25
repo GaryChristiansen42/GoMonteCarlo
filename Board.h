@@ -66,6 +66,7 @@ class Board {
 
   void makeRandomMove();
   GameResult playRandomGame();
+  GameResult playGame();
 
   void show();
 

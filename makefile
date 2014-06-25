@@ -1,5 +1,5 @@
 CC=g++ -pthread -march=native
-CFLAGS=-c -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -g -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -21,20 +21,20 @@ CFLAGS=-c -Ofast -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 
 all: GoMonteCarlo CheckStrength Benchmark
 
-Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o Benchmark -lrt
+Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
+	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o Benchmark -lrt
 
 Benchmark.o: Benchmark.cpp
 	$(CC) $(CFLAGS) Benchmark.cpp
 
-CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o CheckStrength -lrt
+CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
+	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o CheckStrength -lrt
 
 CheckStrength.o: CheckStrength.cpp
 	$(CC) $(CFLAGS) CheckStrength.cpp
 
-GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GoMonteCarlo -lrt
+GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o GoMonteCarlo -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -45,6 +45,12 @@ UCTNode.o: UCTNode.cpp
 UCT.o: UCT.cpp 
 	$(CC) $(CFLAGS) UCT.cpp
 	
+Pattern.o: Pattern.cpp
+	$(CC) $(CFLAGS) Pattern.cpp
+
+Patterns.o: Patterns.cpp
+	$(CC) $(CFLAGS) Patterns.cpp
+
 Point.o: Point.cpp
 	$(CC) $(CFLAGS) Point.cpp
 
