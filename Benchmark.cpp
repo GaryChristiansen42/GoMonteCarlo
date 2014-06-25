@@ -7,13 +7,20 @@
 
 #include "UCT.h"
 
+const std::string patternsFile = "patterns.pat";
+
 void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
-  float millaSecondsToThink) {
+  float millaSecondsToThink, bool usePatterns) {
   UCTNode* newCurrentNode = NULL;
-  if (numSimulations != 0)
+  if (numSimulations != 0) {
     newCurrentNode = UCTSearch((*currentNode), numSimulations);
-  else
-    newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink);
+  } else {
+    if (usePatterns) {
+      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);
+    } else {
+      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, "");
+    }
+  }
 
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -65,7 +72,7 @@ int main(void) {
       randomMove(&node, b);
       break;
      case White:
-      computerMove(&node, b, 0, 500);
+      computerMove(&node, b, 0, 500, true);
       break;
      case Empty:
      case OutOfBounds:

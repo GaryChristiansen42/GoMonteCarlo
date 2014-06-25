@@ -4,12 +4,15 @@
 #include <iostream>
 #include <string>
 
+#include "Point.h"
+
 class Pattern {
  public:
 
   std::string hash;
 
   Pattern();
+  Pattern(Point* p);
 
   void rotate90();
   void invertColor();

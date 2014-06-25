@@ -1,7 +1,42 @@
 #include "Pattern.h"
 
+#include <assert.h>
 
 Pattern::Pattern() : hash("") {
+
+}
+
+char colorToChar(Player color) {
+  if (color == White)
+    return 'W';
+  else if (color == Black)
+    return 'B';
+  else if (color == Empty)
+    return '_';
+  else if (color == OutOfBounds)
+    return 'O';
+  else assert(false);
+}
+
+Pattern::Pattern(Point* p) : hash("") {
+  Point* n = p->north;
+  Point* nw = n->west;
+  Point* ne = n->east;
+  Point* w = p->west;
+  Point* e = p->east;
+  Point* s = p->north;
+  Point* sw = s->west;
+  Point* se = s->east;
+  
+  hash += colorToChar(nw->color);
+  hash += colorToChar(n->color);
+  hash += colorToChar(ne->color);
+  hash += colorToChar(w->color);
+  hash += colorToChar(p->color);
+  hash += colorToChar(e->color);
+  hash += colorToChar(sw->color);
+  hash += colorToChar(s->color);
+  hash += colorToChar(se->color);
 
 }
 

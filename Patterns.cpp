@@ -6,15 +6,23 @@
 
 #include "Board.h"
 
-Patterns::Patterns() : hashTable(std::unordered_map<std::string, Pattern>()) {
+Patterns::Patterns() :
+  hashTable(std::unordered_map<std::string, Pattern>()),
+  initialized(false) {
 
 }
 
 void Patterns::init(std::string patternsFile) {
+
+  if (patternsFile == "")
+    return;
+  
   std::ifstream in;
   in.open(patternsFile);
   if (!in.is_open())
     assert(false);
+
+  initialized = true;
 
   Pattern pattern;
   while (in >> pattern) {
@@ -47,8 +55,20 @@ void Patterns::init(std::string patternsFile) {
   in.close();
 }
 
+void Patterns::clear() {
+  hashTable.clear();
+  initialized = false;
+}
+
 Point Patterns::getMove(Board* b) {
 
-  Point temp = Point(-1, -1);
-  return *b->getPoint(&temp);
+  Pattern lastMove(b->lastMove);
+  lastMove = hashTable[lastMove.hash];
+  // if (lastMove != NULL) {
+    std::vector<Point*> goodMoves = lastMove.getGoodMoves();
+    long unsigned int choice = rand() % goodMoves.size();
+    return b->getPoint(*goodMoves[choice]);
+  // }
+
+  return *b->getRandomMove();
 }

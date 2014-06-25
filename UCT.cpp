@@ -130,7 +130,13 @@ int DefaultPolicy(UCTNode* node, Board* clone) {
   clone->whiteGroups.clear();
 
   node->state->cloneInto(clone);
-  GameResult r = clone->playRandomGame();
+
+  GameResult r;
+  if (patterns.initialized)
+    r = clone->playGame();
+  else
+    r = clone->playRandomGame();
+
   if ((node->state->turn == Black ? White : Black) == static_cast<int>(r))
     return 1;
   else if (r != Draw)
@@ -224,10 +230,10 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
   Log(std::to_string(i).c_str());
 }
 
-UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
+UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, std::string patternsFile) {
   simulationCount = 0;
 
-  patterns.init("patterns.pat");
+  patterns.init(patternsFile);
 
 
   int numThreads = 1;
@@ -258,6 +264,9 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink) {
     && best->move.color != Empty) {
     assert(false);
   }
+
+  patterns.clear();
+
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %f V: %d\nR/V: %f",

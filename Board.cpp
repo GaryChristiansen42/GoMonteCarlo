@@ -11,7 +11,7 @@
 
 #include "Patterns.h"
 
-Patterns patterns;
+extern Patterns patterns;
 
 Board::Board() :
   numLegalMoves(0),

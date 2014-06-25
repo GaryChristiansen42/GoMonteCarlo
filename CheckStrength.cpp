@@ -7,33 +7,46 @@
 
 #include "UCT.h"
 
+const std::string patternsFile = "patterns.pat";
+
 enum PlayerType {
   MyMonteCarlo1HalfSecond,
   MyMonteCarlo1Second,
   MyMonteCarlo5Seconds,
   MyMonteCarlo10Seconds,
   MyMonteCarlo14AndHalfSeconds,
+  WithPatterns1HalfSecond,
+  WithPatterns1Second,
+  WithPatterns14AndHalfSeconds,
   RandomPlayer,
   GnuGo
 };
 
-const char * playerTypeStrings[7] = {
+const char * playerTypeStrings[10] = {
   "MyMonteCarlo1HalfSecond",
   "MyMonteCarlo1Second",
   "MyMonteCarlo5Seconds",
   "MyMonteCarlo10Seconds",
   "MyMonteCarlo14AndHalfSeconds",
+  "WithPatterns1HalfSecond",
+  "WithPatterns1Second",
+  "WithPatterns14AndHalfSeconds",
   "RandomPlayer",
   "GnuGo"
 };
 
 void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
-  float millaSecondsToThink) {
+  float millaSecondsToThink, bool usePatterns) {
   UCTNode* newCurrentNode = NULL;
-  if (numSimulations != 0)
+  if (numSimulations != 0) {
     newCurrentNode = UCTSearch((*currentNode), numSimulations);
-  else
-    newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink);
+  } else {
+    if (usePatterns) {
+      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);
+    } else {
+      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, "");
+    }
+  }
 
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -76,11 +89,11 @@ int main(void) {
   int numTrials = 1;
   // int numSimulations = 1000;
   float komi = 0;
-  PlayerType player1 = RandomPlayer;
+  PlayerType player1 = WithPatterns1HalfSecond;
   // PlayerType player1 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  // PlayerType player2 = MyMonteCarlo1HalfSecond;
+  PlayerType player2 = MyMonteCarlo1HalfSecond;
 
   for (int x = 0; x < 1; x++) {
     int player1Wins = 0;
@@ -102,19 +115,28 @@ int main(void) {
           randomMove(&node, b);
           break;
          case MyMonteCarlo1HalfSecond:
-          computerMove(&node, b, 0, 500);
+          computerMove(&node, b, 0, 500, false);
           break;
          case MyMonteCarlo1Second:
-          computerMove(&node, b, 0, 1000);
+          computerMove(&node, b, 0, 1000, false);
           break;
          case MyMonteCarlo5Seconds:
-          computerMove(&node, b, 0, 5000);
+          computerMove(&node, b, 0, 5000, false);
           break;
          case MyMonteCarlo10Seconds:
-          computerMove(&node, b, 0, 10000);
+          computerMove(&node, b, 0, 10000, false);
           break;
          case MyMonteCarlo14AndHalfSeconds:
-          computerMove(&node, b, 0, 14500);
+          computerMove(&node, b, 0, 14500, false);
+          break;
+         case WithPatterns1HalfSecond:
+          computerMove(&node, b, 0, 500, true);
+          break;
+         case WithPatterns1Second:
+          computerMove(&node, b, 0, 1000, true);
+          break;
+         case WithPatterns14AndHalfSeconds:
+          computerMove(&node, b, 0, 14500, true);
           break;
          case GnuGo:
          default:

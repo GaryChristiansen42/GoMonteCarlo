@@ -13,10 +13,12 @@ class Patterns {
  public:
 
   std::unordered_map<std::string, Pattern> hashTable;
+  bool initialized;
 
   explicit Patterns();
 
   void init(std::string patternFile);
+  void clear();
 
   Point getMove(Board* b);
 };
