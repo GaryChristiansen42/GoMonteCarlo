@@ -631,42 +631,37 @@ bool Board::isSuicide(Point move, const Player &sameColor, const Player &opposit
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
 bool Board::isSuicide(Point* move, const Player &sameColor, const Player &oppositeColor) {
 
-  // if neighbor != NULL
   //   Check for empty neighbors
   //   Check for neighbors of same color with more than one liberty
   //   Check for neighbors of opposite color with only one liberty
-  // if (move->north != NULL) {
-    if (move->north->color == Empty)
-      return false;
-    if (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
-      return false;
-    if (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)
-      return false;
-  // }
-  // if (move->east != NULL) {
-    if (move->east->color == Empty)
-      return false;
-    if (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
-      return false;
-    if (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)
-      return false;
-  // }
-  // if (move->south != NULL) {
-    if (move->south->color == Empty)
-      return false;
-    if (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
-      return false;
-    if (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)
-      return false;
-  // }
-  // if (move->west != NULL) {
-    if (move->west->color == Empty)
-      return false;
-    if (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
-      return false;
-    if (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)
-      return false;
-  // }
+  if (move->north->color == Empty)
+    return false;
+  if (move->east->color == Empty)
+    return false;
+  if (move->south->color == Empty)
+    return false;
+  if (move->west->color == Empty)
+    return false;
+
+  if (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
+    return false;
+  if (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)
+    return false;
+
+  if (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
+    return false;
+  if (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)
+    return false;
+
+  if (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
+    return false;
+  if (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)
+    return false;
+
+  if (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
+    return false;
+  if (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)
+    return false;
   return true;
 }
 
@@ -732,6 +727,7 @@ void Board::getPossibleMoves() {
   }
 }
 
+// TODO(GaryChristiansen): Don't use this in Board, just positions[row][column]
 Point* Board::getPoint(Point *p) {
   if (p == NULL) {
     return NULL;
