@@ -2,7 +2,9 @@
 
 #include <assert.h>
 
-Pattern::Pattern() : hash("") {
+#include "Board.h"
+
+Pattern::Pattern() : hash(""), goodMoves(std::vector<std::pair<unsigned char, unsigned char>>()) {
 
 }
 
@@ -18,7 +20,7 @@ char colorToChar(Player color) {
   else assert(false);
 }
 
-Pattern::Pattern(Point* p) : hash("") {
+Pattern::Pattern(Point* p) : hash(""), goodMoves(std::vector<std::pair<unsigned char, unsigned char>>()) {
   Point* n = p->north;
   Point* nw = n->west;
   Point* ne = n->east;
@@ -82,6 +84,14 @@ void Pattern::invertColor() {
 }
 
 
+std::vector<Point*> Pattern::getGoodMoves(Board* b) {
+  std::vector<Point*> movesToReturn;
+  for (auto p : goodMoves) {
+    Point temp(p.first, p.second);
+    movesToReturn.push_back(b->getPoint(&temp));
+  }
+  return movesToReturn;
+}
 
 
 std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {

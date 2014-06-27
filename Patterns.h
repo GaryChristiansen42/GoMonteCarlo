@@ -20,6 +20,6 @@ class Patterns {
   void init(std::string patternFile);
   void clear();
 
-  Point getMove(Board* b);
+  Point* getMove(Board* b);
 };
 #endif  // BOARD_H_

@@ -3,19 +3,25 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "Point.h"
+
+class Board;
 
 class Pattern {
  public:
 
   std::string hash;
+  std::vector<std::pair<unsigned char, unsigned char>> goodMoves;
 
   Pattern();
   Pattern(Point* p);
 
   void rotate90();
   void invertColor();
+
+  std::vector<Point*> getGoodMoves(Board* b);
 
 };
 

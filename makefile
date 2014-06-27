@@ -4,7 +4,7 @@ CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pe
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
 	-Wformat-nonliteral -Wformat-security  \
-	-Wformat-y2k -Wimport  -Winit-self  -Winline \
+	-Wformat-y2k -Wimport  -Winit-self \
 	-Winvalid-pch -Wlong-long -Wmissing-braces \
   -Wmissing-field-initializers \
 	-Wmissing-format-attribute -Wmissing-include-dirs \
@@ -17,7 +17,7 @@ CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pe
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	#-Wpadded -Wunsafe-loop-optimizations
+	#-Wpadded -Wunsafe-loop-optimizations -Winline 
 
 all: GoMonteCarlo CheckStrength Benchmark
 

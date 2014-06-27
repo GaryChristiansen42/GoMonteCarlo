@@ -60,15 +60,15 @@ void Patterns::clear() {
   initialized = false;
 }
 
-Point Patterns::getMove(Board* b) {
+Point* Patterns::getMove(Board* b) {
 
   Pattern lastMove(b->lastMove);
-  lastMove = hashTable[lastMove.hash];
-  // if (lastMove != NULL) {
-    std::vector<Point*> goodMoves = lastMove.getGoodMoves();
+  auto it = hashTable.find(lastMove.hash);
+  if (it != hashTable.end()) {
+    std::vector<Point*> goodMoves = lastMove.getGoodMoves(b);
     long unsigned int choice = rand() % goodMoves.size();
-    return b->getPoint(*goodMoves[choice]);
-  // }
+    return goodMoves[choice];
+  }
 
-  return *b->getRandomMove();
+  return b->getRandomMove();
 }
