@@ -12,6 +12,7 @@ class Point;
 class Patterns {
  public:
 
+  int numCalled;
   std::unordered_map<std::string, Pattern> hashTable;
   bool initialized;
 

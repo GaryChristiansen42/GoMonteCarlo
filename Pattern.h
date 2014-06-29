@@ -13,7 +13,7 @@ class Pattern {
  public:
 
   std::string hash;
-  std::vector<std::pair<unsigned char, unsigned char>> goodMoves;
+  std::vector<std::pair<char, char>> goodMoves;
 
   Pattern();
   Pattern(Point* p);
@@ -21,7 +21,7 @@ class Pattern {
   void rotate90();
   void invertColor();
 
-  std::vector<Point*> getGoodMoves(Board* b);
+  std::vector<Point*> getGoodMoves(Board* b, Point move);
 
 };
 

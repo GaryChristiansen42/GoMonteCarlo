@@ -1,10 +1,10 @@
 CC=g++ -pthread
-CFLAGS=-c -g --std=c++0x -Wall -Wextra -Werror -pedantic
+CFLAGS=-c -g -O0 --std=c++0x -Wall -Wextra -Werror -pedantic
 
 all: TestGoMonteCarlo
 
-TestGoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o TestGoMonteCarlo -lrt
+TestGoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o TestGoMonteCarlo -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -26,6 +26,12 @@ Board.o: ../Board.cpp
 
 Common.o: ../Common.cpp
 	$(CC) $(CFLAGS) ../Common.cpp
+
+Pattern.o: ../Pattern.cpp
+	$(CC) $(CFLAGS) ../Pattern.cpp
+
+Patterns.o: ../Patterns.cpp
+	$(CC) $(CFLAGS) ../Patterns.cpp
 
 clean:
 	rm -rf  *.o TestGoMonteCarlo

@@ -273,5 +273,7 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, std::string pattern
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
+  snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns.numCalled);
+  Log(buffer);
   return best;
 }

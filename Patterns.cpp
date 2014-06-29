@@ -7,6 +7,7 @@
 #include "Board.h"
 
 Patterns::Patterns() :
+  numCalled(0),
   hashTable(std::unordered_map<std::string, Pattern>()),
   initialized(false) {
 
@@ -26,6 +27,7 @@ void Patterns::init(std::string patternsFile) {
 
   Pattern pattern;
   while (in >> pattern) {
+    printf("read one\n");
     hashTable[pattern.hash] = pattern;
 
     pattern.rotate90();
@@ -65,7 +67,8 @@ Point* Patterns::getMove(Board* b) {
   Pattern lastMove(b->lastMove);
   auto it = hashTable.find(lastMove.hash);
   if (it != hashTable.end()) {
-    std::vector<Point*> goodMoves = lastMove.getGoodMoves(b);
+    numCalled++;
+    std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
     long unsigned int choice = rand() % goodMoves.size();
     return goodMoves[choice];
   }

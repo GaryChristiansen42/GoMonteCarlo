@@ -1,7 +1,10 @@
 #include "../Board.h"
-//#define BOOST_TEST_MODULE MyTest
+#include "../Patterns.h"
+
 #define BOOST_TEST_MAIN
 #include <boost/test/included/unit_test.hpp>
+
+#include <iostream>
 
 BOOST_AUTO_TEST_CASE( testBoard )
 {
@@ -601,4 +604,66 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
   Board* b1Clone2 = b1->clone();
   score = b1Clone2->getTaylorScore(0.5);
   BOOST_CHECK_EQUAL(score, BOARD_SIZE*BOARD_SIZE-0.5);
+}
+
+BOOST_AUTO_TEST_CASE( testPattern )
+{
+  Pattern p;
+
+  std::string patternsFile("testPatterns.pat");
+  std::ifstream in;
+  in.open(patternsFile);
+  BOOST_CHECK_EQUAL(in.is_open(), true);
+  in >> p;
+
+  BOOST_CHECK_EQUAL(p.hash, "____W____");
+  BOOST_CHECK_EQUAL(p.goodMoves.size(), 1);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].first, -1);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].second, -1);
+
+
+  Board b1;
+  b1.init();
+  b1.makeMove(Point(1, 1));
+  p = Pattern(&b1.positions[1][1]);
+  BOOST_CHECK_EQUAL(p.hash, "____B____");
+
+  p = Pattern(&b1.positions[0][0]);
+  BOOST_CHECK_EQUAL(p.hash, "OOOO__O_B");
+
+
+  in >> p;
+  BOOST_CHECK_EQUAL(p.hash, "OOOOBWO__");
+  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 1);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 0);
+
+  // invertColors
+  p.invertColor();
+  BOOST_CHECK_EQUAL(p.hash, "OOOOWBO__");
+  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 1);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 0);
+
+  // rotate90
+  p.rotate90();
+  // BOOST_CHECK_EQUAL(p.hash, "0000BW0__");
+  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 0);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 1);
+}
+
+BOOST_AUTO_TEST_CASE( testPatterns )
+{
+  Board b1;
+  b1.init();
+  b1.makeMove(Point(1, 1));
+
+  std::string patternFile("testPatterns.pat");
+  Patterns patterns;
+  patterns.init(patternFile);
+
+  BOOST_CHECK_EQUAL(patterns.initialized, true);
+
+  BOOST_CHECK_EQUAL(patterns.hashTable.size(), 10);
+
+  Point* move = patterns.getMove(&b1);
+  BOOST_CHECK_EQUAL(*move == Point(0, 0), true);
 }

@@ -4,41 +4,49 @@
 
 #include "Board.h"
 
-Pattern::Pattern() : hash(""), goodMoves(std::vector<std::pair<unsigned char, unsigned char>>()) {
+Pattern::Pattern() : hash(""),
+  goodMoves(std::vector<std::pair<char, char>>()) {
 
 }
 
-char colorToChar(Player color) {
-  if (color == White)
+char pointToChar(Point* p) {
+  if (p == NULL)
+    return 'O';
+  if (p->color == White)
     return 'W';
-  else if (color == Black)
+  else if (p->color == Black)
     return 'B';
-  else if (color == Empty)
+  else if (p->color == Empty)
     return '_';
-  else if (color == OutOfBounds)
+  else if (p->color == OutOfBounds)
     return 'O';
   else assert(false);
 }
 
-Pattern::Pattern(Point* p) : hash(""), goodMoves(std::vector<std::pair<unsigned char, unsigned char>>()) {
+Pattern::Pattern(Point* p) : hash(""),
+  goodMoves(std::vector<std::pair<char, char>>()) {
+
+  if (*p == Point(BOARD_SIZE, BOARD_SIZE))
+    return;
+  
+  Point* s = p->south;
+  Point* sw = s->west;
+  Point* se = s->east;
+  Point* w = p->west;
+  Point* e = p->east;
   Point* n = p->north;
   Point* nw = n->west;
   Point* ne = n->east;
-  Point* w = p->west;
-  Point* e = p->east;
-  Point* s = p->north;
-  Point* sw = s->west;
-  Point* se = s->east;
   
-  hash += colorToChar(nw->color);
-  hash += colorToChar(n->color);
-  hash += colorToChar(ne->color);
-  hash += colorToChar(w->color);
-  hash += colorToChar(p->color);
-  hash += colorToChar(e->color);
-  hash += colorToChar(sw->color);
-  hash += colorToChar(s->color);
-  hash += colorToChar(se->color);
+  hash += pointToChar(sw);
+  hash += pointToChar(s);
+  hash += pointToChar(se);
+  hash += pointToChar(w);
+  hash += pointToChar(p);
+  hash += pointToChar(e);
+  hash += pointToChar(nw);
+  hash += pointToChar(n);
+  hash += pointToChar(ne);
 
 }
 
@@ -75,21 +83,25 @@ void Pattern::rotate90() {
 }
 
 void Pattern::invertColor() {
+  std::string newHash = "";
   for (char c : hash) {
     if (c == 'B')
       c = 'W';
     else if (c == 'W')
       c = 'B';
+    newHash += c;
   }
+  hash = newHash;
 }
 
 
-std::vector<Point*> Pattern::getGoodMoves(Board* b) {
+std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
   std::vector<Point*> movesToReturn;
   for (auto p : goodMoves) {
-    Point temp(p.first, p.second);
+    Point temp((char)(p.first + move.row), (char)(p.second + move.column));
     movesToReturn.push_back(b->getPoint(&temp));
   }
+  assert(movesToReturn.size() > 0);
   return movesToReturn;
 }
 
@@ -106,6 +118,13 @@ std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {
     }
   }
   os << std::endl;
+
+  os << "NumGoodMoves - " << pattern.goodMoves.size() << std::endl;
+  for (auto x : pattern.goodMoves) {
+    os << (int)x.first << " " << (int)x.second << std::endl;
+  }
+
+  printf("TESTING\n%s\nTESTING END\n", pattern.hash.c_str());
   return os;
 }
 
@@ -119,6 +138,7 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
     110
   */
 
+  printf("reading pattern\n");
   char matrix[3][3];
   int i = 0, j = 0;
   for (i = 0; i < 3; ++i) {
@@ -132,6 +152,19 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
       pattern.hash += matrix[i][j];
     }
   }
+
+  for (i = -1; i < 2; ++i) {
+    for (j = -1; j < 2; ++j) {
+      char input;
+      is >> input;
+      if (input == '1') {
+        pattern.goodMoves.push_back(std::pair<char, char>(i, j));
+      }
+    }
+  }
+
+  char temp = 'f';
+  is >> temp; // newline
   /*
 
   pattern.hash.clear();
@@ -152,7 +185,7 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
 
   pattern.hash += temp;
 */
-  std::cout << std::endl << " Pattern: \n" << pattern.hash << std::endl;
+  // std::cout << std::endl << " Pattern: \n" << pattern.hash << std::endl;
 
   return is;
 }
