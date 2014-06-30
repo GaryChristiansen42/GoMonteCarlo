@@ -52,6 +52,7 @@ Pattern::Pattern(Point* p) : hash(""),
 
 
 void Pattern::rotate90() {
+  /*
   char matrix[3][3];
   int i = 0, j = 0;
   for (char c : hash) {
@@ -64,9 +65,19 @@ void Pattern::rotate90() {
   }
 
   // transpose
-  std::swap(matrix[1][0], matrix[0][1]);
-  std::swap(matrix[2][0], matrix[0][2]);
-  std::swap(matrix[1][2], matrix[2][1]);
+  std::cout << *this;
+  // std::swap(matrix[1][0], matrix[0][1]);
+  // std::swap(matrix[2][0], matrix[0][2]);
+  // std::swap(matrix[1][2], matrix[2][1]);
+
+  hash = "";
+
+  for (i = 0; i < 3; ++i) {
+    for (j = 0; j < 3; ++j) {
+      hash += matrix[i][j];
+    }
+  }
+  std::cout << *this;
 
   // reverse rows
   std::swap(matrix[0][0], matrix[0][2]);
@@ -79,7 +90,39 @@ void Pattern::rotate90() {
     for (j = 0; j < 3; ++j) {
       hash += matrix[i][j];
     }
+  }*/
+
+  std::swap(hash[3], hash[1]);
+  std::swap(hash[6], hash[2]);
+  std::swap(hash[5], hash[7]);
+
+  std::swap(hash[0], hash[2]);
+  std::swap(hash[3], hash[5]);
+  std::swap(hash[6], hash[8]);
+
+  std::vector<std::pair<char, char>> newGoodMoves;
+  for (auto move : goodMoves) {
+    if (move.first == -1 && move.second == -1) {
+      newGoodMoves.push_back(std::make_pair(move.first, 1));
+    } else if (move.first == -1 && move.second == 0) {
+      newGoodMoves.push_back(std::make_pair(0, 1));
+    } else if (move.first == -1 && move.second == 1) {
+      newGoodMoves.push_back(std::make_pair(1, move.second));
+    } else if (move.first == 0 && move.second == -1) {
+      newGoodMoves.push_back(std::make_pair(-1, 0));
+    } else if (move.first == 0 && move.second == 0) {
+      newGoodMoves.push_back(move);
+    } else if (move.first == 0 && move.second == 1) {
+      newGoodMoves.push_back(std::make_pair(1, 0));
+    } else if (move.first == 1 && move.second == -1) {
+      newGoodMoves.push_back(std::make_pair(-1, move.second));
+    } else if (move.first == 1 && move.second == 0) {
+      newGoodMoves.push_back(std::make_pair(0, -1));
+    } else if (move.first == 1 && move.second == 1) {
+      newGoodMoves.push_back(std::make_pair(move.first, -1));
+    }
   }
+  goodMoves = newGoodMoves;
 }
 
 void Pattern::invertColor() {
@@ -119,12 +162,10 @@ std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {
   }
   os << std::endl;
 
-  os << "NumGoodMoves - " << pattern.goodMoves.size() << std::endl;
   for (auto x : pattern.goodMoves) {
     os << (int)x.first << " " << (int)x.second << std::endl;
   }
 
-  printf("TESTING\n%s\nTESTING END\n", pattern.hash.c_str());
   return os;
 }
 
@@ -138,7 +179,8 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
     110
   */
 
-  printf("reading pattern\n");
+  pattern = Pattern();
+
   char matrix[3][3];
   int i = 0, j = 0;
   for (i = 0; i < 3; ++i) {
@@ -163,8 +205,8 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
     }
   }
 
-  char temp = 'f';
-  is >> temp; // newline
+  // char temp = 'f';
+  // is >> temp; // newline
   /*
 
   pattern.hash.clear();

@@ -163,7 +163,9 @@ void backup(UCTNode* v, int reward) {
   }
 }
 
-UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
+UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile) {
+  patterns.init(patternsFile);
+
   Board* clone = new Board();
   clone->init();
   for (int i = 0; i < numSimulations; i++) {
@@ -183,6 +185,8 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations) {
       best = next;
     next = next->sibling;
   }
+
+  patterns.clear();
 
   Point pass(BOARD_SIZE, BOARD_SIZE);
   if (!(best->move == pass)

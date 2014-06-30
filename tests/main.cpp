@@ -645,16 +645,17 @@ BOOST_AUTO_TEST_CASE( testPattern )
 
   // rotate90
   p.rotate90();
-  // BOOST_CHECK_EQUAL(p.hash, "0000BW0__");
+  BOOST_CHECK_EQUAL(p.hash, "OOO_WO_BO");
   BOOST_CHECK_EQUAL(p.goodMoves[0].first, 0);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 1);
+  BOOST_CHECK_EQUAL(p.goodMoves[0].second, -1);
 }
 
 BOOST_AUTO_TEST_CASE( testPatterns )
 {
   Board b1;
   b1.init();
-  b1.makeMove(Point(1, 1));
+  b1.makeMove(Point(0, 1));
+  b1.makeMove(Point(0, 0));
 
   std::string patternFile("testPatterns.pat");
   Patterns patterns;
@@ -665,5 +666,5 @@ BOOST_AUTO_TEST_CASE( testPatterns )
   BOOST_CHECK_EQUAL(patterns.hashTable.size(), 10);
 
   Point* move = patterns.getMove(&b1);
-  BOOST_CHECK_EQUAL(*move == Point(0, 0), true);
+  BOOST_CHECK_EQUAL(*move == Point(1, 0), true);
 }

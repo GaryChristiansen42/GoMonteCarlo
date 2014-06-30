@@ -70,7 +70,11 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   float millaSecondsToThink, bool usePatterns) {
   UCTNode* newCurrentNode = NULL;
   if (numSimulations != 0) {
-    newCurrentNode = UCTSearch((*currentNode), numSimulations);
+    if (usePatterns) {
+      newCurrentNode = UCTSearch((*currentNode), numSimulations, patternsFile);
+    } else {
+      newCurrentNode = UCTSearch((*currentNode), numSimulations, "");
+    }
   } else {
     if (usePatterns) {
       newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);

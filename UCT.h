@@ -20,7 +20,7 @@ int DefaultPolicy(UCTNode* node, Board* clone);
 
 void backup(UCTNode* v, int reward);
 
-UCTNode* UCTSearch(UCTNode* root, int numSimulations);
+UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile);
 UCTNode* UCTSearch(UCTNode* root, float secondsToThink, std::string patternsFile);
 
 #endif  // UCT_H_

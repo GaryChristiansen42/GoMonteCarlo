@@ -18,11 +18,13 @@ enum PlayerType {
   WithPatterns1HalfSecond,
   WithPatterns1Second,
   WithPatterns14AndHalfSeconds,
+  MyMonteCarlo1000Sims,
+  WithPatterns1000Sims,
   RandomPlayer,
   GnuGo
 };
 
-const char * playerTypeStrings[10] = {
+const char * playerTypeStrings[12] = {
   "MyMonteCarlo1HalfSecond",
   "MyMonteCarlo1Second",
   "MyMonteCarlo5Seconds",
@@ -31,6 +33,8 @@ const char * playerTypeStrings[10] = {
   "WithPatterns1HalfSecond",
   "WithPatterns1Second",
   "WithPatterns14AndHalfSeconds",
+  "MyMonteCarlo1000Sims",
+  "WithPatterns1000Sims",
   "RandomPlayer",
   "GnuGo"
 };
@@ -39,7 +43,11 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   float millaSecondsToThink, bool usePatterns) {
   UCTNode* newCurrentNode = NULL;
   if (numSimulations != 0) {
-    newCurrentNode = UCTSearch((*currentNode), numSimulations);
+    if (usePatterns) {
+      newCurrentNode = UCTSearch((*currentNode), numSimulations, patternsFile);
+    } else {
+      newCurrentNode = UCTSearch((*currentNode), numSimulations, "");
+    }
   } else {
     if (usePatterns) {
       newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);
@@ -86,16 +94,16 @@ void randomMove(UCTNode** currentNode, Board* b) {
 int main(void) {
   printf("Running...\n");
 
-  int numTrials = 1;
+  int numTrials = 100;
   // int numSimulations = 1000;
   float komi = 0;
-  PlayerType player1 = WithPatterns1HalfSecond;
+  PlayerType player1 = WithPatterns1000Sims;
   // PlayerType player1 = MyMonteCarlo1Second;
   // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo1HalfSecond;
+  PlayerType player2 = MyMonteCarlo1000Sims;
 
-  for (int x = 0; x < 1; x++) {
+  for (int x = 0; x < 2; x++) {
     int player1Wins = 0;
     int player2Wins = 0;
 
@@ -115,7 +123,7 @@ int main(void) {
           randomMove(&node, b);
           break;
          case MyMonteCarlo1HalfSecond:
-          computerMove(&node, b, 0, 500, false);
+          computerMove(&node, b, 0, 50, false);
           break;
          case MyMonteCarlo1Second:
           computerMove(&node, b, 0, 1000, false);
@@ -130,13 +138,19 @@ int main(void) {
           computerMove(&node, b, 0, 14500, false);
           break;
          case WithPatterns1HalfSecond:
-          computerMove(&node, b, 0, 500, true);
+          computerMove(&node, b, 0, 50, true);
           break;
          case WithPatterns1Second:
           computerMove(&node, b, 0, 1000, true);
           break;
          case WithPatterns14AndHalfSeconds:
           computerMove(&node, b, 0, 14500, true);
+          break;
+         case MyMonteCarlo1000Sims:
+          computerMove(&node, b, 1000, 0, false);
+          break;
+         case WithPatterns1000Sims:
+          computerMove(&node, b, 1000, 0, true);
           break;
          case GnuGo:
          default:

@@ -27,7 +27,6 @@ void Patterns::init(std::string patternsFile) {
 
   Pattern pattern;
   while (in >> pattern) {
-    printf("read one\n");
     hashTable[pattern.hash] = pattern;
 
     pattern.rotate90();
@@ -52,8 +51,8 @@ void Patterns::init(std::string patternsFile) {
     hashTable[pattern.hash] = pattern;
   }
 
-  for (auto p : hashTable)
-    std::cout << p.second << std::endl; 
+  // for (auto p : hashTable)
+    // std::cout << p.second << std::endl; 
   in.close();
 }
 
