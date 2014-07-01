@@ -52,45 +52,16 @@ Pattern::Pattern(Point* p) : hash(""),
 
 
 void Pattern::rotate90() {
-  /*
-  char matrix[3][3];
-  int i = 0, j = 0;
-  for (char c : hash) {
-    matrix[i][j] = c;
-    ++i;
-    if (i == 3) {
-      i = 0;
-      ++j;
-    }
-  }
 
   // transpose
-  std::cout << *this;
   // std::swap(matrix[1][0], matrix[0][1]);
   // std::swap(matrix[2][0], matrix[0][2]);
   // std::swap(matrix[1][2], matrix[2][1]);
 
-  hash = "";
-
-  for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j) {
-      hash += matrix[i][j];
-    }
-  }
-  std::cout << *this;
-
   // reverse rows
-  std::swap(matrix[0][0], matrix[0][2]);
-  std::swap(matrix[1][0], matrix[1][2]);
-  std::swap(matrix[2][0], matrix[2][2]);
-
-  hash = "";
-
-  for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j) {
-      hash += matrix[i][j];
-    }
-  }*/
+  // std::swap(matrix[0][0], matrix[0][2]);
+  // std::swap(matrix[1][0], matrix[1][2]);
+  // std::swap(matrix[2][0], matrix[2][2]);
 
   std::swap(hash[3], hash[1]);
   std::swap(hash[6], hash[2]);
@@ -204,30 +175,6 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
       }
     }
   }
-
-  // char temp = 'f';
-  // is >> temp; // newline
-  /*
-
-  pattern.hash.clear();
-  
-  std::string temp;
-  std::getline(is, temp);
-  temp.erase(temp.end());
-
-  pattern.hash += temp;
-
-  std::getline(is, temp);
-  temp.erase(temp.end());
-
-  pattern.hash += temp;
-
-  std::getline(is, temp);
-  temp.erase(temp.end());
-
-  pattern.hash += temp;
-*/
-  // std::cout << std::endl << " Pattern: \n" << pattern.hash << std::endl;
 
   return is;
 }

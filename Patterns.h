@@ -23,4 +23,4 @@ class Patterns {
 
   Point* getMove(Board* b);
 };
-#endif  // BOARD_H_
+#endif  // PATTERN_H_
