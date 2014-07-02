@@ -23,6 +23,7 @@ class Pattern {
 
   std::vector<Point*> getGoodMoves(Board* b, Point move);
 
+  static Pattern getRandomPattern();
 };
 
 std::ostream& operator<<(std::ostream &os, const Pattern &pattern);

@@ -13,6 +13,22 @@ Patterns::Patterns() :
 
 }
 
+
+bool Patterns::operator==(const Patterns &p) {
+  for (auto i : hashTable) {
+    bool found = false;
+    for (auto j : p.hashTable) {
+      if (!i.first.compare(j.first)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      return false;
+  }
+  return true;
+}
+
 void Patterns::init(std::string patternsFile) {
 
   if (patternsFile == "")
@@ -61,15 +77,54 @@ void Patterns::clear() {
   initialized = false;
 }
 
+void Patterns::save(std::string fileName) {
+
+  std::ofstream f;
+  f.open(fileName);
+  assert(f.is_open());
+
+  for (auto i : hashTable) {
+    f << i.second;
+  }
+  f.close();
+}
+
+void Patterns::mutate() {
+  unsigned int choice = rand() % 2;
+  if (choice == 0 && hashTable.size() > 0) { // delete pattern
+    unsigned long int numToDelete = rand() % hashTable.size();
+    unsigned long int i = 0;
+    for (auto it = hashTable.begin(); it != hashTable.end(); ++i, ++it) {
+      if (i == numToDelete) {
+        hashTable.erase(it);
+        break;
+      }
+    }
+  } else { // add new random pattern
+    Pattern randomPattern = Pattern::getRandomPattern();
+    hashTable.insert(std::make_pair(randomPattern.hash, randomPattern));
+  }
+}
+
 Point* Patterns::getMove(Board* b) {
 
-  Pattern lastMove(b->lastMove);
-  auto it = hashTable.find(lastMove.hash);
-  if (it != hashTable.end()) {
-    numCalled++;
-    std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
-    long unsigned int choice = rand() % goodMoves.size();
-    return goodMoves[choice];
+  if (b->lastMove != NULL) {
+    Pattern lastMove(b->lastMove);
+    auto it = hashTable.find(lastMove.hash);
+    if (it != hashTable.end()) {
+      numCalled++;
+      std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
+      long unsigned int choice = rand() % goodMoves.size();
+      bool isLegal = false;
+      for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
+        if (goodMoves[choice] == b->legalMoves[i]) {
+          isLegal = true;
+          break;
+        }
+      }
+      if (isLegal && false)
+        return goodMoves[choice];
+    }
   }
 
   return b->getRandomMove();

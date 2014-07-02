@@ -17,7 +17,7 @@ CFLAGS=-c -g -O0 -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedan
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	#-Wpadded -Wunsafe-loop-optimizations -Winline 
+	-Wunsafe-loop-optimizations -Winline #-Wpadded 
 
 all: GoMonteCarlo CheckStrength Benchmark
 
@@ -64,4 +64,4 @@ Common.o: Common.cpp
 	$(CC) $(CFLAGS) Common.cpp
 
 clean:
-	rm -rf  *.o GoMonteCarlo CheckStrength
+	rm -rf  *.o GoMonteCarlo CheckStrength Benchmark

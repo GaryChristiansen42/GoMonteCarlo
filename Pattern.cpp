@@ -119,6 +119,46 @@ std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
   return movesToReturn;
 }
 
+char getRandomColor() {
+  int i = rand() % 4;
+  char randomColor;
+  if (i == 0) {
+    randomColor = 'B';
+  } else if (i == 1) {
+    randomColor = 'W';
+  } else if (i == 2) {
+    randomColor = '_';
+  } else {
+    randomColor = 'O';
+  }
+  return randomColor;
+}
+
+Pattern Pattern::getRandomPattern() {
+  Pattern p;
+  for (unsigned int i = 0; i < 4; ++i) {
+    p.hash += getRandomColor();
+  }
+  p.hash += 'B';
+  for (unsigned int i = 0; i < 4; ++i) {
+    p.hash += getRandomColor();
+  }
+
+  int i = -1, j = -1;
+  for (char c : p.hash) {
+    if (c == '_' && rand() % 2 == 0)
+      p.goodMoves.push_back(std::make_pair(i, j));
+    if (i == 1) {
+      i = -2;
+      j++;
+    }
+    i++;
+  }
+
+  if (p.goodMoves.size() > 0)
+    return p;
+  return getRandomPattern();
+}
 
 std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {
   int i = 0, j = 0;
@@ -131,11 +171,24 @@ std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {
       os << std::endl;
     }
   }
-  os << std::endl;
 
-  for (auto x : pattern.goodMoves) {
-    os << (int)x.first << " " << (int)x.second << std::endl;
+  for (i = -1; i < 2; ++i) {
+    for (j = -1; j < 2; ++j) {
+      bool found = false;
+      for (auto x : pattern.goodMoves) {
+        if (x.first == i && x.second == j) {
+          found = true;
+          break;
+        }
+      }
+      if (found)
+        os << "1";
+      else
+        os << "0";
+    }
+    os << "\n";
   }
+  os << "\n";
 
   return os;
 }

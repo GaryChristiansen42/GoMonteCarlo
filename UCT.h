@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "UCTNode.h"
+#include "Patterns.h"
 
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
@@ -16,11 +17,11 @@ UCTNode* getNewChild(UCTNode* node);
 
 UCTNode* TreePolicy(UCTNode* node);
 
-int DefaultPolicy(UCTNode* node, Board* clone);
+int DefaultPolicy(UCTNode* node, Board* clone, Patterns* patterns);
 
 void backup(UCTNode* v, int reward);
 
-UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile);
-UCTNode* UCTSearch(UCTNode* root, float secondsToThink, std::string patternsFile);
+UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns);
+UCTNode* UCTSearch(UCTNode* root, float secondsToThink, Patterns* patterns);
 
 #endif  // UCT_H_

@@ -6,63 +6,15 @@
 #include <string>
 
 #include "UCT.h"
+#include "Common.h"
 
 const std::string patternsFile = "patterns.pat";
 
-void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
-  float millaSecondsToThink, bool usePatterns) {
-  UCTNode* newCurrentNode = NULL;
-  if (numSimulations != 0) {
-    if (usePatterns) {
-      newCurrentNode = UCTSearch((*currentNode), numSimulations, patternsFile);
-    } else {
-      newCurrentNode = UCTSearch((*currentNode), numSimulations, "");
-    }
-  } else {
-    if (usePatterns) {
-      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);
-    } else {
-      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, "");
-    }
-  }
-
-  (*currentNode)->removeChild(newCurrentNode);
-  delete (*currentNode);
-
-  (*currentNode) = newCurrentNode;
-  newCurrentNode->parent = NULL;
-  b->makeMove((*currentNode)->move);
-
-  // check if b == currentNode->state
-  for (int row = 0; row < BOARD_SIZE; ++row)
-    for (int column = 0; column < BOARD_SIZE; ++column)
-      if (b->positions[row][column]
-        != (*currentNode)->state->positions[row][column]) {
-        printf("Problem at %d %d\n", row, column);
-      }
-  if (!(*b == *(*currentNode)->state))
-    assert(false);
-
-  /*ofstream myfile;
-  myfile.open ("tree.txt");
-  showTree(&myfile, root, 0);
-  myfile.close();*/
-}
-
-void randomMove(UCTNode** currentNode, Board* b) {
-  Point *chosenMove = b->getRandomMove();
-
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, *currentNode);
-  if (newCurrentNode->parent != NULL)
-    newCurrentNode->init();
-  b->makeMove(*chosenMove);
-  // delete (*currentNode);
-  (*currentNode) = newCurrentNode;
-  newCurrentNode->parent = NULL;
-}
-
 int main(void) {
   printf("Running...\n");
+
+  Patterns patterns;
+  patterns.init(patternsFile);
 
   Board* b = new Board();
   b->init();
@@ -76,7 +28,7 @@ int main(void) {
       randomMove(&node, b);
       break;
      case White:
-      computerMove(&node, b, 0, 500, true);
+      computerMove(&node, b, 0, 500, &patterns);
       break;
      case Empty:
      case OutOfBounds:

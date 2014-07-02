@@ -11,6 +11,7 @@ class Point;
 
 class Patterns {
  public:
+  bool operator==(const Patterns &p);
 
   int numCalled;
   std::unordered_map<std::string, Pattern> hashTable;
@@ -20,6 +21,9 @@ class Patterns {
 
   void init(std::string patternFile);
   void clear();
+  void save(std::string fileName);
+
+  void mutate();
 
   Point* getMove(Board* b);
 };

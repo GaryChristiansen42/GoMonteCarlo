@@ -1,0 +1,31 @@
+CC=g++ -pthread -march=native -mtune=native
+CFLAGS=-c -g -O0 -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+	-Wdisabled-optimization -Wcast-align \
+	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
+	-Wfloat-equal -Wformat -Wformat=2 \
+	-Wformat-nonliteral -Wformat-security  \
+	-Wformat-y2k -Wimport  -Winit-self \
+	-Winvalid-pch -Wlong-long -Wmissing-braces \
+  -Wmissing-field-initializers \
+	-Wmissing-format-attribute -Wmissing-include-dirs \
+	-Wmissing-noreturn -Wpacked  -Wparentheses  \
+	-Wpointer-arith -Wredundant-decls -Wreturn-type \
+	-Wsequence-point  -Wshadow -Wsign-compare  -Wstack-protector \
+	-Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default \
+	-Wswitch-enum -Wtrigraphs  -Wuninitialized \
+	-Wunknown-pragmas  -Wunreachable-code -Wunused \
+	-Wunused-function  -Wunused-label  -Wunused-parameter \
+	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
+	-Wvolatile-register-var  -Wwrite-strings \
+	-Wunsafe-loop-optimizations -Winline #-Wpadded 
+
+all: PatternEvolution
+
+PatternEvolution: main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o
+	$(CC) main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o -o PatternEvolution -lrt
+
+main.o: main.cpp
+	$(CC) $(CFLAGS) main.cpp
+
+clean:
+	rm -rf  *.o PatternEvolution

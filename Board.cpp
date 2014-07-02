@@ -9,10 +9,6 @@
 #include <sstream>
 #include <stack>
 
-#include "Patterns.h"
-
-extern Patterns patterns;
-
 Board::Board() :
   numLegalMoves(0),
   blackGroups(std::vector<Group*>()),
@@ -570,10 +566,10 @@ GameResult Board::playRandomGame() {
   return result;
 }
 
-GameResult Board::playGame() {
+GameResult Board::playGame(Patterns* patterns) {
   GameResult result;
   while (!isGameOver(&result)) {
-    makeMove(patterns.getMove(this));
+    makeMove(patterns->getMove(this));
   }
   return result;
 }

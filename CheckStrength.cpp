@@ -6,6 +6,7 @@
 #include <string>
 
 #include "UCT.h"
+#include "Common.h"
 
 const std::string patternsFile = "patterns.pat";
 
@@ -39,60 +40,11 @@ const char * playerTypeStrings[12] = {
   "GnuGo"
 };
 
-void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
-  float millaSecondsToThink, bool usePatterns) {
-  UCTNode* newCurrentNode = NULL;
-  if (numSimulations != 0) {
-    if (usePatterns) {
-      newCurrentNode = UCTSearch((*currentNode), numSimulations, patternsFile);
-    } else {
-      newCurrentNode = UCTSearch((*currentNode), numSimulations, "");
-    }
-  } else {
-    if (usePatterns) {
-      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, patternsFile);
-    } else {
-      newCurrentNode = UCTSearch((*currentNode), millaSecondsToThink, "");
-    }
-  }
-
-  (*currentNode)->removeChild(newCurrentNode);
-  delete (*currentNode);
-
-  (*currentNode) = newCurrentNode;
-  newCurrentNode->parent = NULL;
-  b->makeMove((*currentNode)->move);
-
-  // check if b == currentNode->state
-  for (int row = 0; row < BOARD_SIZE; ++row)
-    for (int column = 0; column < BOARD_SIZE; ++column)
-      if (b->positions[row][column]
-        != (*currentNode)->state->positions[row][column]) {
-        printf("Problem at %d %d\n", row, column);
-      }
-  if (!(*b == *(*currentNode)->state))
-    assert(false);
-
-  /*ofstream myfile;
-  myfile.open ("tree.txt");
-  showTree(&myfile, root, 0);
-  myfile.close();*/
-}
-
-void randomMove(UCTNode** currentNode, Board* b) {
-  Point *chosenMove = b->getRandomMove();
-
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, *currentNode);
-  if (newCurrentNode->parent != NULL)
-    newCurrentNode->init();
-  b->makeMove(*chosenMove);
-  delete (*currentNode);
-  (*currentNode) = newCurrentNode;
-  newCurrentNode->parent = NULL;
-}
-
 int main(void) {
   printf("Running...\n");
+
+  Patterns patterns;
+  patterns.init(patternsFile);
 
   int numTrials = 100;
   // int numSimulations = 1000;
@@ -123,34 +75,34 @@ int main(void) {
           randomMove(&node, b);
           break;
          case MyMonteCarlo1HalfSecond:
-          computerMove(&node, b, 0, 50, false);
+          computerMove(&node, b, 0, 50, NULL);
           break;
          case MyMonteCarlo1Second:
-          computerMove(&node, b, 0, 1000, false);
+          computerMove(&node, b, 0, 1000, NULL);
           break;
          case MyMonteCarlo5Seconds:
-          computerMove(&node, b, 0, 5000, false);
+          computerMove(&node, b, 0, 5000, NULL);
           break;
          case MyMonteCarlo10Seconds:
-          computerMove(&node, b, 0, 10000, false);
+          computerMove(&node, b, 0, 10000, NULL);
           break;
          case MyMonteCarlo14AndHalfSeconds:
-          computerMove(&node, b, 0, 14500, false);
+          computerMove(&node, b, 0, 14500, NULL);
           break;
          case WithPatterns1HalfSecond:
-          computerMove(&node, b, 0, 50, true);
+          computerMove(&node, b, 0, 50, &patterns);
           break;
          case WithPatterns1Second:
-          computerMove(&node, b, 0, 1000, true);
+          computerMove(&node, b, 0, 1000, &patterns);
           break;
          case WithPatterns14AndHalfSeconds:
-          computerMove(&node, b, 0, 14500, true);
+          computerMove(&node, b, 0, 14500, &patterns);
           break;
          case MyMonteCarlo1000Sims:
-          computerMove(&node, b, 1000, 0, false);
+          computerMove(&node, b, 1000, 0, NULL);
           break;
          case WithPatterns1000Sims:
-          computerMove(&node, b, 1000, 0, true);
+          computerMove(&node, b, 1000, 0, &patterns);
           break;
          case GnuGo:
          default:

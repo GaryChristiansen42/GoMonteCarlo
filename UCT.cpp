@@ -23,7 +23,6 @@ std::mutex treePolicyMutex;
 std::mutex backUpMutex;
 std::atomic<int> simulationCount;
 
-Patterns patterns;
 
 double diffclock(timespec start, timespec finish) {
   double elapsed = static_cast<double>(finish.tv_sec - start.tv_sec);
@@ -121,7 +120,7 @@ UCTNode* TreePolicy(UCTNode* node) {
   return node;
 }
 
-int DefaultPolicy(UCTNode* node, Board* clone) {
+int DefaultPolicy(UCTNode* node, Board* clone, Patterns* patterns) {
   for (Group* g : clone->blackGroups)
     delete g;
   clone->blackGroups.clear();
@@ -132,8 +131,8 @@ int DefaultPolicy(UCTNode* node, Board* clone) {
   node->state->cloneInto(clone);
 
   GameResult r;
-  if (patterns.initialized)
-    r = clone->playGame();
+  if (patterns != NULL && patterns->initialized)
+    r = clone->playGame(patterns);
   else
     r = clone->playRandomGame();
 
@@ -163,14 +162,12 @@ void backup(UCTNode* v, int reward) {
   }
 }
 
-UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile) {
-  patterns.init(patternsFile);
-
+UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
   Board* clone = new Board();
   clone->init();
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root);
-    int reward = DefaultPolicy(v, clone);
+    int reward = DefaultPolicy(v, clone, patterns);
     backup(v, reward);
 
     if (i % 1000 == 0 && i != 0)
@@ -186,8 +183,6 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile) 
     next = next->sibling;
   }
 
-  patterns.clear();
-
   Point pass(BOARD_SIZE, BOARD_SIZE);
   if (!(best->move == pass)
     && best->move.color != Empty) {
@@ -200,7 +195,7 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations, std::string patternsFile) 
   return best;
 }
 
-void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
+void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patterns) {
   struct timespec start, end;
   clock_gettime(CLOCK_MONOTONIC, &start);
   clock_gettime(CLOCK_MONOTONIC, &end);
@@ -216,7 +211,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
 
     UCTNode* v = TreePolicy(root);
 
-    int reward = DefaultPolicy(v, clone);
+    int reward = DefaultPolicy(v, clone, patterns);
 
     backup(v, reward);
 
@@ -234,17 +229,14 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink) {
   Log(std::to_string(i).c_str());
 }
 
-UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, std::string patternsFile) {
+UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns) {
   simulationCount = 0;
-
-  patterns.init(patternsFile);
-
 
   int numThreads = 1;
   std::thread* threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,
-      millaSecondsToThink);
+      millaSecondsToThink, patterns);
   }
 
   for (int threadNum = 0; threadNum < numThreads; threadNum++)
@@ -269,15 +261,13 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, std::string pattern
     assert(false);
   }
 
-  patterns.clear();
-
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %f V: %d\nR/V: %f",
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
-  snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns.numCalled);
+  snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns->numCalled);
   Log(buffer);
   return best;
 }

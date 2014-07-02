@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Group.h"
+#include "Patterns.h"
 
 class Group;
 
@@ -66,7 +67,7 @@ class Board {
 
   void makeRandomMove();
   GameResult playRandomGame();
-  GameResult playGame();
+  GameResult playGame(Patterns* patterns);
 
   void show();
 
