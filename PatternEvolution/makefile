@@ -19,13 +19,19 @@ CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pe
 	-Wvolatile-register-var  -Wwrite-strings \
 	#-Wunsafe-loop-optimizations -Winline #-Wpadded 
 
-all: PatternEvolution
+all: PatternEvolution TestPatterns
 
 PatternEvolution: main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o
 	$(CC) main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o -o PatternEvolution -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
+
+TestPatterns: testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o
+	$(CC) testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o -o TestPatterns -lrt
+
+testPatterns.o: testPatterns.cpp
+	$(CC) $(CFLAGS) testPatterns.cpp
 
 clean:
 	rm -rf  *.o PatternEvolution
