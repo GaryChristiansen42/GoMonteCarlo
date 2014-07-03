@@ -15,6 +15,8 @@ Patterns::Patterns() :
 
 
 bool Patterns::operator==(const Patterns &p) {
+  if (p.hashTable.size() != hashTable.size())
+    return false;
   for (auto i : hashTable) {
     bool found = false;
     for (auto j : p.hashTable) {
