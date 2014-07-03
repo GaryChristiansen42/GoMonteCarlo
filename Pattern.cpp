@@ -134,6 +134,52 @@ char getRandomColor() {
   return randomColor;
 }
 
+bool isLegalPattern(Pattern &p) {
+
+  char matrix[3][3];
+  int i = 0, j = 0, pos = 0;
+  for (i = 0; i < 3; ++i) {
+    for (j = 0; j < 3; ++j) {
+      matrix[i][j] = p.hash[pos++];
+    }
+  }
+
+  for (i = 0; i < 3; ++i) {
+    for (j = 0; j < 3; ++j) {
+      if (matrix[i][j] == 'O') {
+        // corners
+        if (i == 0 && j == 0) {
+          if (matrix[i+1][j] != 'O' && matrix[i][j+1] != 'O') {
+            return false;
+          }
+        } else if (i == 0 && j == 2) {
+          if (matrix[i+1][j] != 'O' && matrix[i][j-1] != 'O') {
+            return false;
+          }
+        } else if (i == 2 && j == 0) {
+          if (matrix[i-1][j] != 'O' && matrix[i][j+1] != 'O') {
+            return false;
+          }
+        } else if (i == 2 && j == 2) {
+          if (matrix[i-1][j] != 'O' && matrix[i][j-1] != 'O') {
+            return false;
+          }
+        } // non corners/middle
+        else if (i == 1) {
+          if (matrix[i-1][j] != 'O' || matrix[i+1][j] != 'O') {
+            return false;
+          }
+        } else if (j == 1) {
+          if (matrix[i][j-1] != 'O' || matrix[i][j+1] != 'O') {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
 Pattern Pattern::getRandomPattern() {
   Pattern p;
   for (unsigned int i = 0; i < 4; ++i) {
@@ -148,14 +194,15 @@ Pattern Pattern::getRandomPattern() {
   for (char c : p.hash) {
     if (c == '_' && rand() % 2 == 0)
       p.goodMoves.push_back(std::make_pair(i, j));
-    if (i == 1) {
-      i = -2;
-      j++;
+    if (j == 1) {
+      j = -2;
+      i++;
     }
-    i++;
+    j++;
   }
 
-  if (p.goodMoves.size() > 0)
+  if (p.goodMoves.size() > 0
+    && isLegalPattern(p))
     return p;
   return getRandomPattern();
 }

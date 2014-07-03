@@ -13,9 +13,9 @@ UCTNode *root;
 
 // http://www.ai-junkie.com/ga/intro/gat2.html
 const float mutationChance = 0.7f;
-const float percentSurvivors = 0.01f;
+const float percentSurvivors = 0.02f;
 const unsigned int populationSize = 1000;
-const unsigned int numGenerations = 200;
+const unsigned int numGenerations = 2000;
 
 // int is fitness
 std::vector<std::pair<Patterns, unsigned int>> patternPopulation;
@@ -85,28 +85,36 @@ void determineFitness() {
 int main(void) {
   printf("PatternEvolution\n");
 
+  int randNumber = rand();
+  char fileName[256];
+  snprintf(fileName, sizeof(fileName), "savedPatterns/patterns%d.pat", randNumber);
+
   originalPatterns.init("patterns.pat");
 
   for (unsigned int i = 0; i < populationSize; ++i)
     patternPopulation.push_back(std::make_pair(originalPatterns, 0));
 
   selectSurvivors();
+  auto best = patternPopulation[0];
 
   for (unsigned int i = 0; i < numGenerations; ++i) {
     std::cout << "Generation " << i << std::endl;
     determineFitness();
+    if (i % 10 == 0) {
+      best = patternPopulation[0];
+      for (auto member : patternPopulation)
+        if (member.second > best.second)
+          best = member;
+      best.first.save(fileName);
+    }
     selectSurvivors();
   }
 
   determineFitness();
-  
-  std::pair<Patterns, unsigned int> best = patternPopulation[0];
+  best = patternPopulation[0];
   for (auto member : patternPopulation)
     if (member.second > best.second)
       best = member;
-
-  char fileName[256];
-  snprintf(fileName, sizeof(fileName), "savedPatterns/patterns%d.pat", rand());
   best.first.save(fileName);
 
   return 0;
