@@ -13,9 +13,9 @@ UCTNode *root;
 
 // http://www.ai-junkie.com/ga/intro/gat2.html
 const float mutationChance = 0.7f;
-const float percentSurvivors = 0.02f;
-const unsigned int populationSize = 1000;
-const unsigned int numGenerations = 2000;
+const float percentSurvivors = 0.05f;
+const unsigned int populationSize = 100;
+const unsigned int numGenerations = 200000;
 
 // int is fitness
 std::vector<std::pair<Patterns, unsigned int>> patternPopulation;
@@ -66,11 +66,11 @@ void determineFitness() {
       b.init();
 
       GameResult r;
-      auto turn = member.first;
+      auto turn = &member.first;
       Player turnColor = Black;
       while (!b.isGameOver(&r)) {
-        b.makeMove(*turn.getMove(&b));
-        turn = turnColor == Black ? originalPatterns : member.first;
+        b.makeMove(*turn->getMove(&b));
+        turn = turnColor == Black ? &originalPatterns : &member.first;
         turnColor = turnColor == Black ? White : Black;
       }
       if ((Player)r == Black)
@@ -85,6 +85,7 @@ void determineFitness() {
 int main(void) {
   printf("PatternEvolution\n");
 
+  srand((unsigned int)time(NULL));
   int randNumber = rand();
   char fileName[256];
   snprintf(fileName, sizeof(fileName), "savedPatterns/patterns%d.pat", randNumber);
