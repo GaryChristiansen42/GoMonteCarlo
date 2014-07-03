@@ -101,12 +101,13 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 void randomMove(UCTNode** currentNode, Board* b) {
 
   Point* chosenMove = b->getRandomMove();
-  printf("Row: %d\nColumn: %d\n", chosenMove->row, chosenMove->column);
 
   b->makeMove(*chosenMove);
   UCTNode* newCurrentNode = new UCTNode(*chosenMove, NULL);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
+  (*currentNode)->state = b->clone();
+
 }
 
 
