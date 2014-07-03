@@ -1,5 +1,5 @@
 CC=g++ -pthread -march=native -mtune=native
-CFLAGS=-c -g -O0 -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -17,7 +17,7 @@ CFLAGS=-c -g -O0 -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedan
 	-Wunused-function  -Wunused-label  -Wunused-parameter \
 	-Wunused-value  -Wunused-variable  -Wvariadic-macros \
 	-Wvolatile-register-var  -Wwrite-strings \
-	-Wunsafe-loop-optimizations -Winline #-Wpadded 
+	#-Wunsafe-loop-optimizations #-Winline #-Wpadded 
 
 all: GoMonteCarlo CheckStrength Benchmark
 
