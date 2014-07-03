@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <math.h>
 #include <time.h>
 
 #include <cstdlib>
@@ -18,7 +19,7 @@ const unsigned int populationSize = 100;
 const unsigned int numGenerations = 200000;
 
 // int is fitness
-std::vector<std::pair<Patterns, unsigned int>> patternPopulation;
+std::vector<std::pair<Patterns, int>> patternPopulation;
 Patterns originalPatterns;
 
 
@@ -27,9 +28,21 @@ void selectSurvivors() {
   if (numSurvivors < 1)
     ++numSurvivors;
 
-  std::vector<std::pair<Patterns, unsigned int>> survivors;
+  int newLineAmount = sqrt(populationSize);
+  int count = 0;
+  for (auto x : patternPopulation) {
+    count++;
+    printf("%d ", x.second);
+    if (count == newLineAmount) {
+      printf("\n");
+      count = 0;
+    }
+  }
+  printf("\n");
+
+  std::vector<std::pair<Patterns, int>> survivors;
   for (unsigned int i = 0; i < numSurvivors; ++i) {
-    std::pair<Patterns, unsigned int> best = patternPopulation[0];
+    auto best = patternPopulation[0];
     for (auto member : patternPopulation) {
       if (member.second > best.second) {
         bool found = false;
@@ -60,8 +73,9 @@ void selectSurvivors() {
 }
 
 void determineFitness() {
-  for (auto member : patternPopulation) {
-    for (int i = 0; i < 10; ++i) {
+  auto count = 0;
+  for (auto& member : patternPopulation) {
+    for (auto i = 0; i < 100; ++i) {
       Board b;
       b.init();
 
@@ -78,6 +92,8 @@ void determineFitness() {
       else
         --member.second;
     }
+    printf("%d score: %d\n", count, member.second);
+    ++count;
   }
 }
 
@@ -101,7 +117,7 @@ int main(void) {
   for (unsigned int i = 0; i < numGenerations; ++i) {
     std::cout << "Generation " << i << std::endl;
     determineFitness();
-    if (i % 10 == 0) {
+    if (i % 1 == 0) {
       best = patternPopulation[0];
       for (auto member : patternPopulation)
         if (member.second > best.second)
