@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
 #include <string>
 
 #include "../UCT.h"
@@ -13,18 +14,20 @@ const std::string patternsFile = "patterns.pat";
 Patterns originalPatterns;
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    printf("Expecting one argument for number of Trials\n");
+  if (argc != 4) {
+    printf("Expecting <filename> <numTrials> <datasavefile>\n");
     return 0;
   }
+
   printf("TestPatterns\n");
 
   srand((unsigned int)time(NULL));
 
-  originalPatterns.init("patterns.pat");
+  originalPatterns.init(argv[1]);
 
-  unsigned int numTrials = atoi(argv[1]);
+  unsigned int numTrials = atoi(argv[2]);
   unsigned int totalWins = 0;
+  unsigned int totalMoves = 0;
   Player patternColor = Black;
 
  start:
@@ -42,19 +45,31 @@ int main(int argc, char** argv) {
       else 
         b.makeRandomMove();
       turnColor = turnColor == Black ? White : Black;
+
+      if (turnColor == patternColor)
+        ++totalMoves;
     }
     if ((Player)r == patternColor)
       ++numWins;
   }
   totalWins += numWins;
-  printf("%d / %d = %f\n", numWins, gamesPlayed, ((float)numWins)/((float)(gamesPlayed)));
+  printf("Games - %d / %d = %f\n", numWins, gamesPlayed, ((float)numWins)/((float)(gamesPlayed)));
 
   if (patternColor == Black) {
     patternColor = White;
     goto start;
   }
 
-  printf("%d / %d = %f\n", totalWins, gamesPlayed*2, ((float)totalWins)/((float)(gamesPlayed*2)));
+  printf("Total - %d / %d = %f\n", totalWins, gamesPlayed*2, ((float)totalWins)/((float)(gamesPlayed*2)));
+  printf("Moves - %d / %d = %f\n", originalPatterns.numCalled, totalMoves, ((float)(originalPatterns.numCalled)) / (float)totalMoves);
       
+  std::ofstream f;
+  // char fileName[200];
+  // snprintf(fileName, sizeof(fileName), "%dx%dDataPoints.dat", BOARD_SIZE, BOARD_SIZE);
+  f.open(argv[3], std::ios::app);
+  if (f.is_open())
+    f << totalWins << ", " << gamesPlayed*2 << ", " << ((float)totalWins) / ((float)gamesPlayed*2) << ", " << originalPatterns.numCalled << ", " << totalMoves << ", " << ((float)originalPatterns.numCalled) / ((float)totalMoves) << std::endl;  
+  f.close();
+
   return 0;
 }
