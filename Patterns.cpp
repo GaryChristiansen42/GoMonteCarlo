@@ -91,9 +91,34 @@ void Patterns::save(std::string fileName) {
   f.close();
 }
 
+void Patterns::addPattern(Pattern pattern) {
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.invertColor();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable[pattern.hash] = pattern;
+}
+
 void Patterns::mutate() {
-  unsigned int choice = rand() % 2;
-  if (choice == 0 && hashTable.size() > 0) { // delete pattern
+  unsigned int choice = rand() % 1;
+  if (choice == 1 && hashTable.size() > 0) { // delete pattern
     unsigned long int numToDelete = rand() % hashTable.size();
     unsigned long int i = 0;
     for (auto it = hashTable.begin(); it != hashTable.end(); ++i, ++it) {
@@ -104,7 +129,8 @@ void Patterns::mutate() {
     }
   } else { // add new random pattern
     Pattern randomPattern = Pattern::getRandomPattern();
-    hashTable.insert(std::make_pair(randomPattern.hash, randomPattern));
+    addPattern(randomPattern);
+    // hashTable.insert(std::make_pair(randomPattern.hash, randomPattern));
   }
 }
 
@@ -124,7 +150,7 @@ Point* Patterns::getMove(Board* b) {
           break;
         }
       }
-      if (isLegal && false)
+      if (isLegal)
         return goodMoves[choice];
     }
   }

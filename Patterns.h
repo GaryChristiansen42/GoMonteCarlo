@@ -23,6 +23,8 @@ class Patterns {
   void clear();
   void save(std::string fileName);
 
+  void addPattern(Pattern pattern);
+
   void mutate();
 
   Point* getMove(Board* b);
