@@ -17,9 +17,15 @@ class Pattern {
 
   Pattern();
   Pattern(Point* p);
+  friend bool operator== ( const Pattern &p1, const Pattern &p2);
 
   void rotate90();
   void invertColor();
+
+  static char getRandomColor();
+  bool isLegalPattern();
+  void determineRandomGoodMoves();
+
 
   std::vector<Point*> getGoodMoves(Board* b, Point move);
 

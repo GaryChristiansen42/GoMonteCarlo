@@ -51,6 +51,12 @@ Pattern::Pattern(Point* p) : hash(""),
 }
 
 
+bool operator==(const Pattern &p1, const Pattern &p2) {
+  if (p1.hash.compare(p2.hash))
+    return false;
+  return true;
+}
+
 void Pattern::rotate90() {
 
   // transpose
@@ -119,7 +125,7 @@ std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
   return movesToReturn;
 }
 
-char getRandomColor() {
+char Pattern::getRandomColor() {
   int i = rand() % 4;
   char randomColor;
   if (i == 0) {
@@ -134,14 +140,39 @@ char getRandomColor() {
   return randomColor;
 }
 
-bool isLegalPattern(Pattern &p) {
+void Pattern::determineRandomGoodMoves() {
+  int i = -1, j = -1;
+  for (char c : hash) {
+    if (c == '_' && (rand() % 2 == 0 || goodMoves.size() == 0))
+      goodMoves.push_back(std::make_pair(i, j));
+    if (j == 1) {
+      j = -2;
+      i++;
+    }
+    j++;
+  }
+}
+
+bool Pattern::isLegalPattern() {
+  if (hash[4] != 'B' && hash[4] != 'W')
+    return false;
 
   char matrix[3][3];
   int i = 0, j = 0, pos = 0;
   for (i = 0; i < 3; ++i) {
     for (j = 0; j < 3; ++j) {
-      matrix[i][j] = p.hash[pos++];
+      matrix[i][j] = hash[pos++];
     }
+  }
+  if (goodMoves.size() == 0)
+    return false;
+  bool foundEmpty = false;
+  for (char c : hash)
+    if (c == '_')
+      foundEmpty = true;
+  if (!foundEmpty) {
+    // std::cout << *this;
+    return false;
   }
 
   for (i = 0; i < 3; ++i) {
@@ -190,19 +221,10 @@ Pattern Pattern::getRandomPattern() {
     p.hash += getRandomColor();
   }
 
-  int i = -1, j = -1;
-  for (char c : p.hash) {
-    if (c == '_' && rand() % 2 == 0)
-      p.goodMoves.push_back(std::make_pair(i, j));
-    if (j == 1) {
-      j = -2;
-      i++;
-    }
-    j++;
-  }
+  p.determineRandomGoodMoves();
 
   if (p.goodMoves.size() > 0
-    && isLegalPattern(p))
+    && p.isLegalPattern())
     return p;
   return getRandomPattern();
 }
