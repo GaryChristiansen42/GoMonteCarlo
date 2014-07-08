@@ -23,11 +23,12 @@ const unsigned int numGenerations = 200000;
 
 const unsigned int numThreads = 2;
 
+std::default_random_engine engine;
+
 // int is fitness
 std::vector<std::pair<Patterns, int>> patternPopulation;
 Patterns originalPatterns;
 
-// int is numEncountered
 std::vector<std::string> patternsEncountered;
 
 std::mutex patternsEncounteredLock;
@@ -73,13 +74,16 @@ void selectSurvivors() {
 
   // repopulate
   patternPopulation.clear();
+  std::uniform_int_distribution<> distSurvivorSize(0, (int)survivors.size()-1);
+  std::uniform_int_distribution<> dist0To100(0, 100);
+  std::uniform_int_distribution<> distPatternsEncounteredSize(0, (int)patternsEncountered.size()-1);
   for (unsigned int i = 0; i < populationSize; ++i) {
-    unsigned long int choice = rand() % survivors.size();
+    unsigned long int choice = distSurvivorSize(engine);
 
     Patterns chosen = survivors[choice].first;
-    if (rand() % 100 > mutationChance * 100) {
+    if (dist0To100(engine) > mutationChance * 100) {
       if (patternsEncountered.size() > 0) {
-        choice = rand() % patternsEncountered.size();
+        choice = distPatternsEncounteredSize(engine);
         chosen.mutatePattern(patternsEncountered[choice]);
 
         /*std::cout << choice << std::endl;
@@ -147,8 +151,9 @@ void determineFitness() {
 int main(void) {
   printf("PatternEvolution\n");
 
-  srand((unsigned int)time(NULL));
-  int randNumber = rand();
+  engine.seed(time(NULL));
+  std::uniform_int_distribution<> dist(1, 100000);
+  int randNumber = dist(engine);
   char fileName[256];
   snprintf(fileName, sizeof(fileName), "savedPatterns/patterns%d.pat", randNumber);
 
