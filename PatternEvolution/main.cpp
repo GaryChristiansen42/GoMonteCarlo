@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
+#include <mutex>
 #include <string>
+#include <thread>
 
 #include "../UCT.h"
 
@@ -19,12 +21,17 @@ const float percentSurvivors = 0.1f;
 const unsigned int populationSize = 9;
 const unsigned int numGenerations = 200000;
 
+const unsigned int numThreads = 2;
+
 // int is fitness
 std::vector<std::pair<Patterns, int>> patternPopulation;
 Patterns originalPatterns;
 
 // int is numEncountered
 std::vector<std::string> patternsEncountered;
+
+std::mutex patternsEncounteredLock;
+std::mutex patternPopulationLock;
 
 void selectSurvivors() {
   unsigned int numSurvivors = (int)(populationSize * percentSurvivors);
@@ -91,10 +98,10 @@ void selectSurvivors() {
   patternsEncountered.clear();
 }
 
-void determineFitness() {
-  auto count = 0;
+void determineFitnessThread() {
+
   for (auto& member : patternPopulation) {
-    for (auto i = 0; i < 10000; ++i) {
+    for (unsigned int i = 0; i < 10000 / numThreads; ++i) {
       Board b;
       b.init();
 
@@ -107,16 +114,33 @@ void determineFitness() {
         turnColor = turnColor == Black ? White : Black;
 
         Pattern lastMove(b.lastMove);
-        if (lastMove.isLegalPattern())
+        if (lastMove.isLegalPattern()) {
+          patternsEncounteredLock.lock();
           patternsEncountered.push_back(lastMove.hash);
+          patternsEncounteredLock.unlock();
+        }
       }
+      patternPopulationLock.lock();
       if ((Player)r == Black)
         ++member.second;
       else
         --member.second;
+      patternPopulationLock.unlock();
     }
-    ++count;
   }
+
+}
+
+void determineFitness() {
+  std::thread* threads = new std::thread[numThreads];
+  for (unsigned int threadNum = 0; threadNum < numThreads; threadNum++) {
+    threads[threadNum] = std::thread(determineFitnessThread);
+  }
+
+  for (unsigned int threadNum = 0; threadNum < numThreads; threadNum++)
+    threads[threadNum].join();
+  delete[] threads;
+
 }
 
 
