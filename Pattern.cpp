@@ -299,7 +299,7 @@ std::istream& operator>>(std::istream &is, Pattern& pattern) {
 
   for (i = -1; i < 2; ++i) {
     for (j = -1; j < 2; ++j) {
-      char input;
+      char input = 0;
       is >> input;
       if (input == '1') {
         pattern.goodMoves.push_back(std::pair<char, char>(i, j));

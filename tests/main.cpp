@@ -426,6 +426,7 @@ BOOST_AUTO_TEST_CASE( testIsSuicide )
   Board* b2Clone = b2.clone();
   float score = b2Clone->getTaylorScore(0);
   BOOST_CHECK_EQUAL(score, -25);
+  delete b2Clone;
 }
 
 BOOST_AUTO_TEST_CASE( testGroup )
@@ -604,6 +605,9 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
   Board* b1Clone2 = b1->clone();
   score = b1Clone2->getTaylorScore(0.5);
   BOOST_CHECK_EQUAL(score, BOARD_SIZE*BOARD_SIZE-0.5);
+  delete b1;
+  delete b1Clone;
+  delete b1Clone2;
 }
 
 BOOST_AUTO_TEST_CASE( testPattern )
