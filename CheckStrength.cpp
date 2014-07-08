@@ -19,13 +19,15 @@ enum PlayerType {
   WithPatterns1HalfSecond,
   WithPatterns1Second,
   WithPatterns14AndHalfSeconds,
+  MyMonteCarlo500Sims,
+  WithPatterns500Sims,
   MyMonteCarlo1000Sims,
   WithPatterns1000Sims,
   RandomPlayer,
   GnuGo
 };
 
-const char * playerTypeStrings[12] = {
+const char * playerTypeStrings[14] = {
   "MyMonteCarlo1HalfSecond",
   "MyMonteCarlo1Second",
   "MyMonteCarlo5Seconds",
@@ -34,6 +36,8 @@ const char * playerTypeStrings[12] = {
   "WithPatterns1HalfSecond",
   "WithPatterns1Second",
   "WithPatterns14AndHalfSeconds",
+  "MyMonteCarlo500Sims",
+  "WithPatterns500Sims",
   "MyMonteCarlo1000Sims",
   "WithPatterns1000Sims",
   "RandomPlayer",
@@ -97,6 +101,12 @@ int main(void) {
           break;
          case WithPatterns14AndHalfSeconds:
           computerMove(&node, b, 0, 14500, &patterns);
+          break;
+         case MyMonteCarlo500Sims:
+          computerMove(&node, b, 500, 0, NULL);
+          break;
+         case WithPatterns500Sims:
+          computerMove(&node, b, 500, 0, &patterns);
           break;
          case MyMonteCarlo1000Sims:
           computerMove(&node, b, 1000, 0, NULL);
