@@ -2,6 +2,7 @@
 #include <math.h>
 #include <time.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstdio>
 #include <string>
@@ -14,14 +15,16 @@ UCTNode *root;
 
 // http://www.ai-junkie.com/ga/intro/gat2.html
 const float mutationChance = 0.7f;
-const float percentSurvivors = 0.05f;
-const unsigned int populationSize = 100;
+const float percentSurvivors = 0.1f;
+const unsigned int populationSize = 9;
 const unsigned int numGenerations = 200000;
 
 // int is fitness
 std::vector<std::pair<Patterns, int>> patternPopulation;
 Patterns originalPatterns;
 
+// int is numEncountered
+std::vector<std::string> patternsEncountered;
 
 void selectSurvivors() {
   unsigned int numSurvivors = (int)(populationSize * percentSurvivors);
@@ -30,6 +33,7 @@ void selectSurvivors() {
 
   int newLineAmount = sqrt(populationSize);
   int count = 0;
+  float totalScore = 0;
   for (auto x : patternPopulation) {
     count++;
     printf("%d ", x.second);
@@ -37,8 +41,9 @@ void selectSurvivors() {
       printf("\n");
       count = 0;
     }
+    totalScore += (float)x.second;
   }
-  printf("\n");
+  printf("\nAverageScore: %f\n", totalScore / (float)patternPopulation.size());
 
   std::vector<std::pair<Patterns, int>> survivors;
   for (unsigned int i = 0; i < numSurvivors; ++i) {
@@ -65,17 +70,31 @@ void selectSurvivors() {
     unsigned long int choice = rand() % survivors.size();
 
     Patterns chosen = survivors[choice].first;
-    if (rand() % 100 > mutationChance * 100)
-      chosen.mutate();
+    if (rand() % 100 > mutationChance * 100) {
+      if (patternsEncountered.size() > 0) {
+        choice = rand() % patternsEncountered.size();
+        chosen.mutatePattern(patternsEncountered[choice]);
+
+        /*std::cout << choice << std::endl;
+        std::cout << std::count(patternsEncountered.begin(), patternsEncountered.end(), patternsEncountered[choice])
+          << " " << patternsEncountered.size() << std::endl;
+        std::cout << (float)std::count(patternsEncountered.begin(), patternsEncountered.end(), patternsEncountered[choice])
+          / (float)patternsEncountered.size() << std::endl;
+        std::cout << patternsEncountered[choice] << std::endl;
+        */
+      }
+    }
 
     patternPopulation.push_back(std::make_pair(chosen, 0));
   }
+  // std::cout << patternsEncountered.size() << std::endl;
+  patternsEncountered.clear();
 }
 
 void determineFitness() {
   auto count = 0;
   for (auto& member : patternPopulation) {
-    for (auto i = 0; i < 100; ++i) {
+    for (auto i = 0; i < 10000; ++i) {
       Board b;
       b.init();
 
@@ -86,13 +105,16 @@ void determineFitness() {
         b.makeMove(*turn->getMove(&b));
         turn = turnColor == Black ? &originalPatterns : &member.first;
         turnColor = turnColor == Black ? White : Black;
+
+        Pattern lastMove(b.lastMove);
+        if (lastMove.isLegalPattern())
+          patternsEncountered.push_back(lastMove.hash);
       }
       if ((Player)r == Black)
         ++member.second;
       else
         --member.second;
     }
-    printf("%d score: %d\n", count, member.second);
     ++count;
   }
 }
