@@ -26,6 +26,7 @@ class Patterns {
   void addPattern(Pattern pattern);
 
   void mutate();
+  void mutatePattern(std::string hash);
 
   Point* getMove(Board* b);
 };

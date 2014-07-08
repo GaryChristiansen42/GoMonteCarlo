@@ -25,6 +25,8 @@ class Pattern {
   static char getRandomColor();
   bool isLegalPattern();
   void determineRandomGoodMoves();
+  void mutate();
+  Pattern getMutated();
 
 
   std::vector<Point*> getGoodMoves(Board* b, Point move);

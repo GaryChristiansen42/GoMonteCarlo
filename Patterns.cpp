@@ -134,6 +134,11 @@ void Patterns::mutate() {
   }
 }
 
+void Patterns::mutatePattern(std::string hash) {
+  Pattern mutated = hashTable[hash].getMutated();
+  addPattern(mutated);
+}
+
 Point* Patterns::getMove(Board* b) {
 
   if (b->lastMove != NULL) {

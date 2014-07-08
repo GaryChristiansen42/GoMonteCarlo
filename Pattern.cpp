@@ -164,8 +164,7 @@ bool Pattern::isLegalPattern() {
       matrix[i][j] = hash[pos++];
     }
   }
-  if (goodMoves.size() == 0)
-    return false;
+
   bool foundEmpty = false;
   for (char c : hash)
     if (c == '_')
@@ -209,6 +208,16 @@ bool Pattern::isLegalPattern() {
     }
   }
   return true;
+}
+
+void Pattern::mutate() {
+  goodMoves.clear();
+  determineRandomGoodMoves(); 
+}
+Pattern Pattern::getMutated() {
+  Pattern p = *this;
+  p.mutate();
+  return p;
 }
 
 Pattern Pattern::getRandomPattern() {
