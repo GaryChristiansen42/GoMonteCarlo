@@ -121,7 +121,6 @@ std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
     Point temp((char)(p.first + move.row), (char)(p.second + move.column));
     movesToReturn.push_back(b->getPoint(&temp));
   }
-  assert(movesToReturn.size() > 0);
   return movesToReturn;
 }
 
@@ -143,7 +142,7 @@ char Pattern::getRandomColor() {
 void Pattern::determineRandomGoodMoves() {
   int i = -1, j = -1;
   for (char c : hash) {
-    if (c == '_' && (rand() % 2 == 0 || goodMoves.size() == 0))
+    if (c == '_' && (rand() % 2 == 0))
       goodMoves.push_back(std::make_pair(i, j));
     if (j == 1) {
       j = -2;
@@ -232,8 +231,7 @@ Pattern Pattern::getRandomPattern() {
 
   p.determineRandomGoodMoves();
 
-  if (p.goodMoves.size() > 0
-    && p.isLegalPattern())
+  if (p.isLegalPattern())
     return p;
   return getRandomPattern();
 }

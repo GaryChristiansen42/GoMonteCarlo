@@ -147,16 +147,18 @@ Point* Patterns::getMove(Board* b) {
     if (it != hashTable.end()) {
       numCalled++;
       std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
-      long unsigned int choice = rand() % goodMoves.size();
-      bool isLegal = false;
-      for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
-        if (goodMoves[choice] == b->legalMoves[i]) {
-          isLegal = true;
-          break;
+      if (goodMoves.size() > 0) {
+        long unsigned int choice = rand() % goodMoves.size();
+        bool isLegal = false;
+        for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
+          if (goodMoves[choice] == b->legalMoves[i]) {
+            isLegal = true;
+            break;
+          }
         }
+        if (isLegal)
+          return goodMoves[choice];
       }
-      if (isLegal)
-        return goodMoves[choice];
     }
   }
 
