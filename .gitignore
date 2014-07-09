@@ -1,4 +1,5 @@
 *.o
+*.swo
 *.swp
 *.txt
 
@@ -8,8 +9,10 @@ callgrind.out.*
 
 Benchmark
 CheckStrength
+GenerateAllPatterns
 GoMonteCarlo
 GTPClient
+PatternEvolution
 TestGoMonteCarlo
 
 myTestGoBot.ini
