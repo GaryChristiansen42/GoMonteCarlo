@@ -19,9 +19,9 @@ UCTNode *root;
 const float mutationChance = 0.7f;
 const float percentSurvivors = 0.1f;
 const unsigned int populationSize = 9;
-const unsigned int numGenerations = 200000;
+const unsigned int numGenerations = 20000;
 
-const unsigned int numThreads = 2;
+const unsigned int numThreads = 4;
 
 std::default_random_engine engine;
 
