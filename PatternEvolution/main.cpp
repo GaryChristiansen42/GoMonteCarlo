@@ -84,7 +84,7 @@ void selectSurvivors() {
     if (dist0To100(engine) > mutationChance * 100) {
       if (patternsEncountered.size() > 0) {
         choice = distPatternsEncounteredSize(engine);
-        chosen.mutatePattern(patternsEncountered[choice]);
+        chosen.mutatePattern(patternsEncountered[choice], engine);
 
         /*std::cout << choice << std::endl;
         std::cout << std::count(patternsEncountered.begin(), patternsEncountered.end(), patternsEncountered[choice])
@@ -103,6 +103,7 @@ void selectSurvivors() {
 }
 
 void determineFitnessThread() {
+  std::default_random_engine threadEngine(time(NULL));
 
   for (auto& member : patternPopulation) {
     for (unsigned int i = 0; i < 10000 / numThreads; ++i) {
@@ -113,7 +114,7 @@ void determineFitnessThread() {
       auto turn = &member.first;
       Player turnColor = Black;
       while (!b.isGameOver(&r)) {
-        b.makeMove(*turn->getMove(&b));
+        b.makeMove(*turn->getMove(&b, threadEngine));
         turn = turnColor == Black ? &originalPatterns : &member.first;
         turnColor = turnColor == Black ? White : Black;
 

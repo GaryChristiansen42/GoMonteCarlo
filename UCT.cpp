@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <cstdlib>
-#include <thread>
-#include <mutex>
 #include <atomic>
+#include <cstdlib>
+#include <mutex>
+#include <random>
+#include <thread>
 
 #include "Common.h"
 #include "Patterns.h"
@@ -65,7 +66,7 @@ UCTNode* bestChild(UCTNode* node) {
   return bestChild;
 }
 
-UCTNode* getNewChild(UCTNode* node) {
+UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == NULL) {
     for (unsigned short i = 0; i < node->state->numLegalMoves; ++i) {
@@ -84,9 +85,8 @@ UCTNode* getNewChild(UCTNode* node) {
   }
   // else //Pick random child
   // {
-    static unsigned int seed = static_cast<unsigned int>(time(NULL));
-    unsigned int choice = rand_r(&seed) %
-      static_cast<unsigned int>(node->possibleChildren.size());
+    std::uniform_int_distribution<> dist(0, (int)node->possibleChildren.size()-1);
+    unsigned int choice = dist(engine);
     UCTNode* chosenChild = node->possibleChildren[choice];
     // for(unsigned int i = 0; i < possibleChildren.size(); i++)
     //  if(i != choice)
@@ -101,10 +101,10 @@ UCTNode* getNewChild(UCTNode* node) {
   //  }
 }
 
-UCTNode* TreePolicy(UCTNode* node) {
+UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
   GameResult r;
   while (!node->state->isGameOver(&r)) {  // Not terminal
-    UCTNode* newChild = getNewChild(node);
+    UCTNode* newChild = getNewChild(node, engine);
     if (newChild != NULL) {
       node->addChild(newChild);
       return newChild;
@@ -120,7 +120,7 @@ UCTNode* TreePolicy(UCTNode* node) {
   return node;
 }
 
-int DefaultPolicy(UCTNode* node, Board* clone, Patterns* patterns) {
+int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clone, Patterns* patterns) {
   for (Group* g : clone->blackGroups)
     delete g;
   clone->blackGroups.clear();
@@ -132,9 +132,9 @@ int DefaultPolicy(UCTNode* node, Board* clone, Patterns* patterns) {
 
   GameResult r;
   if (patterns != NULL && patterns->initialized)
-    r = clone->playGame(patterns);
+    r = clone->playGame(patterns, engine);
   else
-    r = clone->playRandomGame();
+    r = clone->playRandomGame(engine);
 
   if ((node->state->turn == Black ? White : Black) == static_cast<int>(r))
     return 1;
@@ -165,9 +165,10 @@ void backup(UCTNode* v, int reward) {
 UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
   Board* clone = new Board();
   clone->init();
+  std::default_random_engine engine(time(NULL));
   for (int i = 0; i < numSimulations; i++) {
-    UCTNode* v = TreePolicy(root);
-    int reward = DefaultPolicy(v, clone, patterns);
+    UCTNode* v = TreePolicy(root, engine);
+    int reward = DefaultPolicy(engine, v, clone, patterns);
     backup(v, reward);
 
     if (i % 1000 == 0 && i != 0)
@@ -202,6 +203,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
 
   int i = 0;
 
+  std::default_random_engine engine(time(NULL));
   Board* clone = new Board();
   clone->init();
 
@@ -209,9 +211,9 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
     simulationCount++;
     i++;
 
-    UCTNode* v = TreePolicy(root);
+    UCTNode* v = TreePolicy(root, engine);
 
-    int reward = DefaultPolicy(v, clone, patterns);
+    int reward = DefaultPolicy(engine, v, clone, patterns);
 
     backup(v, reward);
 
@@ -267,7 +269,9 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
-  snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns->numCalled);
-  Log(buffer);
+  if (patterns != NULL) {
+    snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns->numCalled);
+    Log(buffer);
+  }
   return best;
 }

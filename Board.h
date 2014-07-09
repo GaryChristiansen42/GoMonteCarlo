@@ -3,6 +3,7 @@
 
 #define RUNNING_TESTS
 
+#include <random>
 #include <vector>
 
 #include "Group.h"
@@ -62,12 +63,12 @@ class Board {
 
   unsigned long int getHash();
 
-  Point* getRandomMove();
+  Point* getRandomMove(std::default_random_engine& engine);
   void makeMove(Point move);
 
-  void makeRandomMove();
-  GameResult playRandomGame();
-  GameResult playGame(Patterns* patterns);
+  void makeRandomMove(std::default_random_engine& engine);
+  GameResult playRandomGame(std::default_random_engine& engine);
+  GameResult playGame(Patterns* patterns, std::default_random_engine& engine);
 
   void show();
 

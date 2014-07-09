@@ -99,8 +99,9 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
+  std::default_random_engine engine(time(NULL));
 
-  Point* chosenMove = b->getRandomMove();
+  Point* chosenMove = b->getRandomMove(engine);
 
   b->makeMove(*chosenMove);
   UCTNode* newCurrentNode = new UCTNode(*chosenMove, NULL);

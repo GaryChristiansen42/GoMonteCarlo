@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 
   printf("TestPatterns\n");
 
-  srand((unsigned int)time(NULL));
+  std::default_random_engine engine(time(NULL));
 
   originalPatterns.init(argv[1]);
 
@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
     Player turnColor = Black;
     while (!b.isGameOver(&r)) {
       if (turnColor == patternColor)
-        b.makeMove(*originalPatterns.getMove(&b));
+        b.makeMove(*originalPatterns.getMove(&b, engine));
       else 
-        b.makeRandomMove();
+        b.makeRandomMove(engine);
       turnColor = turnColor == Black ? White : Black;
 
       if (turnColor == patternColor)
