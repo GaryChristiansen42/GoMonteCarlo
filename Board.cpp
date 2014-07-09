@@ -548,28 +548,28 @@ void Board::makeMove(Point* move) {
   #endif
 }
 
-Point* Board::getRandomMove() {
-  static unsigned int seed = static_cast<unsigned int>(time(NULL));
-  unsigned int choice = rand_r(&seed) % numLegalMoves;
+Point* Board::getRandomMove(std::default_random_engine& engine) {
+  std::uniform_int_distribution<> dist(0, numLegalMoves-1);
+  unsigned int choice = dist(engine);
   return legalMoves[choice];
 }
 
-void Board::makeRandomMove() {
-  makeMove(getRandomMove());
+void Board::makeRandomMove(std::default_random_engine& engine) {
+  makeMove(getRandomMove(engine));
 }
 
-GameResult Board::playRandomGame() {
+GameResult Board::playRandomGame(std::default_random_engine& engine) {
   GameResult result;
   while (!isGameOver(&result)) {
-    makeRandomMove();
+    makeRandomMove(engine);
   }
   return result;
 }
 
-GameResult Board::playGame(Patterns* patterns) {
+GameResult Board::playGame(Patterns* patterns, std::default_random_engine& engine) {
   GameResult result;
   while (!isGameOver(&result)) {
-    makeMove(patterns->getMove(this));
+    makeMove(patterns->getMove(this, engine));
   }
   return result;
 }

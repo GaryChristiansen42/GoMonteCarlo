@@ -125,8 +125,9 @@ std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
   return movesToReturn;
 }
 
-char Pattern::getRandomColor() {
-  int i = rand() % 4;
+char Pattern::getRandomColor(std::default_random_engine& engine) {
+  std::uniform_int_distribution<> dist(0, 3);
+  int i = dist(engine);
   char randomColor;
   if (i == 0) {
     randomColor = 'B';
@@ -140,10 +141,11 @@ char Pattern::getRandomColor() {
   return randomColor;
 }
 
-void Pattern::determineRandomGoodMoves() {
+void Pattern::determineRandomGoodMoves(std::default_random_engine& engine) {
+  std::uniform_int_distribution<> boolDist(0, 1);
   int i = -1, j = -1;
   for (char c : hash) {
-    if (c == '_' && (rand() % 2 == 0 || goodMoves.size() == 0))
+    if (c == '_' && (boolDist(engine) == 0 || goodMoves.size() == 0))
       goodMoves.push_back(std::make_pair(i, j));
     if (j == 1) {
       j = -2;
@@ -210,32 +212,32 @@ bool Pattern::isLegalPattern() {
   return true;
 }
 
-void Pattern::mutate() {
+void Pattern::mutate(std::default_random_engine& engine) {
   goodMoves.clear();
-  determineRandomGoodMoves(); 
+  determineRandomGoodMoves(engine); 
 }
-Pattern Pattern::getMutated() {
+Pattern Pattern::getMutated(std::default_random_engine& engine) {
   Pattern p = *this;
-  p.mutate();
+  p.mutate(engine);
   return p;
 }
 
-Pattern Pattern::getRandomPattern() {
+Pattern Pattern::getRandomPattern(std::default_random_engine& engine) {
   Pattern p;
   for (unsigned int i = 0; i < 4; ++i) {
-    p.hash += getRandomColor();
+    p.hash += getRandomColor(engine);
   }
   p.hash += 'B';
   for (unsigned int i = 0; i < 4; ++i) {
-    p.hash += getRandomColor();
+    p.hash += getRandomColor(engine);
   }
 
-  p.determineRandomGoodMoves();
+  p.determineRandomGoodMoves(engine);
 
   if (p.goodMoves.size() > 0
     && p.isLegalPattern())
     return p;
-  return getRandomPattern();
+  return getRandomPattern(engine);
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {

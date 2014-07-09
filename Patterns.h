@@ -1,6 +1,7 @@
 #ifndef PATTERNS_H_
 #define PATTERNS_H_
 
+#include <random>
 #include <string>
 #include <unordered_map>
 
@@ -25,9 +26,9 @@ class Patterns {
 
   void addPattern(Pattern pattern);
 
-  void mutate();
-  void mutatePattern(std::string hash);
+  void mutate(std::default_random_engine& engine);
+  void mutatePattern(std::string hash, std::default_random_engine& engine);
 
-  Point* getMove(Board* b);
+  Point* getMove(Board* b, std::default_random_engine& engine);
 };
 #endif  // PATTERN_H_

@@ -116,10 +116,12 @@ void Patterns::addPattern(Pattern pattern) {
   hashTable[pattern.hash] = pattern;
 }
 
-void Patterns::mutate() {
-  unsigned int choice = rand() % 1;
+void Patterns::mutate(std::default_random_engine& engine) {
+  std::uniform_int_distribution<> boolDist(0, 1);
+  unsigned int choice = boolDist(engine);
   if (choice == 1 && hashTable.size() > 0) { // delete pattern
-    unsigned long int numToDelete = rand() % hashTable.size();
+    std::uniform_int_distribution<> dist(0, (int)hashTable.size()-1);
+    unsigned long int numToDelete = dist(engine);
     unsigned long int i = 0;
     for (auto it = hashTable.begin(); it != hashTable.end(); ++i, ++it) {
       if (i == numToDelete) {
@@ -128,18 +130,18 @@ void Patterns::mutate() {
       }
     }
   } else { // add new random pattern
-    Pattern randomPattern = Pattern::getRandomPattern();
+    Pattern randomPattern = Pattern::getRandomPattern(engine);
     addPattern(randomPattern);
     // hashTable.insert(std::make_pair(randomPattern.hash, randomPattern));
   }
 }
 
-void Patterns::mutatePattern(std::string hash) {
-  Pattern mutated = hashTable[hash].getMutated();
+void Patterns::mutatePattern(std::string hash, std::default_random_engine& engine) {
+  Pattern mutated = hashTable[hash].getMutated(engine);
   addPattern(mutated);
 }
 
-Point* Patterns::getMove(Board* b) {
+Point* Patterns::getMove(Board* b, std::default_random_engine& engine) {
 
   if (b->lastMove != NULL) {
     Pattern lastMove(b->lastMove);
@@ -147,7 +149,8 @@ Point* Patterns::getMove(Board* b) {
     if (it != hashTable.end()) {
       numCalled++;
       std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
-      long unsigned int choice = rand() % goodMoves.size();
+      std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
+      long unsigned int choice = dist(engine);
       bool isLegal = false;
       for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
         if (goodMoves[choice] == b->legalMoves[i]) {
@@ -160,5 +163,5 @@ Point* Patterns::getMove(Board* b) {
     }
   }
 
-  return b->getRandomMove();
+  return b->getRandomMove(engine);
 }

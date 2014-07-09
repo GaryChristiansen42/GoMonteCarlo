@@ -16,6 +16,8 @@ struct pattern_compare {
 
 int main() {
 
+  std::default_random_engine engine(time(NULL));
+
   Patterns patterns;
 
   std::vector<std::string> strings;
@@ -47,7 +49,7 @@ int main() {
 
     Pattern p;
     p.hash = hash;
-    p.determineRandomGoodMoves();
+    p.determineRandomGoodMoves(engine);
 
     patterns.hashTable[hash] = p;
 

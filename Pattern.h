@@ -2,6 +2,7 @@
 #define PATTERN_H_
 
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -22,16 +23,16 @@ class Pattern {
   void rotate90();
   void invertColor();
 
-  static char getRandomColor();
+  static char getRandomColor(std::default_random_engine& engine);
   bool isLegalPattern();
-  void determineRandomGoodMoves();
-  void mutate();
-  Pattern getMutated();
+  void determineRandomGoodMoves(std::default_random_engine& engine);
+  void mutate(std::default_random_engine& engine);
+  Pattern getMutated(std::default_random_engine& engine);
 
 
   std::vector<Point*> getGoodMoves(Board* b, Point move);
 
-  static Pattern getRandomPattern();
+  static Pattern getRandomPattern(std::default_random_engine& engine);
 };
 
 std::ostream& operator<<(std::ostream &os, const Pattern &pattern);
