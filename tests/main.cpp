@@ -610,48 +610,93 @@ BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
   delete b1Clone2;
 }
 
-BOOST_AUTO_TEST_CASE( testPattern )
+BOOST_AUTO_TEST_CASE( testPattern3x3 )
 {
-  Pattern p;
+  Pattern3x3 p3x3;
 
-  std::string patternsFile("testPatterns.pat");
+  std::string patternsFile("testPatterns3x3.pat");
   std::ifstream in;
   in.open(patternsFile);
   BOOST_CHECK_EQUAL(in.is_open(), true);
-  in >> p;
+  in >> p3x3;
 
-  BOOST_CHECK_EQUAL(p.hash, "____W____");
-  BOOST_CHECK_EQUAL(p.goodMoves.size(), 1);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].first, -1);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].second, -1);
+  BOOST_CHECK_EQUAL(p3x3.hash, "____W____");
+  BOOST_CHECK_EQUAL(p3x3.goodMoves.size(), 1);
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].first, -1);
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].second, -1);
 
 
   Board b1;
   b1.init();
   b1.makeMove(Point(1, 1));
-  p = Pattern(&b1.positions[1][1]);
-  BOOST_CHECK_EQUAL(p.hash, "____B____");
+  p3x3 = Pattern3x3(&b1.positions[1][1]);
+  BOOST_CHECK_EQUAL(p3x3.hash, "____B____");
 
-  p = Pattern(&b1.positions[0][0]);
-  BOOST_CHECK_EQUAL(p.hash, "OOOO__O_B");
+  p3x3 = Pattern3x3(&b1.positions[0][0]);
+  BOOST_CHECK_EQUAL(p3x3.hash, "OOOO__O_B");
 
 
-  in >> p;
-  BOOST_CHECK_EQUAL(p.hash, "OOOOBWO__");
-  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 1);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 0);
+  in >> p3x3;
+  BOOST_CHECK_EQUAL(p3x3.hash, "OOOOBWO__");
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].first, 1);
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].second, 0);
 
   // invertColors
-  p.invertColor();
-  BOOST_CHECK_EQUAL(p.hash, "OOOOWBO__");
-  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 1);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].second, 0);
+  p3x3.invertColor();
+  BOOST_CHECK_EQUAL(p3x3.hash, "OOOOWBO__");
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].first, 1);
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].second, 0);
 
   // rotate90
-  p.rotate90();
-  BOOST_CHECK_EQUAL(p.hash, "OOO_WO_BO");
-  BOOST_CHECK_EQUAL(p.goodMoves[0].first, 0);
-  BOOST_CHECK_EQUAL(p.goodMoves[0].second, -1);
+  p3x3.rotate90();
+  BOOST_CHECK_EQUAL(p3x3.hash, "OOO_WO_BO");
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].first, 0);
+  BOOST_CHECK_EQUAL(p3x3.goodMoves[0].second, -1);
+}
+
+
+BOOST_AUTO_TEST_CASE( testPattern5x5 )
+{
+  Pattern5x5 p5x5;
+
+  std::string patternsFile("testPatterns5x5.pat");
+  std::ifstream in;
+  in.open(patternsFile);
+  BOOST_CHECK_EQUAL(in.is_open(), true);
+  in >> p5x5;
+
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOO____O_W__O____O____");
+  BOOST_CHECK_EQUAL(p5x5.goodMoves.size(), 1);
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].first, 2);
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].second, 0);
+
+
+  Board b1;
+  b1.init();
+  b1.makeMove(Point(1, 1));
+  p5x5 = Pattern5x5(&b1.positions[1][1]);
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOO____O_B__O____O____");
+
+  p5x5 = Pattern5x5(&b1.positions[0][0]);
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOOOOOOOO___OO_B_OO___");
+
+
+  in >> p5x5;
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOOB___O_W__O____O____");
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].first, 2);
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].second, 0);
+
+  // invertColors
+  p5x5.invertColor();
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOOW___O_B__O____O____");
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].first, 2);
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].second, 0);
+
+  // rotate90
+  p5x5.rotate90();
+  BOOST_CHECK_EQUAL(p5x5.hash, "OOOOO___WO__B_O____O____O");
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].first, 0);
+  BOOST_CHECK_EQUAL(p5x5.goodMoves[0].second, -2);
 }
 
 BOOST_AUTO_TEST_CASE( testPatterns )
@@ -661,13 +706,14 @@ BOOST_AUTO_TEST_CASE( testPatterns )
   b1.makeMove(Point(0, 1));
   b1.makeMove(Point(0, 0));
 
-  std::string patternFile("testPatterns.pat");
+  std::string patternFile3x3("testPatterns3x3.pat");
+  std::string patternFile5x5("testPatterns5x5.pat");
   Patterns patterns;
-  patterns.init(patternFile);
+  patterns.init(patternFile3x3, patternFile5x5);
 
   BOOST_CHECK_EQUAL(patterns.initialized, true);
 
-  BOOST_CHECK_EQUAL(patterns.hashTable.size(), 10);
+  BOOST_CHECK_EQUAL(patterns.hashTable3x3.size(), 10);
 
   std::default_random_engine engine(time(NULL));
   Point* move = patterns.getMove(&b1, engine);

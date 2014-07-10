@@ -21,20 +21,20 @@ CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pe
 
 all: GoMonteCarlo CheckStrength Benchmark
 
-Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
-	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o Benchmark -lrt
+Benchmark: Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o
+	$(CC) Benchmark.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o -o Benchmark -lrt
 
 Benchmark.o: Benchmark.cpp
 	$(CC) $(CFLAGS) Benchmark.cpp
 
-CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
-	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o CheckStrength -lrt
+CheckStrength: CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o
+	$(CC) CheckStrength.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o -o CheckStrength -lrt
 
 CheckStrength.o: CheckStrength.cpp
 	$(CC) $(CFLAGS) CheckStrength.cpp
 
-GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o -o GoMonteCarlo -lrt
+GoMonteCarlo: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o -o GoMonteCarlo -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -45,6 +45,12 @@ UCTNode.o: UCTNode.cpp
 UCT.o: UCT.cpp 
 	$(CC) $(CFLAGS) UCT.cpp
 	
+Pattern3x3.o: Pattern3x3.cpp
+	$(CC) $(CFLAGS) Pattern3x3.cpp
+
+Pattern5x5.o: Pattern5x5.cpp
+	$(CC) $(CFLAGS) Pattern5x5.cpp
+
 Pattern.o: Pattern.cpp
 	$(CC) $(CFLAGS) Pattern.cpp
 

@@ -8,7 +8,8 @@
 #include "UCT.h"
 #include "Common.h"
 
-const std::string patternsFile = "patterns.pat";
+const std::string patternsFile3x3 = "patterns3x3.pat";
+const std::string patternsFile5x5 = "patterns5x5.pat";
 
 UCTNode *root;
 
@@ -28,7 +29,7 @@ int main(void) {
   b->show();
 
   Patterns patterns;
-  patterns.init(patternsFile);
+  patterns.init(patternsFile3x3, patternsFile5x5);
 
   GameResult result = None;
   while (!b->isGameOver(&result)) {

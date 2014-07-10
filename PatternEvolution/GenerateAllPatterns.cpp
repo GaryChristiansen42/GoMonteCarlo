@@ -47,22 +47,22 @@ int main() {
         assert(false);
     }
 
-    Pattern p;
+    Pattern3x3 p;
     p.hash = hash;
     p.determineRandomGoodMoves(engine);
 
-    patterns.hashTable[hash] = p;
+    patterns.hashTable3x3[hash] = p;
 
   }
 
   /*for (auto x : patterns.hashTable) {
     std::cout << x.second << std::endl;
   }*/
-  std::cout << patterns.hashTable.size() << std::endl;
-  std::cout << (patterns.hashTable["BBBBBBBBB"]) << std::endl;
+  std::cout << patterns.hashTable3x3.size() << std::endl;
+  std::cout << (patterns.hashTable3x3["BBBBBBBBB"]) << std::endl;
 
-  std::vector<Pattern> legalGeneratedPatterns;
-  for (auto it = patterns.hashTable.begin(); it != patterns.hashTable.end(); ++it) {
+  std::vector<Pattern3x3> legalGeneratedPatterns;
+  for (auto it = patterns.hashTable3x3.begin(); it != patterns.hashTable3x3.end(); ++it) {
     if ((*it).second.isLegalPattern()) {
       legalGeneratedPatterns.push_back((*it).second);
     }
@@ -79,9 +79,9 @@ int main() {
   }
   std::cout << i << std::endl;
 
-  std::set<Pattern, pattern_compare> notDoubles1;
+  std::set<Pattern3x3, pattern_compare> notDoubles1;
   for (auto x : legalGeneratedPatterns) {
-    Pattern p = x;
+    Pattern3x3 p = x;
     if (notDoubles1.find(p) != notDoubles1.end())
       continue;
     p.rotate90();
@@ -117,11 +117,11 @@ int main() {
         ++i;
       }
     }
-    patterns2.hashTable[x.hash] = x;
+    patterns2.hashTable3x3[x.hash] = x;
   }
   std::cout << i << std::endl;
 
-  patterns2.save("generatedPatterns.pat");
-  std::cout << patterns2.hashTable.size() << std::endl;
+  patterns2.save("generatedPatterns3x3.pat", "generatedPatterns5x5.pat");
+  std::cout << patterns2.hashTable3x3.size() << std::endl;
 
 }

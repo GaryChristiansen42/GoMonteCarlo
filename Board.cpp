@@ -21,6 +21,10 @@ Board::Board() :
   outOfBoundsPoint(new Point(-1, -1, OutOfBounds, outOfBoundsGroup,
     NULL, NULL, NULL, NULL)),
   turn(Black) {
+    outOfBoundsPoint->north = outOfBoundsPoint;
+    outOfBoundsPoint->east = outOfBoundsPoint;
+    outOfBoundsPoint->south = outOfBoundsPoint;
+    outOfBoundsPoint->west = outOfBoundsPoint;
 }
 
 Board::~Board() {

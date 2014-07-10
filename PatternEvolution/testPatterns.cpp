@@ -14,8 +14,8 @@ const std::string patternsFile = "patterns.pat";
 Patterns originalPatterns;
 
 int main(int argc, char** argv) {
-  if (argc != 4) {
-    printf("Expecting <filename> <numTrials> <datasavefile>\n");
+  if (argc != 5) {
+    printf("Expecting <filename3x3> <filename5x5> <numTrials> <datasavefile>\n");
     return 0;
   }
 
@@ -23,9 +23,9 @@ int main(int argc, char** argv) {
 
   std::default_random_engine engine(time(NULL));
 
-  originalPatterns.init(argv[1]);
+  originalPatterns.init(argv[1], argv[2]);
 
-  unsigned int numTrials = atoi(argv[2]);
+  unsigned int numTrials = atoi(argv[3]);
   unsigned int totalWins = 0;
   unsigned int totalMoves = 0;
   Player patternColor = Black;
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   std::ofstream f;
   // char fileName[200];
   // snprintf(fileName, sizeof(fileName), "%dx%dDataPoints.dat", BOARD_SIZE, BOARD_SIZE);
-  f.open(argv[3], std::ios::app);
+  f.open(argv[4], std::ios::app);
   if (f.is_open())
     f << totalWins << ", " << gamesPlayed*2 << ", " << ((float)totalWins) / ((float)gamesPlayed*2) << ", " << originalPatterns.numCalled << ", " << totalMoves << ", " << ((float)originalPatterns.numCalled) / ((float)totalMoves) << std::endl;  
   f.close();

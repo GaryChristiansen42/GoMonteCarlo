@@ -17,24 +17,25 @@ class Pattern {
   std::vector<std::pair<char, char>> goodMoves;
 
   Pattern();
-  Pattern(Point* p);
+  // Pattern(Point* p);
+  virtual ~Pattern();
   friend bool operator== ( const Pattern &p1, const Pattern &p2);
 
-  void rotate90();
+  char pointToChar(Point* p);
+
+  // void rotate90();
   void invertColor();
 
   static char getRandomColor(std::default_random_engine& engine);
-  bool isLegalPattern();
-  void determineRandomGoodMoves(std::default_random_engine& engine);
-  void mutate(std::default_random_engine& engine);
-  Pattern getMutated(std::default_random_engine& engine);
-
-
+  // bool isLegalPattern();
+  // void determineRandomGoodMoves(std::default_random_engine& engine);
+  // void mutate(std::default_random_engine& engine);
+  // Pattern getMutated(std::default_random_engine& engine);
+  
   std::vector<Point*> getGoodMoves(Board* b, Point move);
 
-  static Pattern getRandomPattern(std::default_random_engine& engine);
+  // static Pattern getRandomPattern(std::default_random_engine& engine);
+
 };
 
-std::ostream& operator<<(std::ostream &os, const Pattern &pattern);
-std::istream& operator>>(std::istream &is, Pattern& pattern);
 #endif  // PATTERN_H_

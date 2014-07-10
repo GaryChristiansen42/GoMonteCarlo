@@ -9,7 +9,7 @@ Pattern::Pattern() : hash(""),
 
 }
 
-char pointToChar(Point* p) {
+char Pattern::pointToChar(Point* p) {
   if (p == NULL)
     return 'O';
   if (p->color == White)
@@ -22,7 +22,7 @@ char pointToChar(Point* p) {
     return 'O';
   else assert(false);
 }
-
+/*
 Pattern::Pattern(Point* p) : hash(""),
   goodMoves(std::vector<std::pair<char, char>>()) {
 
@@ -48,58 +48,16 @@ Pattern::Pattern(Point* p) : hash(""),
   hash += pointToChar(n);
   hash += pointToChar(ne);
 
-}
+}*/
 
+Pattern::~Pattern() {
+
+}
 
 bool operator==(const Pattern &p1, const Pattern &p2) {
   if (p1.hash.compare(p2.hash))
     return false;
   return true;
-}
-
-void Pattern::rotate90() {
-
-  // transpose
-  // std::swap(matrix[1][0], matrix[0][1]);
-  // std::swap(matrix[2][0], matrix[0][2]);
-  // std::swap(matrix[1][2], matrix[2][1]);
-
-  // reverse rows
-  // std::swap(matrix[0][0], matrix[0][2]);
-  // std::swap(matrix[1][0], matrix[1][2]);
-  // std::swap(matrix[2][0], matrix[2][2]);
-
-  std::swap(hash[3], hash[1]);
-  std::swap(hash[6], hash[2]);
-  std::swap(hash[5], hash[7]);
-
-  std::swap(hash[0], hash[2]);
-  std::swap(hash[3], hash[5]);
-  std::swap(hash[6], hash[8]);
-
-  std::vector<std::pair<char, char>> newGoodMoves;
-  for (auto move : goodMoves) {
-    if (move.first == -1 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(move.first, 1));
-    } else if (move.first == -1 && move.second == 0) {
-      newGoodMoves.push_back(std::make_pair(0, 1));
-    } else if (move.first == -1 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(1, move.second));
-    } else if (move.first == 0 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(-1, 0));
-    } else if (move.first == 0 && move.second == 0) {
-      newGoodMoves.push_back(move);
-    } else if (move.first == 0 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(1, 0));
-    } else if (move.first == 1 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(-1, move.second));
-    } else if (move.first == 1 && move.second == 0) {
-      newGoodMoves.push_back(std::make_pair(0, -1));
-    } else if (move.first == 1 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(move.first, -1));
-    }
-  }
-  goodMoves = newGoodMoves;
 }
 
 void Pattern::invertColor() {
@@ -140,7 +98,7 @@ char Pattern::getRandomColor(std::default_random_engine& engine) {
   return randomColor;
 }
 
-void Pattern::determineRandomGoodMoves(std::default_random_engine& engine) {
+/*void Pattern::determineRandomGoodMoves(std::default_random_engine& engine) {
   std::uniform_int_distribution<> boolDist(0, 1);
   int i = -1, j = -1;
   for (char c : hash) {
@@ -152,9 +110,9 @@ void Pattern::determineRandomGoodMoves(std::default_random_engine& engine) {
     }
     j++;
   }
-}
+}*/
 
-bool Pattern::isLegalPattern() {
+/*bool Pattern::isLegalPattern() {
   if (hash[4] != 'B' && hash[4] != 'W')
     return false;
 
@@ -209,16 +167,11 @@ bool Pattern::isLegalPattern() {
     }
   }
   return true;
-}
+}*/
 
-void Pattern::mutate(std::default_random_engine& engine) {
+/*void Pattern::mutate(std::default_random_engine& engine) {
   goodMoves.clear();
   determineRandomGoodMoves(engine); 
-}
-Pattern Pattern::getMutated(std::default_random_engine& engine) {
-  Pattern p = *this;
-  p.mutate(engine);
-  return p;
 }
 
 Pattern Pattern::getRandomPattern(std::default_random_engine& engine) {
@@ -236,76 +189,5 @@ Pattern Pattern::getRandomPattern(std::default_random_engine& engine) {
   if (p.isLegalPattern())
     return p;
   return getRandomPattern(engine);
-}
+}*/
 
-std::ostream& operator<<(std::ostream &os, const Pattern &pattern) {
-  int i = 0, j = 0;
-  for (char c : pattern.hash) {
-    os << c;
-    ++i;
-    if (i == 3) {
-      i = 0;
-      ++j;
-      os << std::endl;
-    }
-  }
-
-  for (i = -1; i < 2; ++i) {
-    for (j = -1; j < 2; ++j) {
-      bool found = false;
-      for (auto x : pattern.goodMoves) {
-        if (x.first == i && x.second == j) {
-          found = true;
-          break;
-        }
-      }
-      if (found)
-        os << "1";
-      else
-        os << "0";
-    }
-    os << "\n";
-  }
-  os << "\n";
-
-  return os;
-}
-
-std::istream& operator>>(std::istream &is, Pattern& pattern) {
-  /* Example Pattern to be read in
-    BWW
-    BBB
-    ___
-    000
-    000
-    110
-  */
-
-  pattern = Pattern();
-
-  char matrix[3][3];
-  int i = 0, j = 0;
-  for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j) {
-      is >> matrix[i][j];
-    }
-  }
-
-  for (i = 0; i < 3; ++i) {
-    for (j = 0; j < 3; ++j) {
-      pattern.hash += matrix[i][j];
-    }
-  }
-
-  for (i = -1; i < 2; ++i) {
-    for (j = -1; j < 2; ++j) {
-      char input = 0;
-      is >> input;
-      if (input == '1') {
-        pattern.goodMoves.push_back(std::pair<char, char>(i, j));
-      }
-    }
-  }
-
-  return is;
-}

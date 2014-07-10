@@ -8,7 +8,8 @@
 #include "UCT.h"
 #include "Common.h"
 
-const std::string patternsFile = "patterns.pat";
+const std::string patternsFile3x3 = "patterns3x3.pat";
+const std::string patternsFile5x5 = "patterns5x5.pat";
 
 enum PlayerType {
   MyMonteCarlo1HalfSecond,
@@ -48,12 +49,13 @@ int main(void) {
   printf("Running...\n");
 
   Patterns patterns;
-  patterns.init(patternsFile);
+  patterns.init(patternsFile3x3, patternsFile5x5);
 
-  int numTrials = 100;
+  int numTrials = 1;
   // int numSimulations = 1000;
   float komi = 0;
   PlayerType player1 = WithPatterns1000Sims;
+  // PlayerType player1 = RandomPlayer;
   // PlayerType player1 = MyMonteCarlo1Second;
   // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;

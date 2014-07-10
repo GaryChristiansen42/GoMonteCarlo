@@ -1,5 +1,5 @@
 CC=g++ -pthread -march=native -mtune=native
-CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -g -O0 -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -21,20 +21,20 @@ CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pe
 
 all: PatternEvolution TestPatterns GenerateAllPatterns
 
-PatternEvolution: main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o
-	$(CC) main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o -o PatternEvolution -lrt
+PatternEvolution: main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o
+	$(CC) main.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o -o PatternEvolution -lrt
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
 
-TestPatterns: testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o
-	$(CC) testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o -o TestPatterns -lrt
+TestPatterns: testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o
+	$(CC) testPatterns.o ../UCTNode.o ../UCT.o ../Point.o ../Group.o ../Board.o ../Common.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o -o TestPatterns -lrt
 
 testPatterns.o: testPatterns.cpp
 	$(CC) $(CFLAGS) testPatterns.cpp
 
-GenerateAllPatterns: GenerateAllPatterns.o ../Point.o ../Group.o ../Board.o ../Patterns.o ../Pattern.o
-	$(CC) GenerateAllPatterns.o ../Point.o ../Group.o ../Board.o ../Patterns.o ../Pattern.o -o GenerateAllPatterns -lrt
+GenerateAllPatterns: GenerateAllPatterns.o ../Point.o ../Group.o ../Board.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o
+	$(CC) GenerateAllPatterns.o ../Point.o ../Group.o ../Board.o ../Patterns.o ../Pattern.o ../Pattern3x3.o ../Pattern5x5.o -o GenerateAllPatterns -lrt
 
 GenerateAllPatterns.o: GenerateAllPatterns.cpp
 	$(CC) $(CFLAGS) GenerateAllPatterns.cpp

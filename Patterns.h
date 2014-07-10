@@ -6,6 +6,8 @@
 #include <unordered_map>
 
 #include "Pattern.h"
+#include "Pattern3x3.h"
+#include "Pattern5x5.h"
 
 class Board;
 class Point;
@@ -15,16 +17,18 @@ class Patterns {
   bool operator==(const Patterns &p);
 
   int numCalled;
-  std::unordered_map<std::string, Pattern> hashTable;
+  std::unordered_map<std::string, Pattern3x3> hashTable3x3;
+  std::unordered_map<std::string, Pattern5x5> hashTable5x5;
   bool initialized;
 
   explicit Patterns();
 
-  void init(std::string patternFile);
+  void init(std::string patternFile3x3, std::string patternFile5x5);
   void clear();
-  void save(std::string fileName);
+  void save(std::string fileName3x3, std::string fileName5x5);
 
-  void addPattern(Pattern pattern);
+  void addPattern(Pattern3x3 pattern);
+  void addPattern(Pattern5x5 pattern);
 
   void mutate(std::default_random_engine& engine);
   void mutatePattern(std::string hash, std::default_random_engine& engine);

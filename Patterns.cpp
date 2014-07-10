@@ -8,18 +8,19 @@
 
 Patterns::Patterns() :
   numCalled(0),
-  hashTable(std::unordered_map<std::string, Pattern>()),
+  hashTable3x3(std::unordered_map<std::string, Pattern3x3>()),
+  hashTable5x5(std::unordered_map<std::string, Pattern5x5>()),
   initialized(false) {
 
 }
 
 
 bool Patterns::operator==(const Patterns &p) {
-  if (p.hashTable.size() != hashTable.size())
+  if (p.hashTable3x3.size() != hashTable3x3.size())
     return false;
-  for (auto i : hashTable) {
+  for (auto i : hashTable3x3) {
     bool found = false;
-    for (auto j : p.hashTable) {
+    for (auto j : p.hashTable3x3) {
       if (!i.first.compare(j.first)) {
         found = true;
         break;
@@ -28,95 +29,185 @@ bool Patterns::operator==(const Patterns &p) {
     if (!found)
       return false;
   }
+  if (p.hashTable5x5.size() != hashTable5x5.size())
+    return false;
+  for (auto i : hashTable5x5) {
+    bool found = false;
+    for (auto j : p.hashTable5x5) {
+      if (!i.first.compare(j.first)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+      return false;
+  }
+ 
   return true;
 }
 
-void Patterns::init(std::string patternsFile) {
+void Patterns::init(std::string patternsFile3x3, std::string patternsFile5x5) {
 
-  if (patternsFile == "")
+  if (patternsFile3x3 == "")
     return;
   
   std::ifstream in;
-  in.open(patternsFile);
+  in.open(patternsFile3x3);
   if (!in.is_open())
     assert(false);
 
   initialized = true;
 
-  Pattern pattern;
-  while (in >> pattern) {
-    hashTable[pattern.hash] = pattern;
+  Pattern3x3 pattern3x3;
+  while (in >> pattern3x3) {
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.invertColor();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.invertColor();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
 
-    pattern.rotate90();
-    hashTable[pattern.hash] = pattern;
+    pattern3x3.rotate90();
+    hashTable3x3[pattern3x3.hash] = pattern3x3;
   }
 
   // for (auto p : hashTable)
     // std::cout << p.second << std::endl; 
   in.close();
+
+  in.open(patternsFile5x5);
+  if (!in.is_open())
+    assert(false);
+
+  Pattern5x5 pattern5x5;
+  while (in >> pattern5x5) {
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.invertColor();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+
+    pattern5x5.rotate90();
+    hashTable5x5[pattern5x5.hash] = pattern5x5;
+  }
+
+  // for (auto p : hashTable)
+    // std::cout << p.second << std::endl; 
+  in.close();
+
 }
 
 void Patterns::clear() {
-  hashTable.clear();
+  hashTable3x3.clear();
+  hashTable5x5.clear();
   initialized = false;
 }
 
-void Patterns::save(std::string fileName) {
+void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
 
+  std::cout << hashTable3x3.size() << std::endl;
+  std::cout << hashTable5x5.size() << std::endl;
   std::ofstream f;
-  f.open(fileName);
+  f.open(fileName3x3);
   assert(f.is_open());
 
-  for (auto i : hashTable) {
+  for (auto i : hashTable3x3) {
     f << i.second;
   }
+  f.flush();
   f.close();
+
+  std::ofstream f2;
+  f2.open(fileName5x5);
+  assert(f2.is_open());
+
+  for (auto i : hashTable5x5) {
+    f2 << i.second;
+  }
+  f2.flush();
+  f2.close();
+
 }
 
-void Patterns::addPattern(Pattern pattern) {
-  hashTable[pattern.hash] = pattern;
+void Patterns::addPattern(Pattern3x3 pattern) {
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.invertColor();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 
   pattern.rotate90();
-  hashTable[pattern.hash] = pattern;
+  hashTable3x3[pattern.hash] = pattern;
 }
 
-void Patterns::mutate(std::default_random_engine& engine) {
+
+void Patterns::addPattern(Pattern5x5 pattern) {
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.invertColor();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+
+  pattern.rotate90();
+  hashTable5x5[pattern.hash] = pattern;
+}
+
+/*void Patterns::mutate(std::default_random_engine& engine) {
   std::uniform_int_distribution<> boolDist(0, 1);
   unsigned int choice = boolDist(engine);
   if (choice == 1 && hashTable.size() > 0) { // delete pattern
@@ -134,21 +225,53 @@ void Patterns::mutate(std::default_random_engine& engine) {
     addPattern(randomPattern);
     // hashTable.insert(std::make_pair(randomPattern.hash, randomPattern));
   }
-}
+}*/
 
 void Patterns::mutatePattern(std::string hash, std::default_random_engine& engine) {
-  Pattern mutated = hashTable[hash].getMutated(engine);
-  addPattern(mutated);
+  if (hash.length() == 9) {
+    Pattern3x3 mutated = hashTable3x3[hash].getMutated(engine);
+    addPattern(mutated);
+  } else if (hash.length() == 25) {
+    Pattern5x5 mutated;
+    if (hashTable5x5.find(hash) == hashTable5x5.end()) {
+      mutated.hash = hash;
+      mutated.determineRandomGoodMoves(engine);
+    } else {
+      mutated = hashTable5x5[hash].getMutated(engine);
+    }
+    addPattern(mutated);
+  } else {
+    assert(false);
+  }
 }
 
 Point* Patterns::getMove(Board* b, std::default_random_engine& engine) {
 
   if (b->lastMove != NULL) {
-    Pattern lastMove(b->lastMove);
-    auto it = hashTable.find(lastMove.hash);
-    if (it != hashTable.end()) {
+    Pattern5x5 lastMove5x5(b->lastMove);
+    auto it5x5 = hashTable5x5.find(lastMove5x5.hash);
+    if (it5x5 != hashTable5x5.end()) {
       numCalled++;
-      std::vector<Point*> goodMoves = (*it).second.getGoodMoves(b, *b->lastMove);
+      std::vector<Point*> goodMoves = (*it5x5).second.getGoodMoves(b, *b->lastMove);
+      if (goodMoves.size() > 0) {
+        std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
+        long unsigned int choice = dist(engine);
+        bool isLegal = false;
+        for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
+          if (goodMoves[choice] == b->legalMoves[i]) {
+            isLegal = true;
+            break;
+          }
+        }
+        if (isLegal)
+          return goodMoves[choice];
+      }
+    }
+    Pattern3x3 lastMove3x3(b->lastMove);
+    auto it3x3 = hashTable3x3.find(lastMove3x3.hash);
+    if (it3x3 != hashTable3x3.end()) {
+      numCalled++;
+      std::vector<Point*> goodMoves = (*it3x3).second.getGoodMoves(b, *b->lastMove);
       if (goodMoves.size() > 0) {
         std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
         long unsigned int choice = dist(engine);
