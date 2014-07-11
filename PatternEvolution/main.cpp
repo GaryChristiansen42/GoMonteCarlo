@@ -31,8 +31,9 @@ std::default_random_engine engine;
 std::vector<std::pair<Patterns, int>> patternPopulation;
 Patterns originalPatterns;
 
-std::vector<std::string> patterns3x3Encountered;
-std::vector<std::string> patterns5x5Encountered;
+std::unordered_map<std::string, int> patterns3x3Encountered;
+std::unordered_map<std::string, int> patterns5x5Encountered;
+long unsigned int totalEncountered = 0;
 
 std::mutex patternsEncounteredLock;
 std::mutex patternPopulationLock;
@@ -81,25 +82,41 @@ void selectSurvivors() {
   std::uniform_int_distribution<> dist0To100(0, 100);
   std::uniform_int_distribution<> dist3x3PatternsEncounteredSize(0, (int)patterns3x3Encountered.size()-1);
   std::uniform_int_distribution<> dist5x5PatternsEncounteredSize(0, (int)patterns5x5Encountered.size()-1);
+
+  std::vector<std::pair<std::string, int>> patterns3x3, patterns5x5;
+  if (mutate3x3) {
+    for (auto i : patterns3x3Encountered) {
+      patterns3x3.push_back(std::make_pair(i.first, i.second));
+    }
+    std::sort(patterns3x3.begin(), patterns3x3.end(), [] (const std::pair<std::string, int>& i, const std::pair<std::string, int>& j) { return i.second > j.second;});
+  }
+  if (mutate5x5) {
+    for (auto i : patterns5x5Encountered) {
+      patterns5x5.push_back(std::make_pair(i.first, i.second));
+    }
+    std::sort(patterns5x5.begin(), patterns5x5.end(), [] (const std::pair<std::string, int>& i, const std::pair<std::string, int>& j) { return i.second > j.second;});
+  }
+
+
   for (unsigned int i = 0; i < populationSize; ++i) {
     unsigned long int choice = distSurvivorSize(engine);
 
     Patterns chosen = survivors[choice].first;
     if (dist0To100(engine) > mutationChance * 100) {
       if (mutate3x3 && patterns3x3Encountered.size() > 0) {
-        choice = dist3x3PatternsEncounteredSize(engine);
-        chosen.mutatePattern(patterns3x3Encountered[choice], engine);
+        // choice = dist3x3PatternsEncounteredSize(engine);
+        choice = dist0To100(engine);
+        chosen.mutatePattern(patterns3x3[choice].first, engine);
       }
       if (mutate5x5 && patterns5x5Encountered.size() > 0) {
-        choice = dist5x5PatternsEncounteredSize(engine);
-        chosen.mutatePattern(patterns5x5Encountered[choice], engine);
+        // choice = dist5x5PatternsEncounteredSize(engine);
+        choice = dist0To100(engine);
+        chosen.mutatePattern(patterns5x5[choice].first, engine);
 
         std::cout << choice << std::endl;
-        std::cout << std::count(patterns5x5Encountered.begin(), patterns5x5Encountered.end(), patterns5x5Encountered[choice])
-          << " " << patterns5x5Encountered.size() << std::endl;
-        std::cout << (float)std::count(patterns5x5Encountered.begin(), patterns5x5Encountered.end(), patterns5x5Encountered[choice])
-          / (float)patterns5x5Encountered.size() << std::endl;
-        std::cout << patterns5x5Encountered[choice] << std::endl;
+        std::cout << patterns5x5[choice].second << " " << totalEncountered << std::endl;
+        std::cout << (float)patterns5x5[choice].second / (float)totalEncountered << std::endl;
+        std::cout << patterns5x5[choice].first << std::endl;
       }
     }
 
@@ -108,6 +125,9 @@ void selectSurvivors() {
   std::cout << patterns5x5Encountered.size() << std::endl;
   patterns3x3Encountered.clear();
   patterns5x5Encountered.clear();
+  patterns3x3.clear();
+  patterns5x5.clear();
+  totalEncountered = 0;
 }
 
 void determineFitnessThread() {
@@ -131,7 +151,8 @@ void determineFitnessThread() {
           if (last3x3Move.isLegalPattern()) {
             patternsEncounteredLock.lock();
             // TODO(GaryChristiansen42) add all rotations and inverts
-            patterns5x5Encountered.push_back(last3x3Move.hash);
+            ++patterns3x3Encountered[last3x3Move.hash];
+            ++totalEncountered;
             patternsEncounteredLock.unlock();
           }
         }
@@ -139,7 +160,8 @@ void determineFitnessThread() {
           Pattern5x5 last5x5Move(b.lastMove);
           if (last5x5Move.isLegalPattern()) {
             patternsEncounteredLock.lock();
-            patterns5x5Encountered.push_back(last5x5Move.hash);
+            ++patterns5x5Encountered[last5x5Move.hash];
+            ++totalEncountered;
             patternsEncounteredLock.unlock();
           }
         }
