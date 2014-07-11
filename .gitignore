@@ -1,4 +1,5 @@
 *.o
+*.swn
 *.swo
 *.swp
 *.txt
