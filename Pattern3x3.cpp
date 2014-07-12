@@ -133,6 +133,7 @@ bool Pattern3x3::isLegalPattern() {
 }
 
 void Pattern3x3::determineRandomGoodMoves(std::default_random_engine& engine) {
+  goodMoves.clear();
   std::uniform_int_distribution<> boolDist(0, 1);
   int i = -1, j = -1;
   for (char c : hash) {
@@ -147,7 +148,6 @@ void Pattern3x3::determineRandomGoodMoves(std::default_random_engine& engine) {
 }
 
 void Pattern3x3::mutate(std::default_random_engine& engine) {
-  goodMoves.clear();
   determineRandomGoodMoves(engine); 
 }
 

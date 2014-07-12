@@ -113,10 +113,11 @@ void selectSurvivors() {
         choice = dist0To100(engine);
         chosen.mutatePattern(patterns5x5[choice].first, engine);
 
-        std::cout << choice << std::endl;
+        /*std::cout << choice << std::endl;
         std::cout << patterns5x5[choice].second << " " << totalEncountered << std::endl;
         std::cout << (float)patterns5x5[choice].second / (float)totalEncountered << std::endl;
         std::cout << patterns5x5[choice].first << std::endl;
+        */
       }
     }
 

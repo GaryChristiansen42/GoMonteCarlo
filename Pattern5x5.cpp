@@ -133,7 +133,6 @@ void Pattern5x5::rotate90() {
   std::swap(hash[4*5+0], hash[4*5+4]);
   std::swap(hash[4*5+1], hash[4*5+3]);
 
-  std::vector<std::pair<char, char>> newGoodMoves;
   for (auto& move : goodMoves) {
     std::swap(move.first, move.second);
     if (move.second == -2)
@@ -145,7 +144,6 @@ void Pattern5x5::rotate90() {
     else if (move.second == 2)
       move.second = -2;
   }
-  goodMoves = newGoodMoves;
 }
 
 bool Pattern5x5::isLegalPattern() {
@@ -206,6 +204,7 @@ bool Pattern5x5::isLegalPattern() {
 }
 
 void Pattern5x5::determineRandomGoodMoves(std::default_random_engine& engine) {
+  goodMoves.clear();
   std::uniform_int_distribution<> boolDist(0, 1);
   int i = -2, j = -2;
   for (char c : hash) {
@@ -220,7 +219,6 @@ void Pattern5x5::determineRandomGoodMoves(std::default_random_engine& engine) {
 }
 
 void Pattern5x5::mutate(std::default_random_engine& engine) {
-  goodMoves.clear();
   determineRandomGoodMoves(engine); 
 }
 
@@ -232,11 +230,11 @@ Pattern5x5 Pattern5x5::getMutated(std::default_random_engine& engine) {
 
 Pattern5x5 Pattern5x5::getRandomPattern(std::default_random_engine& engine) {
   Pattern5x5 p;
-  for (unsigned int i = 0; i < 4; ++i) {
+  for (unsigned int i = 0; i < 12; ++i) {
     p.hash += getRandomColor(engine);
   }
   p.hash += 'B';
-  for (unsigned int i = 0; i < 4; ++i) {
+  for (unsigned int i = 0; i < 12; ++i) {
     p.hash += getRandomColor(engine);
   }
 
