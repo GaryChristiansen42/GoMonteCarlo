@@ -19,9 +19,9 @@ UCTNode *root;
 const bool mutate3x3 = false;
 const bool mutate5x5 = true;
 const float mutationChance = 0.7f;
-const float percentSurvivors = 0.1f;
-const unsigned int populationSize = 9;
-const unsigned int numGenerations = 20000;
+const float percentSurvivors = 0.05f;
+const unsigned int populationSize = 100;
+const unsigned int numGenerations = 200000;
 
 const unsigned int numThreads = 4;
 
@@ -58,7 +58,14 @@ void selectSurvivors() {
   printf("\nAverageScore: %f\n", totalScore / (float)patternPopulation.size());
 
   std::vector<std::pair<Patterns, int>> survivors;
+  sort(patternPopulation.begin(), patternPopulation.end(), [] (const std::pair<Patterns, int>& first, const std::pair<Patterns, int>& second) {
+    return first.second > second.second;
+  });
+
   for (unsigned int i = 0; i < numSurvivors; ++i) {
+    survivors.push_back(patternPopulation[i]);
+    std::cout << survivors[i].second << " ";
+    /*
     auto best = patternPopulation[0];
     for (auto member : patternPopulation) {
       if (member.second > best.second) {
@@ -73,8 +80,9 @@ void selectSurvivors() {
           best = member;
       }
     }
-    survivors.push_back(best);
+    survivors.push_back(best);*/
   }
+  std::cout << std::endl;
 
   // repopulate
   patternPopulation.clear();
@@ -98,6 +106,8 @@ void selectSurvivors() {
   }
 
 
+  // if (mutate5x5 && patterns5x5.size() > 0)
+    // std::cout << (float)patterns5x5[0].second / (float)totalEncountered << std::endl;
   for (unsigned int i = 0; i < populationSize; ++i) {
     unsigned long int choice = distSurvivorSize(engine);
 
@@ -113,11 +123,11 @@ void selectSurvivors() {
         choice = dist0To100(engine);
         chosen.mutatePattern(patterns5x5[choice].first, engine);
 
-        /*std::cout << choice << std::endl;
-        std::cout << patterns5x5[choice].second << " " << totalEncountered << std::endl;
-        std::cout << (float)patterns5x5[choice].second / (float)totalEncountered << std::endl;
-        std::cout << patterns5x5[choice].first << std::endl;
-        */
+        // std::cout << choice << std::endl;
+        // std::cout << patterns5x5[choice].second << " " << totalEncountered << std::endl;
+        // std::cout << (float)patterns5x5[choice].second / (float)totalEncountered << std::endl;
+        // std::cout << patterns5x5[choice].first << std::endl;
+        
       }
     }
 
@@ -135,7 +145,7 @@ void determineFitnessThread() {
   std::default_random_engine threadEngine(time(NULL));
 
   for (auto& member : patternPopulation) {
-    for (unsigned int i = 0; i < 10000 / numThreads; ++i) {
+    for (unsigned int i = 0; i < 1000 / numThreads; ++i) {
       Board b;
       b.init();
 
