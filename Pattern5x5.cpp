@@ -1,5 +1,7 @@
 #include "Pattern5x5.h"
 
+#include <algorithm>
+
 Pattern5x5::Pattern5x5() {
 
 }
@@ -218,8 +220,33 @@ void Pattern5x5::determineRandomGoodMoves(std::default_random_engine& engine) {
   }
 }
 
+void Pattern5x5::changeOneGoodMove(std::default_random_engine& engine) {
+  std::vector<std::pair<char, char>> possibleMoves;
+  int i = -2, j = -2;
+  for (char c : hash) {
+    if (c == '_')
+      possibleMoves.push_back(std::make_pair(i, j));
+    if (j == 2) {
+      j = -3;
+      i++;
+    }
+    j++;
+  }
+
+  std::uniform_int_distribution<> dist(0, (int)possibleMoves.size()-1);
+  int choice = dist(engine);
+  // auto m = std::find_if(goodMoves.begin(), goodMoves.end(), [possibleMoves[choice]] (std::pair<char, char> p) { return p.first == possibleMoves[choice].first && p.second == possibleMoves[choice].second; });
+  auto m = std::find(goodMoves.begin(), goodMoves.end(), possibleMoves[choice]);
+  if (m == goodMoves.end()) {
+    goodMoves.push_back(possibleMoves[choice]);
+  } else {
+    goodMoves.erase(m);
+  }
+}
+
 void Pattern5x5::mutate(std::default_random_engine& engine) {
-  determineRandomGoodMoves(engine); 
+  changeOneGoodMove(engine);
+  // determineRandomGoodMoves(engine); 
 }
 
 Pattern5x5 Pattern5x5::getMutated(std::default_random_engine& engine) {
