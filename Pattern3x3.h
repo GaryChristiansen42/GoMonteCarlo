@@ -7,6 +7,7 @@ class Pattern3x3 : public Pattern {
  public:
   Pattern3x3();
   Pattern3x3(Point* p);
+  Pattern3x3(Board& b, Point& p);
 
   void rotate90();
 

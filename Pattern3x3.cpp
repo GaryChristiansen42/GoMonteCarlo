@@ -1,5 +1,7 @@
 #include "Pattern3x3.h"
 
+#include "Board.h"
+
 Pattern3x3::Pattern3x3() {
 
 }
@@ -18,11 +20,39 @@ Pattern3x3::Pattern3x3(Point* p) {
   Point* nw = n->west;
   Point* ne = n->east;
   
+  hash.reserve(9);
   hash += pointToChar(sw);
   hash += pointToChar(s);
   hash += pointToChar(se);
   hash += pointToChar(w);
   hash += pointToChar(p);
+  hash += pointToChar(e);
+  hash += pointToChar(nw);
+  hash += pointToChar(n);
+  hash += pointToChar(ne);
+
+}
+
+Pattern3x3::Pattern3x3(Board& b, Point& p) {
+
+  if (&p == b.pass)
+    return;
+  
+  Point* s = p.south;
+  Point* sw = s->west;
+  Point* se = s->east;
+  Point* w = p.west;
+  Point* e = p.east;
+  Point* n = p.north;
+  Point* nw = n->west;
+  Point* ne = n->east;
+  
+  hash.reserve(9);
+  hash += pointToChar(sw);
+  hash += pointToChar(s);
+  hash += pointToChar(se);
+  hash += pointToChar(w);
+  hash += pointToChar(&p);
   hash += pointToChar(e);
   hash += pointToChar(nw);
   hash += pointToChar(n);
