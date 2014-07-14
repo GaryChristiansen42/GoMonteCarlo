@@ -72,12 +72,18 @@ void Pattern::invertColor() {
   hash = newHash;
 }
 
+Point* Pattern::getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine) {
+  if (goodMoves.size() == 0)
+    return NULL;
+  std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
+  int choice = dist(engine);
+  return &b->positions[goodMoves[choice].first+move.row][goodMoves[choice].second+move.color];
+}
 
-std::vector<Point*> Pattern::getGoodMoves(Board* b, Point move) {
+std::vector<Point*> Pattern::getGoodMoves(Board* b, Point& move) {
   std::vector<Point*> movesToReturn;
   for (auto p : goodMoves) {
-    Point temp((char)(p.first + move.row), (char)(p.second + move.column));
-    movesToReturn.push_back(b->getPoint(&temp));
+    movesToReturn.push_back(&b->positions[p.first+move.row][p.second+move.column]);
   }
   return movesToReturn;
 }

@@ -8,6 +8,14 @@
 
 Patterns::Patterns() :
   numCalled(0),
+  numNotLegal(0),
+  numNull(0),
+  numNotCalled(0),
+  numCalled2(0),
+  numNotLegal2(0),
+  numNull2(0),
+  numNotCalled2(0),
+  total(0),
   hashTable3x3(std::unordered_map<std::string, Pattern3x3>()),
   hashTable5x5(std::unordered_map<std::string, Pattern5x5>()),
   initialized(false) {
@@ -245,48 +253,61 @@ void Patterns::mutatePattern(std::string hash, std::default_random_engine& engin
   }
 }
 
-Point* Patterns::getMove(Board* b, std::default_random_engine& engine) {
+bool legal(Board* b, Point* goodMove) {
+    if (goodMove != NULL) {
+      bool isLegal = false;
+      Player sameColor = b->turn == Black ? Black : White;
+      Player oppositeColor = b->turn == Black ? White : Black;
+      int r = goodMove->row, c = goodMove->column;
+      if (b->positions[r][c].color == Empty
+        && !b->isSuicide(goodMove, sameColor, oppositeColor)
+        && goodMove != b->koPoint) {
+        isLegal = true;
+      }
+      return isLegal;
+    }
+    return false;
 
-  if (b->lastMove != NULL) {
-    Pattern5x5 lastMove5x5(b->lastMove);
-    auto it5x5 = hashTable5x5.find(lastMove5x5.hash);
-    if (it5x5 != hashTable5x5.end()) {
-      numCalled++;
-      std::vector<Point*> goodMoves = (*it5x5).second.getGoodMoves(b, *b->lastMove);
-      if (goodMoves.size() > 0) {
-        std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
-        long unsigned int choice = dist(engine);
-        bool isLegal = false;
-        for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
-          if (goodMoves[choice] == b->legalMoves[i]) {
-            isLegal = true;
-            break;
-          }
-        }
-        if (isLegal)
-          return goodMoves[choice];
-      }
-    }
-    Pattern3x3 lastMove3x3(b->lastMove);
-    auto it3x3 = hashTable3x3.find(lastMove3x3.hash);
-    if (it3x3 != hashTable3x3.end()) {
-      numCalled++;
-      std::vector<Point*> goodMoves = (*it3x3).second.getGoodMoves(b, *b->lastMove);
-      if (goodMoves.size() > 0) {
-        std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
-        long unsigned int choice = dist(engine);
-        bool isLegal = false;
-        for (unsigned int i = 0; i < b->numLegalMoves; ++i) {
-          if (goodMoves[choice] == b->legalMoves[i]) {
-            isLegal = true;
-            break;
-          }
-        }
-        if (isLegal)
-          return goodMoves[choice];
-      }
-    }
+}
+
+Point* Patterns::getMove(Board& b, std::default_random_engine& engine) {
+
+  total++;
+  if (b.lastMove != NULL) {
+    Pattern3x3 lastMove3x3(b, *b.lastMove);
+    Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
+    goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
+    if (legal(&b, goodMove))
+      return goodMove;
+    numNull++;
   }
 
-  return b->getRandomMove(engine);
+  numNotCalled++;
+
+  /*if (b->secondLastMove != NULL) {
+    Pattern3x3 lastMove3x3(b->secondLastMove);
+    Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(b, *b->secondLastMove, engine);
+    if (goodMove != NULL) {
+      bool isLegal = false;
+      Player sameColor = b->turn == Black ? Black : White;
+      Player oppositeColor = b->turn == Black ? White : Black;
+      int r = goodMove->row, c = goodMove->column;
+      if (b->positions[r][c].color == Empty
+        && !b->isSuicide(goodMove, sameColor, oppositeColor)
+        && goodMove != b->koPoint) {
+        isLegal = true;
+      }
+      if (isLegal) {
+        numCalled2++;
+        return goodMove;
+      }
+      numNotLegal2++;
+    }
+    numNull2++;
+  }*/
+
+
+  numNotCalled2++;
+
+  return b.getRandomMove(engine);
 }

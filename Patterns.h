@@ -17,6 +17,14 @@ class Patterns {
   bool operator==(const Patterns &p);
 
   int numCalled;
+  int numNotLegal;
+  int numNull;
+  int numNotCalled;
+  int numCalled2;
+  int numNotLegal2;
+  int numNull2;
+  int numNotCalled2;
+  int total;
   std::unordered_map<std::string, Pattern3x3> hashTable3x3;
   std::unordered_map<std::string, Pattern5x5> hashTable5x5;
   bool initialized;
@@ -33,6 +41,6 @@ class Patterns {
   void mutate(std::default_random_engine& engine);
   void mutatePattern(std::string hash, std::default_random_engine& engine);
 
-  Point* getMove(Board* b, std::default_random_engine& engine);
+  Point* getMove(Board& b, std::default_random_engine& engine);
 };
 #endif  // PATTERN_H_

@@ -32,7 +32,8 @@ class Pattern {
   // void mutate(std::default_random_engine& engine);
   // Pattern getMutated(std::default_random_engine& engine);
   
-  std::vector<Point*> getGoodMoves(Board* b, Point move);
+  Point* getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine);
+  std::vector<Point*> getGoodMoves(Board* b, Point& move);
 
   // static Pattern getRandomPattern(std::default_random_engine& engine);
 
