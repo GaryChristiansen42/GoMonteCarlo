@@ -4,12 +4,16 @@
 
 #include "Board.h"
 
+static char pointToCharMap[] = { '_', 'B', 'W', 'O' };
+
 Pattern::Pattern() : hash(""),
   goodMoves(std::vector<std::pair<char, char>>()) {
 
 }
 
 char Pattern::pointToChar(Point* p) {
+  return pointToCharMap[p->color];
+  /*
   if (p == NULL)
     return 'O';
   if (p->color == White)
@@ -21,6 +25,7 @@ char Pattern::pointToChar(Point* p) {
   else if (p->color == OutOfBounds)
     return 'O';
   else assert(false);
+  */
 }
 /*
 Pattern::Pattern(Point* p) : hash(""),
