@@ -546,13 +546,15 @@ void Board::makeMove(Point* move) {
   secondLastMove = lastMove;
   lastMove = move;
 
-  getPossibleMoves();
+  numLegalMoves = 0;
   #ifdef RUNNING_TESTS
     // testPossibleMoves(this);
   #endif
 }
 
 Point* Board::getRandomMove(std::default_random_engine& engine) {
+  if (numLegalMoves == 0)
+    getPossibleMoves();
   std::uniform_int_distribution<> dist(0, numLegalMoves-1);
   unsigned int choice = dist(engine);
   return legalMoves[choice];
@@ -573,7 +575,7 @@ GameResult Board::playRandomGame(std::default_random_engine& engine) {
 GameResult Board::playGame(Patterns* patterns, std::default_random_engine& engine) {
   GameResult result;
   while (!isGameOver(&result)) {
-    makeMove(patterns->getMove(this, engine));
+    makeMove(patterns->getMove(*this, engine));
   }
   return result;
 }

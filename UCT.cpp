@@ -69,6 +69,7 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == NULL) {
+    node->state->getPossibleMoves();
     for (unsigned short i = 0; i < node->state->numLegalMoves; ++i) {
       UCTNode* child = new UCTNode(*node->state->legalMoves[i], node);
       node->possibleChildren.push_back(child);
@@ -270,7 +271,23 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
   if (patterns != NULL) {
-    snprintf(buffer, sizeof(buffer), "Called %d times\n", patterns->numCalled);
+    snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Not Legal\t%d times", patterns->numNotLegal);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Null\t\t%d times", patterns->numNull);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Not Called\t%d times", patterns->numNotCalled);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Called2\t\t%d times", patterns->numCalled2);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Not Legal2\t%d times", patterns->numNotLegal2);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Null2\t\t%d times", patterns->numNull2);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Not Called2\t%d times", patterns->numNotCalled2);
+    Log(buffer);
+    snprintf(buffer, sizeof(buffer), "Total\t\t%d times\n", patterns->total);
     Log(buffer);
   }
   return best;
