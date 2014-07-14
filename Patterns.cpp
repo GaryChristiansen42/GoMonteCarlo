@@ -243,7 +243,8 @@ void Patterns::mutatePattern(std::string hash, std::default_random_engine& engin
     Pattern5x5 mutated;
     if (hashTable5x5.find(hash) == hashTable5x5.end()) {
       mutated.hash = hash;
-      mutated.determineRandomGoodMoves(engine);
+      // mutated.determineRandomGoodMoves(engine);
+      mutated.changeOneGoodMove(engine);
     } else {
       mutated = hashTable5x5[hash].getMutated(engine);
     }

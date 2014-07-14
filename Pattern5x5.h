@@ -12,6 +12,7 @@ class Pattern5x5 : public Pattern {
 
   bool isLegalPattern();
 
+  void changeOneGoodMove(std::default_random_engine& engine);
   void determineRandomGoodMoves(std::default_random_engine& engine);
   void mutate(std::default_random_engine& engine);
   Pattern5x5 getMutated(std::default_random_engine& engine);
