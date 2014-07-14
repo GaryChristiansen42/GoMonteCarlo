@@ -22,6 +22,7 @@ const float mutationChance = 0.7f;
 const float percentSurvivors = 0.05f;
 const unsigned int populationSize = 100;
 const unsigned int numGenerations = 200000;
+const int numTrials = 1000;
 
 const unsigned int numThreads = 4;
 
@@ -145,17 +146,21 @@ void determineFitnessThread() {
   std::default_random_engine threadEngine(time(NULL));
 
   for (auto& member : patternPopulation) {
-    for (unsigned int i = 0; i < 1000 / numThreads; ++i) {
+    
+    for (unsigned int i = 0; i < numTrials / numThreads; ++i) {
       Board b;
       b.init();
 
       GameResult r;
-      auto turn = &member.first;
-      Player turnColor = Black;
+      Player memberColor = Black;
+      if (i >= (numTrials / 2) / numThreads) {
+        memberColor = White;
+      }
+      auto turn = b.turn == memberColor ? &member.first : &originalPatterns;
       while (!b.isGameOver(&r)) {
+        turn = &member.first;
         b.makeMove(*turn->getMove(&b, threadEngine));
-        turn = turnColor == Black ? &originalPatterns : &member.first;
-        turnColor = turnColor == Black ? White : Black;
+        turn = b.turn == memberColor ? &member.first : &originalPatterns;
 
         if (mutate3x3) {
           Pattern3x3 last3x3Move(b.lastMove);
@@ -178,7 +183,7 @@ void determineFitnessThread() {
         }
       }
       patternPopulationLock.lock();
-      if ((Player)r == Black)
+      if ((Player)r == memberColor)
         ++member.second;
       else
         --member.second;
