@@ -113,7 +113,7 @@ void selectSurvivors() {
     unsigned long int choice = distSurvivorSize(engine);
 
     Patterns chosen = survivors[choice].first;
-    if (dist0To100(engine) > mutationChance * 100) {
+    if (dist0To100(engine) < mutationChance * 100) {
       if (mutate3x3 && patterns3x3Encountered.size() > 0) {
         // choice = dist3x3PatternsEncounteredSize(engine);
         choice = dist0To100(engine);
