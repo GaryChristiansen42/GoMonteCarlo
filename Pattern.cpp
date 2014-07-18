@@ -4,7 +4,7 @@
 
 #include "Board.h"
 
-static char pointToCharMap[] = { '_', 'B', 'W', 'O' };
+static char pointToCharMap[] = { '_', 'W', 'B', 'O' };
 
 Pattern::Pattern() : hash(""),
   goodMoves(std::vector<std::pair<char, char>>()) {
