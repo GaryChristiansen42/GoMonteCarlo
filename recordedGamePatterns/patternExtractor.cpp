@@ -56,6 +56,7 @@ void readSGF(std::string fileName) {
   while (f >> temp) {
     contents += temp;
   }
+  f.close();
   // std::cout << contents << std::endl;
 
   std::vector<std::string> tokens;
@@ -158,7 +159,7 @@ void readSGF(std::string fileName) {
 
   Board b;
   b.init();
-  for (auto x : moves) {
+  for (auto& x : moves) {
     if (x.second.first < 'a' || x.second.second < 'a'
         || x.second.first >= 't' || x.second.second >= 't') {
       ++moveFailures;
@@ -169,21 +170,33 @@ void readSGF(std::string fileName) {
 
     if (b.lastMove != NULL) {
       Pattern3x3 pat3x3(b.lastMove);
+      auto hash = pat3x3.hash;
       pat3x3 = patterns.hashTable3x3[pat3x3.hash];
+      pat3x3.hash = hash;
       bool found = false;
-      for (auto x : pat3x3.goodMoves)
-        if (x.first == p.row && x.second == p.column)
+      for (auto& y : pat3x3.goodMoves)
+        if (y.first == p.row && y.second == p.column)
           found = true;
-      if (!found)
-        pat3x3.goodMoves.push_back(std::make_pair(p.row, p.column));
+      if (!found) {
+        auto pairDiff = std::make_pair(p.row - b.lastMove->row, p.column - b.lastMove->column);
+        if (pairDiff.first < 2 && pairDiff.first > -2
+          && pairDiff.second < 2 && pairDiff.second > -2)
+          pat3x3.goodMoves.push_back(pairDiff); // should be 0 in center not 0,0 on top left
+      }
       patterns.addPattern(pat3x3);
-
+      assert(pat3x3.goodMoves.size() > 0);
+      b.show();
+      std::cout << (int)p.row << " " << (int)p.column << std::endl;
+      std::cout << (int)b.lastMove->row << " " << (int)b.lastMove->column << std::endl;
+      std::cout << pat3x3 << std::endl;
 
       Pattern5x5 pat5x5(b.lastMove);
+      hash = pat5x5.hash;
       pat5x5 = patterns.hashTable5x5[pat5x5.hash];
+      pat5x5.hash = hash;
       found = false;
-      for (auto x : pat5x5.goodMoves)
-        if (x.first == p.row && x.second == p.column)
+      for (auto& y : pat5x5.goodMoves)
+        if (y.first == p.row && y.second == p.column)
           found = true;
       if (!found)
         pat5x5.goodMoves.push_back(std::make_pair(p.row, p.column));
@@ -199,7 +212,7 @@ void readSGF(std::string fileName) {
 int main(int argc, char* argv[]) {
 
   auto sgfFiles = getSGFFiles(argv[1]);
-  for (auto fileName : sgfFiles)
+  for (auto& fileName : sgfFiles)
     readSGF(fileName);
 
   std::cout << "moveFailures: " << moveFailures << " " << total << std::endl;
@@ -207,19 +220,7 @@ int main(int argc, char* argv[]) {
   std::cout << "failed: " << failed << " " << total << std::endl;
 
   std::cout << patterns.hashTable3x3.size() << " " << patterns.hashTable5x5.size() << std::endl;
-  // patterns.save("patterns3x3.pat", "patterns5x5.pat");
-
-
-
-  std::ofstream f;
-  f.open("test.pat");
-  assert(f.is_open());
-  if (!f || f.fail())
-    std::cout << "3x3 Failed" << std::endl;
-
-  f << "test";
-  f.close();
-
+  patterns.save("patterns3x3.pat", "patterns5x5.pat");
 
   std::ofstream myfile;
   myfile.open ("example.txt");
