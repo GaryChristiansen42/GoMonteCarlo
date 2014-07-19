@@ -277,7 +277,6 @@ Point* Patterns::getMove(Board& b, std::default_random_engine& engine) {
   if (b.lastMove != NULL) {
     Pattern3x3 lastMove3x3(b, *b.lastMove);
     Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
-    goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
     if (legal(&b, goodMove))
       return goodMove;
     numNull++;
