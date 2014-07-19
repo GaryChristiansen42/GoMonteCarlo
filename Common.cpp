@@ -9,7 +9,7 @@
 
 void Log(const char* message) {
   std::ofstream file("log.txt", std::ios::app);
-  file << message << std::endl;
+  file << message << '\n';
   file.close();
 }
 
