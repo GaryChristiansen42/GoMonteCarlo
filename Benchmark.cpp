@@ -19,7 +19,7 @@ int main(void) {
 
   Board* b = new Board();
   b->init();
-  UCTNode *node = new UCTNode(Point(-1, -1), NULL);
+  UCTNode *node = new UCTNode(Point(-1, -1), nullptr);
   node->state = b->clone();
 
   GameResult r;

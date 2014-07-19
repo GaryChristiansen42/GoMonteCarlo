@@ -70,7 +70,7 @@ int main(void) {
         printf("\nTrial Number: %d\n", i);
       Board* b = new Board();
       b->init();
-      UCTNode *node = new UCTNode(Point(-1, -1), NULL);
+      UCTNode *node = new UCTNode(Point(-1, -1), nullptr);
       node->state = b->clone();
 
       GameResult r;
@@ -81,19 +81,19 @@ int main(void) {
           randomMove(&node, b);
           break;
          case MyMonteCarlo1HalfSecond:
-          computerMove(&node, b, 0, 50, NULL);
+          computerMove(&node, b, 0, 50, nullptr);
           break;
          case MyMonteCarlo1Second:
-          computerMove(&node, b, 0, 1000, NULL);
+          computerMove(&node, b, 0, 1000, nullptr);
           break;
          case MyMonteCarlo5Seconds:
-          computerMove(&node, b, 0, 5000, NULL);
+          computerMove(&node, b, 0, 5000, nullptr);
           break;
          case MyMonteCarlo10Seconds:
-          computerMove(&node, b, 0, 10000, NULL);
+          computerMove(&node, b, 0, 10000, nullptr);
           break;
          case MyMonteCarlo14AndHalfSeconds:
-          computerMove(&node, b, 0, 14500, NULL);
+          computerMove(&node, b, 0, 14500, nullptr);
           break;
          case WithPatterns1HalfSecond:
           computerMove(&node, b, 0, 50, &patterns);
@@ -105,13 +105,13 @@ int main(void) {
           computerMove(&node, b, 0, 14500, &patterns);
           break;
          case MyMonteCarlo500Sims:
-          computerMove(&node, b, 500, 0, NULL);
+          computerMove(&node, b, 500, 0, nullptr);
           break;
          case WithPatterns500Sims:
           computerMove(&node, b, 500, 0, &patterns);
           break;
          case MyMonteCarlo1000Sims:
-          computerMove(&node, b, 1000, 0, NULL);
+          computerMove(&node, b, 1000, 0, nullptr);
           break;
          case WithPatterns1000Sims:
           computerMove(&node, b, 1000, 0, &patterns);

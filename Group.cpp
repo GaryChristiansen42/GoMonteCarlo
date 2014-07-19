@@ -40,7 +40,7 @@ void Group::addStone(Point* p) {
 void Group::removeStones() {
   for (Point* stone : stones) {
     stone->color = Empty;
-    stone->group = NULL;
+    stone->group = nullptr;
 
     stone->incrementNeighborGroups();
   }
@@ -77,22 +77,22 @@ int Group::numLiberties() {
 /*void Group::recalculateLiberties(Board* b) {
   numberLiberties = 0;
   for(Point* stone : stones) {
-    if (stone->north != NULL && stone->north->color == Empty
+    if (stone->north != nullptr && stone->north->color == Empty
       && !stone->north->marked) {
       numberLiberties++;
       stone->north->marked = true;
     }
-    if (stone->east != NULL && stone->east->color == Empty
+    if (stone->east != nullptr && stone->east->color == Empty
       && !stone->east->marked) {
       numberLiberties++;
       stone->east->marked = true;
     }
-    if (stone->south != NULL && stone->south->color == Empty
+    if (stone->south != nullptr && stone->south->color == Empty
       && !stone->south->marked) {
       numberLiberties++;
       stone->south->marked = true;
     }
-    if (stone->west != NULL && stone->west->color == Empty
+    if (stone->west != nullptr && stone->west->color == Empty
       && !stone->west->marked) {
       numberLiberties++;
       stone->west->marked = true;

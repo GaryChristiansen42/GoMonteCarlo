@@ -267,7 +267,7 @@ void Patterns::mutatePattern(std::string hash, std::default_random_engine& engin
 }
 
 bool legal(Board* b, Point* goodMove) {
-    if (goodMove != NULL) {
+    if (goodMove != nullptr) {
       bool isLegal = false;
       Player sameColor = b->turn == Black ? Black : White;
       Player oppositeColor = b->turn == Black ? White : Black;
@@ -286,10 +286,9 @@ bool legal(Board* b, Point* goodMove) {
 Point* Patterns::getMove(Board& b, std::default_random_engine& engine) {
 
   total++;
-  if (b.lastMove != NULL) {
+  if (b.lastMove != nullptr) {
     Pattern3x3 lastMove3x3(b, *b.lastMove);
     Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
-    goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
     if (legal(&b, goodMove))
       return goodMove;
     numNull++;
@@ -297,10 +296,10 @@ Point* Patterns::getMove(Board& b, std::default_random_engine& engine) {
 
   numNotCalled++;
 
-  /*if (b->secondLastMove != NULL) {
+  /*if (b->secondLastMove != nullptr) {
     Pattern3x3 lastMove3x3(b->secondLastMove);
     Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(b, *b->secondLastMove, engine);
-    if (goodMove != NULL) {
+    if (goodMove != nullptr) {
       bool isLegal = false;
       Player sameColor = b->turn == Black ? Black : White;
       Player oppositeColor = b->turn == Black ? White : Black;

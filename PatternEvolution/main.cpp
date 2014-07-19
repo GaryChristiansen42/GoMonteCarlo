@@ -143,7 +143,7 @@ void selectSurvivors() {
 }
 
 void determineFitnessThread() {
-  std::default_random_engine threadEngine(time(NULL) + std::hash<std::thread::id>()(std::this_thread::get_id()));
+  std::default_random_engine threadEngine(time(nullptr) + std::hash<std::thread::id>()(std::this_thread::get_id()));
 
   for (auto& member : patternPopulation) {
     for (unsigned int i = 0; i < numTrials / numThreads; ++i) {
@@ -208,7 +208,7 @@ void determineFitness() {
 int main(void) {
   printf("PatternEvolution\n");
 
-  engine.seed(time(NULL));
+  engine.seed(time(nullptr));
   std::uniform_int_distribution<> dist(1, 100000);
   int randNumber = dist(engine);
   char fileName3x3[256];

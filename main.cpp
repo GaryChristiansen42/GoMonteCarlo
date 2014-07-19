@@ -22,7 +22,7 @@ int main(void) {
   Board* b = new Board();
 
   UCTNode *currentNode;
-  root = new UCTNode(Point(-1, -1), NULL);
+  root = new UCTNode(Point(-1, -1), nullptr);
   root->state = b;
   currentNode = root;
 

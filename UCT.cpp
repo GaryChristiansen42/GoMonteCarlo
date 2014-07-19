@@ -38,7 +38,7 @@ void printNode(UCTNode* n, char* spaces) {
     // << ") V " << n->visits << " R " << n->totalRewards << std::endl;
 
   UCTNode* next = n->child;
-  while (next != NULL) {
+  while (next != nullptr) {
     char moreSpaces[100];
     snprintf(moreSpaces, sizeof(spaces), "%s ", spaces);
     printNode(next, moreSpaces);
@@ -53,7 +53,7 @@ UCTNode* bestChild(UCTNode* node) {
   UCTNode* bestChild = node->child;
   double bestScore = -100000;
   UCTNode* next = node->child;
-  while (next != NULL) {
+  while (next != nullptr) {
     double uctScore = next->totalRewards / next->visits
       + c*sqrt((2*log(static_cast<float>(node->visits))) / next->visits);
     if (bestScore < uctScore) {
@@ -68,7 +68,7 @@ UCTNode* bestChild(UCTNode* node) {
 
 UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   node->mutex.lock();
-  if (node->possibleChildren.empty() && node->child == NULL) {
+  if (node->possibleChildren.empty() && node->child == nullptr) {
     node->state->getPossibleMoves();
     for (unsigned short i = 0; i < node->state->numLegalMoves; ++i) {
       UCTNode* child = new UCTNode(*node->state->legalMoves[i], node);
@@ -82,7 +82,7 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
 
   if (node->possibleChildren.size() == 0) {
     node->mutex.unlock();
-    return NULL;
+    return nullptr;
   }
   // else //Pick random child
   // {
@@ -106,7 +106,7 @@ UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
   GameResult r;
   while (!node->state->isGameOver(&r)) {  // Not terminal
     UCTNode* newChild = getNewChild(node, engine);
-    if (newChild != NULL) {
+    if (newChild != nullptr) {
       node->addChild(newChild);
       return newChild;
     } else {
@@ -132,7 +132,7 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clon
   node->state->cloneInto(clone);
 
   GameResult r;
-  if (patterns != NULL && patterns->initialized)
+  if (patterns != nullptr && patterns->initialized)
     r = clone->playGame(patterns, engine);
   else
     r = clone->playRandomGame(engine);
@@ -150,7 +150,7 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clon
 void backup(UCTNode* v, int reward) {
   // If not me, then its updating opponent
   bool me = true;
-  while (v != NULL) {
+  while (v != nullptr) {
     v->mutex.lock();
     v->visits++;
     if (me)
@@ -166,7 +166,7 @@ void backup(UCTNode* v, int reward) {
 UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
   Board* clone = new Board();
   clone->init();
-  std::default_random_engine engine(time(NULL));
+  std::default_random_engine engine(time(nullptr));
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root, engine);
     int reward = DefaultPolicy(engine, v, clone, patterns);
@@ -179,7 +179,7 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
 
   UCTNode* best = root->child;
   UCTNode* next = root->child;
-  while (next != NULL) {
+  while (next != nullptr) {
     if (next->visits > best->visits)
       best = next;
     next = next->sibling;
@@ -204,7 +204,7 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
 
   int i = 0;
 
-  std::default_random_engine engine(time(NULL));
+  std::default_random_engine engine(time(nullptr));
   Board* clone = new Board();
   clone->init();
 
@@ -248,7 +248,7 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
 
   UCTNode* best = root->child;
   UCTNode* next = root->child;
-  while (next != NULL) {
+  while (next != nullptr) {
     if (next->visits > best->visits)
       best = next;
     next = next->sibling;
@@ -270,7 +270,7 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
     static_cast<double>(best->totalRewards/best->visits));
   Log(buffer);
-  if (patterns != NULL) {
+  if (patterns != nullptr) {
     snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);
     Log(buffer);
     snprintf(buffer, sizeof(buffer), "Not Legal\t%d times", patterns->numNotLegal);

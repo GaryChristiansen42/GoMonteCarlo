@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 
   printf("TestPatterns\n");
 
-  std::default_random_engine engine(time(NULL));
+  std::default_random_engine engine(time(nullptr));
 
   originalPatterns.init(argv[1], argv[2]);
 
