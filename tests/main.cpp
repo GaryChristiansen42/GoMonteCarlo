@@ -716,6 +716,6 @@ BOOST_AUTO_TEST_CASE( testPatterns )
   BOOST_CHECK_EQUAL(patterns.hashTable3x3.size(), 10);
 
   std::default_random_engine engine(time(NULL));
-  Point* move = patterns.getMove(&b1, engine);
+  Point* move = patterns.getMove(b1, engine);
   BOOST_CHECK_EQUAL(*move == Point(1, 0), true);
 }
