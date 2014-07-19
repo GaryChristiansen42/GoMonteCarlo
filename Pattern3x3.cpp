@@ -1,6 +1,7 @@
 #include "Pattern3x3.h"
 
 #include "Board.h"
+#include <assert.h>
 
 Pattern3x3::Pattern3x3() {
 
@@ -80,29 +81,13 @@ void Pattern3x3::rotate90() {
   std::swap(hash[3], hash[5]);
   std::swap(hash[6], hash[8]);
 
-  std::vector<std::pair<char, char>> newGoodMoves;
-  for (auto move : goodMoves) {
-    if (move.first == -1 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(move.first, 1));
-    } else if (move.first == -1 && move.second == 0) {
-      newGoodMoves.push_back(std::make_pair(0, 1));
-    } else if (move.first == -1 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(1, move.second));
-    } else if (move.first == 0 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(-1, 0));
-    } else if (move.first == 0 && move.second == 0) {
-      newGoodMoves.push_back(move);
-    } else if (move.first == 0 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(1, 0));
-    } else if (move.first == 1 && move.second == -1) {
-      newGoodMoves.push_back(std::make_pair(-1, move.second));
-    } else if (move.first == 1 && move.second == 0) {
-      newGoodMoves.push_back(std::make_pair(0, -1));
-    } else if (move.first == 1 && move.second == 1) {
-      newGoodMoves.push_back(std::make_pair(move.first, -1));
-    }
+  for (auto& move : goodMoves) {
+    std::swap(move.first, move.second);
+    if (move.second == -1)
+      move.second = 1;
+    else if (move.second == 1)
+      move.second = -1;
   }
-  goodMoves = newGoodMoves;
 }
 
 bool Pattern3x3::isLegalPattern() {
@@ -188,6 +173,7 @@ Pattern3x3 Pattern3x3::getMutated(std::default_random_engine& engine) {
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern3x3 &pattern) {
+      assert(pattern.goodMoves.size() > 0);
   int i = 0, j = 0;
   for (char c : pattern.hash) {
     os << c;
@@ -199,23 +185,27 @@ std::ostream& operator<<(std::ostream &os, const Pattern3x3 &pattern) {
     }
   }
 
+  bool foundOne = false;
   for (i = -1; i < 2; ++i) {
     for (j = -1; j < 2; ++j) {
       bool found = false;
-      for (auto x : pattern.goodMoves) {
+      for (auto& x : pattern.goodMoves) {
         if (x.first == i && x.second == j) {
           found = true;
           break;
         }
       }
-      if (found)
+      if (found) {
         os << "1";
-      else
+        foundOne = true;
+      } else {
         os << "0";
+      }
     }
     os << "\n";
   }
   os << "\n";
+  assert(foundOne);
 
   return os;
 }
