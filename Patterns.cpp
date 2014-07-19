@@ -143,20 +143,24 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
   std::cout << hashTable3x3.size() << std::endl;
   std::cout << hashTable5x5.size() << std::endl;
   std::ofstream f;
-  f.open(fileName3x3);
+  f.open(fileName3x3, std::ofstream::out);
   assert(f.is_open());
+  if (!f || f.fail())
+    std::cout << "3x3 Failed" << std::endl;
 
-  for (auto i : hashTable3x3) {
+  for (auto& i : hashTable3x3) {
     f << i.second;
   }
   f.flush();
   f.close();
 
   std::ofstream f2;
-  f2.open(fileName5x5);
+  f2.open(fileName5x5, std::ofstream::out);
   assert(f2.is_open());
+  if (!f2 || f2.fail())
+    std::cout << "5x5 Failed" << std::endl;
 
-  for (auto i : hashTable5x5) {
+  for (auto& i : hashTable5x5) {
     f2 << i.second;
   }
   f2.flush();
@@ -166,27 +170,35 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
 
 void Patterns::addPattern(Pattern3x3 pattern) {
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.invertColor();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
 }
 
 
