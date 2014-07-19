@@ -66,15 +66,12 @@ bool operator==(const Pattern &p1, const Pattern &p2) {
 }
 
 void Pattern::invertColor() {
-  std::string newHash = "";
-  for (char c : hash) {
+  for (char& c : hash) {
     if (c == 'B')
       c = 'W';
     else if (c == 'W')
       c = 'B';
-    newHash += c;
   }
-  hash = newHash;
 }
 
 Point* Pattern::getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine) {
