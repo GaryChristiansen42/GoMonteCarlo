@@ -14,7 +14,7 @@ float millaSecondsToThink = 14500;
 char name[] = "TestGoBot";
 char version[] = "3.5.11";
 
-Board* b = NULL;
+Board* b = nullptr;
 std::list<unsigned long int> previousHashes;
 
 void switchTurnTo(Player color) {
@@ -87,7 +87,7 @@ void doGenMove() {
 
   b->eliminatePositionalSuperKo(previousHashes);
 
-  UCTNode* currentMove = new UCTNode(Point(-1, -1), NULL);
+  UCTNode* currentMove = new UCTNode(Point(-1, -1), nullptr);
   currentMove->state = b->clone();
   UCTNode* bestMoveNode = UCTSearch(currentMove, millaSecondsToThink);
   if ((1.0*bestMoveNode->totalRewards)/bestMoveNode->visits < (-0.9)) {
@@ -130,7 +130,7 @@ int main() {
   b->init();
 
   previousHashes.push_back(b->getHash());
-  //currentMove = new UCTNode(Point(-1, -1), b, NULL);
+  //currentMove = new UCTNode(Point(-1, -1), b, nullptr);
 
   while (true) {
     char command[128];

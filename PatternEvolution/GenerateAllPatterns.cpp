@@ -16,7 +16,7 @@ struct pattern_compare {
 
 int main() {
 
-  std::default_random_engine engine(time(NULL));
+  std::default_random_engine engine(time(nullptr));
 
   Patterns patterns;
 

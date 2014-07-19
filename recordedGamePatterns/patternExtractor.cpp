@@ -168,7 +168,7 @@ void readSGF(std::string fileName) {
 
     Point p((int)x.second.first - 'a', (int)x.second.second - 'a');
 
-    if (b.lastMove != NULL) {
+    if (b.lastMove != nullptr) {
       Pattern3x3 pat3x3(b.lastMove);
       auto hash = pat3x3.hash;
       pat3x3 = patterns.hashTable3x3[pat3x3.hash];

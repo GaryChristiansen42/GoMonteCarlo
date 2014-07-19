@@ -5,7 +5,7 @@
 #include <vector>
 
 UCTNode::UCTNode(Point newMove, UCTNode* newParent) :
-  move(newMove), state(NULL), bestNode(NULL), child(NULL), sibling(NULL),
+  move(newMove), state(nullptr), bestNode(nullptr), child(nullptr), sibling(nullptr),
   parent(newParent), possibleChildren(std::vector<UCTNode*>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
@@ -31,11 +31,11 @@ void UCTNode::init() {
 
 void UCTNode::addChild(UCTNode* newChild) {
   mutex.lock();
-  if (child == NULL) {
+  if (child == nullptr) {
     child = newChild;
   } else {
     UCTNode* temp = child;
-    while (temp->sibling != NULL)
+    while (temp->sibling != nullptr)
       temp = temp->sibling;
     temp->sibling = newChild;
   }
@@ -45,17 +45,17 @@ void UCTNode::addChild(UCTNode* newChild) {
 void UCTNode::removeChild(UCTNode* childToRemove) {
   if (child == childToRemove) {
     child = child->sibling;
-    childToRemove->parent = NULL;
-    childToRemove->sibling = NULL;
+    childToRemove->parent = nullptr;
+    childToRemove->sibling = nullptr;
     return;
   }
 
   UCTNode* temp = child;
-  while (temp != NULL) {
+  while (temp != nullptr) {
     if (temp->sibling == childToRemove) {
       temp->sibling = childToRemove->sibling;
-      childToRemove->parent = NULL;
-      childToRemove->sibling = NULL;
+      childToRemove->parent = nullptr;
+      childToRemove->sibling = nullptr;
       return;
     }
     temp = temp->sibling;
@@ -66,7 +66,7 @@ void UCTNode::removeChild(UCTNode* childToRemove) {
 bool UCTNode::isChild(Point nodeMove) {
   mutex.lock();
   UCTNode* next = child;
-  while (next != NULL) {
+  while (next != nullptr) {
     if (next->move.row == nodeMove.row && next->move.column == nodeMove.column) {
       mutex.unlock();
       return true;

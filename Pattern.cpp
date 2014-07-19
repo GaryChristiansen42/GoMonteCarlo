@@ -14,7 +14,7 @@ Pattern::Pattern() : hash(""),
 char Pattern::pointToChar(Point* p) {
   return pointToCharMap[p->color];
   /*
-  if (p == NULL)
+  if (p == nullptr)
     return 'O';
   if (p->color == White)
     return 'W';
@@ -79,7 +79,7 @@ void Pattern::invertColor() {
 
 Point* Pattern::getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine) {
   if (goodMoves.size() == 0)
-    return NULL;
+    return nullptr;
   std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
   int choice = dist(engine);
   return &b->positions[goodMoves[choice].first+move.row][goodMoves[choice].second+move.column];

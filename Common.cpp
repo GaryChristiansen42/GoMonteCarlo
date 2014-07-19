@@ -40,7 +40,7 @@ void playerMove(UCTNode** currentNode, Board* b) {
   printf("Row: %d\nColumn: %d\n", choice.row, choice.column);
 
   b->makeMove(choice);
-  UCTNode* newCurrentNode = new UCTNode(choice, NULL);
+  UCTNode* newCurrentNode = new UCTNode(choice, nullptr);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 }
@@ -51,7 +51,7 @@ void printTabs(int numTabs) {
 }
 
 void showTree(UCTNode* node, int numTabs, int maxDepth) {
-  if (node == NULL || numTabs >= maxDepth || node->visits < 2)
+  if (node == nullptr || numTabs >= maxDepth || node->visits < 2)
     return;
   printTabs(numTabs);
   printf("Node\n");
@@ -70,7 +70,7 @@ void showTree(UCTNode* node, int numTabs, int maxDepth) {
 
 void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   float millaSecondsToThink, Patterns* patterns) {
-  UCTNode* newCurrentNode = NULL;
+  UCTNode* newCurrentNode = nullptr;
   if (numSimulations != 0) {
     newCurrentNode = UCTSearch((*currentNode), numSimulations, patterns);
   } else {
@@ -99,12 +99,12 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
-  std::default_random_engine engine(time(NULL));
+  std::default_random_engine engine(time(nullptr));
 
   Point* chosenMove = b->getRandomMove(engine);
 
   b->makeMove(*chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, NULL);
+  UCTNode* newCurrentNode = new UCTNode(*chosenMove, nullptr);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
   (*currentNode)->state = b->clone();

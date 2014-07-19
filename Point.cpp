@@ -5,13 +5,13 @@
 #include "Group.h"
 
 Point::Point() :
-  color(Empty), row(0), column(0), marked(false), group(NULL), north(NULL),
-  east(NULL), south(NULL), west(NULL)
+  color(Empty), row(0), column(0), marked(false), group(nullptr), north(nullptr),
+  east(nullptr), south(nullptr), west(nullptr)
 { }
 
 Point::Point(char newRow, char newColumn) :
-  color(Empty), row(newRow), column(newColumn), marked(false), group(NULL), 
-  north(NULL), east(NULL), south(NULL), west(NULL)
+  color(Empty), row(newRow), column(newColumn), marked(false), group(nullptr), 
+  north(nullptr), east(nullptr), south(nullptr), west(nullptr)
 { }
 
 Point::Point(char newRow, char newColumn, Player newColor, Group* newGroup,
