@@ -1,4 +1,4 @@
-CC=g++ -pthread -march=native -mtune=native
+CC=g++ -pthread -march=native -mtune=native #-fvpt -fbranch-probabilities -fpeel-loops
 CFLAGS=-c -g -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
