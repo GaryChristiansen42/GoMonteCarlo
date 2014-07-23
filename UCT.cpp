@@ -266,9 +266,9 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
 
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
-    "Thought for %d simulations.\nR: %f V: %d\nR/V: %f",
+    "Thought for %d simulations.\nR: %f V: %d\nR/V: %f\t%d %d",
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
-    static_cast<double>(best->totalRewards/best->visits));
+    static_cast<double>(best->totalRewards/best->visits), best->move.row, best->move.column);
   Log(buffer);
   if (patterns != nullptr) {
     snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);
