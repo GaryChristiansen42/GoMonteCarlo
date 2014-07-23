@@ -11,29 +11,29 @@ Group::Group(Player newColor) :
 Group::~Group() {
 }
 
-void Group::addStone(Point* p) {
-  p->group = this;
-  stones.push_back(p);
+void Group::addStone(Point& p) {
+  p.group = this;
+  stones.push_back(&p);
 
-  if (!(p->north->color != Empty
-    || (p->north->north->group == this)
-    || (p->north->east->group == this)
-    || (p->north->west->group == this)))
+  if (!(p.north->color != Empty
+    || (p.north->north->group == this)
+    || (p.north->east->group == this)
+    || (p.north->west->group == this)))
     numberLiberties++;
-  if (!(p->east->color != Empty
-    || (p->east->north->group == this)
-    || (p->east->east->group == this)
-    || (p->east->south->group == this)))
+  if (!(p.east->color != Empty
+    || (p.east->north->group == this)
+    || (p.east->east->group == this)
+    || (p.east->south->group == this)))
     numberLiberties++;
-  if (!(p->south->color != Empty
-    || (p->south->east->group == this)
-    || (p->south->south->group == this)
-    || (p->south->west->group == this)))
+  if (!(p.south->color != Empty
+    || (p.south->east->group == this)
+    || (p.south->south->group == this)
+    || (p.south->west->group == this)))
     numberLiberties++;
-  if (!(p->west->color != Empty
-    || (p->west->north->group == this)
-    || (p->west->south->group == this)
-    || (p->west->west->group == this)))
+  if (!(p.west->color != Empty
+    || (p.west->north->group == this)
+    || (p.west->south->group == this)
+    || (p.west->west->group == this)))
     numberLiberties++;
 }
 

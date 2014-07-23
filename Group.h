@@ -14,12 +14,13 @@ class Group {
   std::list<Point*> stones;
   unsigned char numberLiberties;
   Player color;
+  // Change to be above stones for 'hotness'
 
   explicit Group(Player newColor);
 
   ~Group();
 
-  void addStone(Point* p);
+  void addStone(Point& p);
 
   void removeStones();
 
