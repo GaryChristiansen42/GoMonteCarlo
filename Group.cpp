@@ -6,7 +6,7 @@
 Group::Group(Player newColor) :
   stones(std::vector<Point*>()),
   numberLiberties(0), color(newColor) {
-  
+  stones.reserve(25); // tuning required
 }
 
 Group::~Group() {
