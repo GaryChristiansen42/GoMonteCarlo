@@ -341,10 +341,9 @@ void Board::updateStructures(Point& move) {
         continue;
       }
 
-      while (!g->stones.empty()) {
-        move.group->addStone(*g->stones.begin());
-        g->stones.pop_front();
-      }
+      for (auto& x : g->stones)
+        move.group->addStone(*x);
+      g->stones.clear();
 
       std::remove(groupsSameColor->begin(), groupsSameColor->end(), g);
       groupsSameColor->pop_back();
