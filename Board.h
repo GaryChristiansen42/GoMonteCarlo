@@ -3,6 +3,7 @@
 
 #define RUNNING_TESTS
 
+#include <list>
 #include <random>
 #include <vector>
 
@@ -58,7 +59,7 @@ class Board {
 
   bool isGameOver(GameResult *result);
 
-  void updateStructures(Point* move);
+  void updateStructures(Point& move);
   void removeDeadStones(Player color);
 
   unsigned long int getHash();

@@ -272,62 +272,62 @@ bool Board::isGameOver(GameResult *result) {
   return false;
 }
 
-void Board::updateStructures(Point* move) {
+void Board::updateStructures(Point& move) {
   Group* groupsToCombine[4];
   unsigned char numGroupsToCombine = 0;
   bool inGroup = false;
-  if (move->north->color == move->color) {
-    move->north->group->addStone(move);
-    groupsToCombine[0] = move->north->group;
+  if (move.north->color == move.color) {
+    move.north->group->addStone(move);
+    groupsToCombine[0] = move.north->group;
     ++numGroupsToCombine;
     inGroup = true;
   }
-  if (move->east->color == move->color) {
+  if (move.east->color == move.color) {
     if (!inGroup) {
-      move->east->group->addStone(move);
+      move.east->group->addStone(move);
       inGroup = true;
     }
     bool found = false;
     for (unsigned char i = 0; i < numGroupsToCombine; ++i)
-      if (groupsToCombine[i] == move->east->group)
+      if (groupsToCombine[i] == move.east->group)
         found = true;
     if (!found) {
-      groupsToCombine[numGroupsToCombine] = move->east->group;
+      groupsToCombine[numGroupsToCombine] = move.east->group;
       ++numGroupsToCombine;
     }
   }
-  if (move->south->color == move->color) {
+  if (move.south->color == move.color) {
     if (!inGroup) {
-      move->south->group->addStone(move);
+      move.south->group->addStone(move);
       inGroup = true;
     }
     bool found = false;
     for (unsigned char i = 0; i < numGroupsToCombine; ++i)
-      if (groupsToCombine[i] == move->south->group)
+      if (groupsToCombine[i] == move.south->group)
         found = true;
     if (!found) {
-      groupsToCombine[numGroupsToCombine] = move->south->group;
+      groupsToCombine[numGroupsToCombine] = move.south->group;
       ++numGroupsToCombine;
     }
   }
-  if (move->west->color == move->color) {
+  if (move.west->color == move.color) {
     if (!inGroup) {
-      move->west->group->addStone(move);
+      move.west->group->addStone(move);
       inGroup = true;
     }
     bool found = false;
     for (unsigned char i = 0; i < numGroupsToCombine; ++i)
-      if (groupsToCombine[i] == move->west->group)
+      if (groupsToCombine[i] == move.west->group)
         found = true;
     if (!found) {
-      groupsToCombine[numGroupsToCombine] = move->west->group;
+      groupsToCombine[numGroupsToCombine] = move.west->group;
       ++numGroupsToCombine;
     }
   }
 
 
   std::vector<Group*>* groupsSameColor =
-    (move->color == Black) ? &blackGroups : &whiteGroups;
+    (move.color == Black) ? &blackGroups : &whiteGroups;
   if (!inGroup) {
     Group* group = new Group((turn == Black) ? Black : White);
     group->addStone(move);
@@ -337,11 +337,12 @@ void Board::updateStructures(Point* move) {
   if (numGroupsToCombine > 1) {
     for (unsigned char i = 0; i < numGroupsToCombine; ++i) {
       Group* g = groupsToCombine[i];
-      if (g == move->group) {  // move's group will survive, others removed
+      if (g == move.group) {  // move's group will survive, others removed
         continue;
       }
+
       while (!g->stones.empty()) {
-        move->group->addStone(*g->stones.begin());
+        move.group->addStone(*g->stones.begin());
         g->stones.pop_front();
       }
 
@@ -525,7 +526,7 @@ void Board::makeMove(Point* move) {
     move->color = turn;
 
     move->decrementNeighborGroups();
-    updateStructures(move);
+    updateStructures(*move);
     removeDeadStones((turn == Black ? White : Black));
 
     // if the move has a neighbor of the same color,
