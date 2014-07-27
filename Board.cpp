@@ -558,15 +558,45 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
   // std::uniform_int_distribution<> distBoardSize(0, BOARD_SIZE*BOARD_SIZE);
   Player sameColor = turn == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
-  int index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
+  unsigned int index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
 
+  unsigned int numTries = 0;
   before:
+  /*if (numTries == 50) {
+    std::vector<unsigned int> v;
+    v.push_back(BOARD_SIZE*BOARD_SIZE);
+    for (int j = 0; j < BOARD_SIZE*BOARD_SIZE; ++j)
+      if (positions[j/BOARD_SIZE][j%BOARD_SIZE].color == Empty)
+        v.push_back(j);
+    if (v.size() == 1)
+      return pass;
+    
+    int i = rand() % v.size();
+    beforeWithVectors:
+    if (v[i] == BOARD_SIZE*BOARD_SIZE)
+      return pass;
+    if (!(!isSuicide(&positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE], sameColor, oppositeColor)
+        && &positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE] != koPoint)) {
+      i = rand() % v.size();
+      ++numTries;
+      goto beforeWithVectors;
+    }
+    return &positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE];
+    
+  }*/
+  if (numTries == 50) { // Requires tuning
+    getPossibleMoves();
+    std::uniform_int_distribution<> dist(0, numLegalMoves-1);
+    unsigned int choice = dist(engine);
+    return legalMoves[choice];
+  }
   if (index == BOARD_SIZE*BOARD_SIZE)
     return pass;
   if (!(positions[index/BOARD_SIZE][index%BOARD_SIZE].color == Empty
       && !isSuicide(&positions[index/BOARD_SIZE][index%BOARD_SIZE], sameColor, oppositeColor)
       && &positions[index/BOARD_SIZE][index%BOARD_SIZE] != koPoint)) {
     index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
+    ++numTries;
     goto before;
   }
 
