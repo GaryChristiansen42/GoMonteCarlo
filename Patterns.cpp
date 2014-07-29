@@ -148,11 +148,18 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
   if (!f || f.fail())
     std::cout << "3x3 Failed" << std::endl;
 
+  auto count = 0;
   for (auto& i : hashTable3x3) {
-    f << i.second;
+    if (i.second.goodMoves.size() > 0) {
+      f << i.second;
+      ++count;
+    } else {
+      // std::cout << i.second.hash << std::endl;
+    }
   }
   f.flush();
   f.close();
+  std::cout << count << std::endl;
 
   std::ofstream f2;
   f2.open(fileName5x5, std::ofstream::out);
@@ -160,71 +167,102 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
   if (!f2 || f2.fail())
     std::cout << "5x5 Failed" << std::endl;
 
+  count = 0;
   for (auto& i : hashTable5x5) {
-    f2 << i.second;
+    if (i.second.goodMoves.size() > 0) {
+      f2 << i.second;
+      ++count;
+    } else {
+      // std::cout << i.second.hash << std::endl;
+    }
   }
   f2.flush();
   f2.close();
+  std::cout << count << std::endl;
 
 }
 
 void Patterns::addPattern(Pattern3x3 pattern) {
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.invertColor();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
   assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 }
 
 
 void Patterns::addPattern(Pattern5x5 pattern) {
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.invertColor();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
+  assert(pattern.goodMoves.size() > 0);
+  assert(pattern.hash.size() > 0);
 }
 
 /*void Patterns::mutate(std::default_random_engine& engine) {
@@ -287,10 +325,19 @@ Point* Patterns::getMove(Board& b, std::default_random_engine& engine) {
 
   total++;
   if (b.lastMove != nullptr) {
-    Pattern3x3 lastMove3x3(b, *b.lastMove);
-    Point* goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
-    if (legal(&b, goodMove))
+    Pattern5x5 lastMove5x5(b.lastMove);
+    Point* goodMove = hashTable5x5[lastMove5x5.hash].getRandomGoodMove(&b, *b.lastMove, engine);
+    if (legal(&b, goodMove)) {
+      numCalled++;
       return goodMove;
+    }
+    
+    Pattern3x3 lastMove3x3(b, *b.lastMove);
+    goodMove = hashTable3x3[lastMove3x3.hash].getRandomGoodMove(&b, *b.lastMove, engine);
+    if (legal(&b, goodMove)) {
+      numCalled2++;
+      return goodMove;
+    }
     numNull++;
   }
 
