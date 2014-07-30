@@ -1,6 +1,7 @@
 #include "Pattern5x5.h"
 
 #include <algorithm>
+#include <assert.h>
 
 Pattern5x5::Pattern5x5() {
 
@@ -273,6 +274,15 @@ Pattern5x5 Pattern5x5::getRandomPattern(std::default_random_engine& engine) {
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern5x5 &pattern) {
+  assert(pattern.goodMoves.size() > 0);
+  for (auto& x : pattern.goodMoves) {
+    assert(x.first >= -2);
+    assert(x.second >= -2);
+
+    assert(x.first <= 2);
+    assert(x.second <= 2);
+  }
+
   int i = 0, j = 0;
   for (char c : pattern.hash) {
     os << c;

@@ -173,7 +173,15 @@ Pattern3x3 Pattern3x3::getMutated(std::default_random_engine& engine) {
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern3x3 &pattern) {
-      assert(pattern.goodMoves.size() > 0);
+  assert(pattern.goodMoves.size() > 0);
+  for (auto& x : pattern.goodMoves) {
+    assert(x.first >= -1);
+    assert(x.second >= -1);
+
+    assert(x.first <= 1);
+    assert(x.second <= 1);
+  }
+
   int i = 0, j = 0;
   for (char c : pattern.hash) {
     os << c;
