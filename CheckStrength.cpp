@@ -49,17 +49,17 @@ int main(void) {
   printf("Running...\n");
 
   Patterns patterns;
-  patterns.init(patternsFile3x3, patternsFile5x5);
+  // patterns.init(patternsFile3x3, patternsFile5x5);
 
   int numTrials = 1;
   // int numSimulations = 1000;
   float komi = 0;
-  PlayerType player1 = WithPatterns1000Sims;
-  // PlayerType player1 = RandomPlayer;
+  // PlayerType player1 = WithPatterns1000Sims;
+  PlayerType player1 = RandomPlayer;
   // PlayerType player1 = MyMonteCarlo1Second;
-  // PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
+  PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
-  PlayerType player2 = MyMonteCarlo1000Sims;
+  // PlayerType player2 = MyMonteCarlo1000Sims;
 
   for (int x = 0; x < 2; x++) {
     int player1Wins = 0;

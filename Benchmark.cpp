@@ -15,7 +15,7 @@ int main(void) {
   printf("Running...\n");
 
   Patterns patterns;
-  patterns.init(patternsFile3x3, patternsFile5x5);
+  // patterns.init(patternsFile3x3, patternsFile5x5);
 
   Board* b = new Board();
   b->init();
@@ -29,7 +29,7 @@ int main(void) {
       randomMove(&node, b);
       break;
      case White:
-      computerMove(&node, b, 0, 500, &patterns);
+      computerMove(&node, b, 0, 500, nullptr); // &patterns);
       break;
      case Empty:
      case OutOfBounds:

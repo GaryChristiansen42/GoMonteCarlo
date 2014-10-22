@@ -556,12 +556,12 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
   // if (lastMove == pass)
     // return pass;
   // std::uniform_int_distribution<> distBoardSize(0, BOARD_SIZE*BOARD_SIZE);
-  Player sameColor = turn == Black ? Black : White;
-  Player oppositeColor = turn == Black ? White : Black;
-  unsigned int index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
+  // Player sameColor = turn == Black ? Black : White;
+  // Player oppositeColor = turn == Black ? White : Black;
+  // unsigned int index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
 
-  unsigned int numTries = 0;
-  before:
+  // unsigned int numTries = 0;
+  // before:
   /*if (numTries == 50) {
     std::vector<unsigned int> v;
     v.push_back(BOARD_SIZE*BOARD_SIZE);
@@ -584,12 +584,13 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
     return &positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE];
     
   }*/
-  if (numTries == 50) { // Requires tuning
+  // if (numTries == 1) { // Requires tuning
+    
     getPossibleMoves();
     std::uniform_int_distribution<> dist(0, numLegalMoves-1);
     unsigned int choice = dist(engine);
     return legalMoves[choice];
-  }
+  /*}
   if (index == BOARD_SIZE*BOARD_SIZE)
     return pass;
   if (!(positions[index/BOARD_SIZE][index%BOARD_SIZE].color == Empty
@@ -598,7 +599,7 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
     index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
     ++numTries;
     goto before;
-  }
+  }*/
 
   /*if (numLegalMoves == 0)
     getPossibleMoves();
@@ -606,7 +607,8 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
   unsigned int choice = dist(engine);
   return legalMoves[choice];
   */
-  return &positions[index/BOARD_SIZE][index%BOARD_SIZE];
+  // return &positions[index/BOARD_SIZE][index%BOARD_SIZE];
+
 }
 
 void Board::makeRandomMove(std::default_random_engine& engine) {
