@@ -27,9 +27,6 @@ class Group {
   bool contains(Point* p);
   bool isAdjacent(Point* p);
 
-  bool hasLiberties();
-  int numLiberties();
-
   // void recalculateLiberties(Board* b);
 };
 

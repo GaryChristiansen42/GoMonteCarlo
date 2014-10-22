@@ -67,14 +67,6 @@ bool Group::isAdjacent(Point* p) {
   return false;
 }
 
-bool Group::hasLiberties() {
-  return numberLiberties > 0;
-}
-
-int Group::numLiberties() {
-  return numberLiberties;
-}
-
 /*void Group::recalculateLiberties(Board* b) {
   numberLiberties = 0;
   for(Point* stone : stones) {

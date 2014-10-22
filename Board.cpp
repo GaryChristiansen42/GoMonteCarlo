@@ -374,7 +374,7 @@ void Board::removeDeadStones(Player color) {
   // TODO(GaryChristiansen): only check neighbors instead of all groups?
   std::vector<Group*> deadGroups;
   for(Group* group : *firstGroups)
-    if (!(group->hasLiberties()))
+    if (group->numberLiberties == 0)
       deadGroups.push_back(group);
 
   // beg1:
@@ -696,24 +696,24 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
   if (move->west->color == Empty)
     return false;
 
-  if (move->north->group->color == sameColor && move->north->group->numLiberties() > 1)
+  if (move->north->group->color == sameColor && move->north->group->numberLiberties > 1)
     return false;
-  if (move->north->group->color == oppositeColor && move->north->group->numLiberties() == 1)
-    return false;
-
-  if (move->east->group->color == sameColor && move->east->group->numLiberties() > 1)
-    return false;
-  if (move->east->group->color == oppositeColor && move->east->group->numLiberties() == 1)
+  if (move->north->group->color == oppositeColor && move->north->group->numberLiberties == 1)
     return false;
 
-  if (move->south->group->color == sameColor && move->south->group->numLiberties() > 1)
+  if (move->east->group->color == sameColor && move->east->group->numberLiberties > 1)
     return false;
-  if (move->south->group->color == oppositeColor && move->south->group->numLiberties() == 1)
+  if (move->east->group->color == oppositeColor && move->east->group->numberLiberties == 1)
     return false;
 
-  if (move->west->group->color == sameColor && move->west->group->numLiberties() > 1)
+  if (move->south->group->color == sameColor && move->south->group->numberLiberties > 1)
     return false;
-  if (move->west->group->color == oppositeColor && move->west->group->numLiberties() == 1)
+  if (move->south->group->color == oppositeColor && move->south->group->numberLiberties == 1)
+    return false;
+
+  if (move->west->group->color == sameColor && move->west->group->numberLiberties > 1)
+    return false;
+  if (move->west->group->color == oppositeColor && move->west->group->numberLiberties == 1)
     return false;
   return true;
 }
@@ -742,7 +742,7 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
       if (p != &positions[r][c]) {
         if (positions[r][c].group != nullptr
           && positions[r][c].group->isAdjacent(p)
-          && positions[r][c].group->numLiberties() == 1) {
+          && positions[r][c].group->numberLiberties == 1) {
           s += (char)Empty;
         } else {
           s += (char)positions[r][c].color;
