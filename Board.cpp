@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
+#include <set>
 #include <sstream>
 #include <stack>
 
@@ -364,21 +365,25 @@ void Board::updateStructures(Point& move) {
   }
 }
 
-void Board::removeDeadStones(Player color) {
-  std::vector<Group*>* firstGroups =
-    (color == Black) ? &blackGroups : &whiteGroups;
-  // vector<Group*> secondGroup = (turn == Black) ? blackGroups : whiteGroups;
+void Board::removeDeadStones(Point& move, Player color) {
+  auto firstGroups = (color == Black) ? &blackGroups : &whiteGroups;
 
   unsigned int numDeadStones = 0;
 
-  // TODO(GaryChristiansen): only check neighbors instead of all groups?
-  std::vector<Group*> deadGroups;
-  for(Group* group : *firstGroups)
-    if (group->numberLiberties == 0)
-      deadGroups.push_back(group);
+  std::set<Group*> deadGroups;
+  // Group* groupsToKill[4];
+  if (move.north->color == color && move.north->group->numberLiberties == 0)
+    deadGroups.insert(move.north->group);
+  if (move.east->color == color && move.east->group->numberLiberties == 0)
+    deadGroups.insert(move.east->group);
+  if (move.south->color == color && move.south->group->numberLiberties == 0)
+    deadGroups.insert(move.south->group);
+  if (move.west->color == color && move.west->group->numberLiberties == 0) {
+    deadGroups.insert(move.west->group);
+  }
 
   // beg1:
-  for(Group* deadGroup : deadGroups) {
+  for(auto deadGroup : deadGroups) {
     // remove dead stones on board
     unsigned int numStones = (unsigned int)deadGroup->stones.size();
     if (numStones == 1) {
@@ -526,7 +531,7 @@ void Board::makeMove(Point* move) {
 
     move->decrementNeighborGroups();
     updateStructures(*move);
-    removeDeadStones((turn == Black ? White : Black));
+    removeDeadStones(*move, (turn == Black ? White : Black));
 
     // if the move has a neighbor of the same color,
     // then the next move cannot be ko

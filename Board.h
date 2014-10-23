@@ -60,7 +60,7 @@ class Board {
   bool isGameOver(GameResult *result);
 
   void updateStructures(Point& move);
-  void removeDeadStones(Player color);
+  void removeDeadStones(Point& move, Player color);
 
   unsigned long int getHash();
 

@@ -515,19 +515,19 @@ BOOST_AUTO_TEST_CASE( testGroupNumLiberties )
   b1.makeMove(Point(0, 0)); // Black
   Group* g = *b1.blackGroups.begin();
     
-  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
+  BOOST_CHECK_EQUAL(g->numberLiberties, 2);
     
   b1.makeMove(Point(0, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
+  BOOST_CHECK_EQUAL(g->numberLiberties, 1);
   
   b1.makeMove(Point(1, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
+  BOOST_CHECK_EQUAL(g->numberLiberties, 2);
     
   b1.makeMove(Point(1, 1)); //White
-  BOOST_CHECK_EQUAL(g->numLiberties(), 1);
+  BOOST_CHECK_EQUAL(g->numberLiberties, 1);
     
   b1.makeMove(Point(2, 0)); //Black
-  BOOST_CHECK_EQUAL(g->numLiberties(), 2);
+  BOOST_CHECK_EQUAL(g->numberLiberties, 2);
 }
 
 bool testHasLiberties(int stoneX, int stoneY, int adjStoneX, int adjStoneY)
