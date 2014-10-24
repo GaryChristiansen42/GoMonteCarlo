@@ -151,7 +151,7 @@ void Board::cloneGroupsInto(Board* b) {
   for(Group* g : blackGroups) {
     Group* gClone = new Group(Black);
     for(Point* p : g->stones) {
-      Point* pClone = &b->positions[p->row][p->column];// b->getPoint(&temp);
+      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)][static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
@@ -161,7 +161,7 @@ void Board::cloneGroupsInto(Board* b) {
   for(Group* g : whiteGroups) {
     Group* gClone = new Group(White);
     for(Point* p : g->stones) {
-      Point* pClone = &b->positions[p->row][p->column];// b->getPoint(&temp);
+      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)][static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
