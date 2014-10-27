@@ -209,7 +209,6 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
   clone->init();
 
   while (diffclock(end, start) < millaSecondsToThink) {
-    simulationCount++;
     i++;
 
     UCTNode* v = TreePolicy(root, engine);
@@ -229,6 +228,8 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
     clock_gettime(CLOCK_MONOTONIC, &end);
   }
   delete clone;
+
+  simulationCount.fetch_add(i);
   Log(std::to_string(i).c_str());
 }
 
