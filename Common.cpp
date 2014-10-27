@@ -18,13 +18,16 @@ void playerMove(UCTNode** currentNode, Board* b) {
   Point choice(-1, -1);
   while (!validInput) {
     printf("Row: ");
-    int tokensRead = scanf("%c", &choice.row);
+    int input;
+    int tokensRead = scanf("%d", &input);
+    choice.row = static_cast<unsigned char>(input);
     if (tokensRead != 1) {
       printf("Problem %d\n", tokensRead);
     }
 
     printf("Column: ");
-    tokensRead = scanf("%c", &choice.column);
+    tokensRead = scanf("%d", &input);
+    choice.column = static_cast<unsigned char>(input);
     if (tokensRead != 1) {
       printf("Problem %d\n", tokensRead);
     }
