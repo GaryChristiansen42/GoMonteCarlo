@@ -774,26 +774,24 @@ void Board::getPossibleMoves() {
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (positions[r][c].color == Empty
-        
-          && (positions[r][c].north->color == Empty
+          // !isSuicide(&positions[r][c], sameColor, oppositeColor)
+          && (positions[r][c].west->color == Empty
             || positions[r][c].east->color == Empty
+            || positions[r][c].north->color == Empty
             || positions[r][c].south->color == Empty
-            || positions[r][c].west->color == Empty
 
-            || (positions[r][c].north->group->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
-            || (positions[r][c].north->group->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
+            || (positions[r][c].west->group->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
+            || (positions[r][c].west->group->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
 
             || (positions[r][c].east->group->color == sameColor && positions[r][c].east->group->numberLiberties > 1)
             || (positions[r][c].east->group->color == oppositeColor && positions[r][c].east->group->numberLiberties == 1)
 
+            || (positions[r][c].north->group->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
+            || (positions[r][c].north->group->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
+
             || (positions[r][c].south->group->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
             || (positions[r][c].south->group->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
-
-            || (positions[r][c].west->group->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
-            || (positions[r][c].west->group->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
             )
-
-        // !isSuicide(&positions[r][c], sameColor, oppositeColor)
         && &positions[r][c] != koPoint) {
         legalMoves[numLegalMoves] = &positions[r][c];
         ++numLegalMoves;
