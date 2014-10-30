@@ -780,17 +780,17 @@ void Board::getPossibleMoves() {
             || positions[r][c].north->color == Empty
             || positions[r][c].south->color == Empty
 
-            || (positions[r][c].west->group->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
-            || (positions[r][c].west->group->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
+            || (positions[r][c].west->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
+            || (positions[r][c].west->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
 
-            || (positions[r][c].east->group->color == sameColor && positions[r][c].east->group->numberLiberties > 1)
-            || (positions[r][c].east->group->color == oppositeColor && positions[r][c].east->group->numberLiberties == 1)
+            || (positions[r][c].east->color == sameColor && positions[r][c].east->group->numberLiberties > 1)
+            || (positions[r][c].east->color == oppositeColor && positions[r][c].east->group->numberLiberties == 1)
 
-            || (positions[r][c].north->group->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
-            || (positions[r][c].north->group->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
+            || (positions[r][c].north->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
+            || (positions[r][c].north->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
 
-            || (positions[r][c].south->group->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
-            || (positions[r][c].south->group->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
+            || (positions[r][c].south->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
+            || (positions[r][c].south->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
             )
         && &positions[r][c] != koPoint) {
         legalMoves[numLegalMoves] = &positions[r][c];
