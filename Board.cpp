@@ -661,6 +661,7 @@ void Board::show() {
           boardString << "O ";
           break;
         default:
+          printf("Position[%d][%d] = %d", row, column, positions[row][column].color);
           assert(false);
         }
       }
@@ -768,13 +769,31 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
 void Board::getPossibleMoves() {
   Player sameColor = turn == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
-  numLegalMoves = 0;
-  legalMoves[numLegalMoves] = pass;
-  ++numLegalMoves;
+  legalMoves[0] = pass;
+  numLegalMoves = 1;
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (positions[r][c].color == Empty
-        && !isSuicide(&positions[r][c], sameColor, oppositeColor)
+        
+          && (positions[r][c].north->color == Empty
+            || positions[r][c].east->color == Empty
+            || positions[r][c].south->color == Empty
+            || positions[r][c].west->color == Empty
+
+            || (positions[r][c].north->group->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
+            || (positions[r][c].north->group->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
+
+            || (positions[r][c].east->group->color == sameColor && positions[r][c].east->group->numberLiberties > 1)
+            || (positions[r][c].east->group->color == oppositeColor && positions[r][c].east->group->numberLiberties == 1)
+
+            || (positions[r][c].south->group->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
+            || (positions[r][c].south->group->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
+
+            || (positions[r][c].west->group->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
+            || (positions[r][c].west->group->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
+            )
+
+        // !isSuicide(&positions[r][c], sameColor, oppositeColor)
         && &positions[r][c] != koPoint) {
         legalMoves[numLegalMoves] = &positions[r][c];
         ++numLegalMoves;
