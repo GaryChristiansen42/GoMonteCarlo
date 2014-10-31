@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE( testBoard )
 
   for(int i = 0; i < BOARD_SIZE; i++)
     for(int j = 0; j < BOARD_SIZE; j++)
-      BOOST_CHECK_EQUAL(b2.positions[i][j].color, Empty);
+      BOOST_CHECK_EQUAL(b2.positions[i*BOARD_SIZE + j].color, Empty);
   
   //Valid moves 
   for(int i = 0; i < BOARD_SIZE; i++)
@@ -89,9 +89,9 @@ BOOST_AUTO_TEST_CASE( testCornerCapture )
   b1.makeMove(Point(8,1)); //White
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0].color, Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0].color, Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0*BOARD_SIZE + 0].color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1*BOARD_SIZE + 0].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0*BOARD_SIZE + 1].color, Empty);
 }
 
 BOOST_AUTO_TEST_CASE( testBoardKo )
@@ -445,9 +445,9 @@ BOOST_AUTO_TEST_CASE( testGroup )
   b1.makeMove(Point(0,0)); //Black //Capture 1,0 0,1
   b1.makeMove(Point(8,2)); //White
   
-  BOOST_CHECK_EQUAL(b1.positions[0][0].color, Black);
-  BOOST_CHECK_EQUAL(b1.positions[1][0].color, Empty);
-  BOOST_CHECK_EQUAL(b1.positions[0][1].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0*BOARD_SIZE + 0].color, Black);
+  BOOST_CHECK_EQUAL(b1.positions[1*BOARD_SIZE + 0].color, Empty);
+  BOOST_CHECK_EQUAL(b1.positions[0*BOARD_SIZE + 1].color, Empty);
   
   BOOST_CHECK_EQUAL(b1.whiteGroups.size(), 1);
   BOOST_CHECK_EQUAL(b1.blackGroups.size(), 4);
@@ -629,10 +629,10 @@ BOOST_AUTO_TEST_CASE( testPattern3x3 )
   Board b1;
   b1.init();
   b1.makeMove(Point(1, 1));
-  p3x3 = Pattern3x3(&b1.positions[1][1]);
+  p3x3 = Pattern3x3(&b1.positions[1*BOARD_SIZE + 1]);
   BOOST_CHECK_EQUAL(p3x3.hash, "____B____");
 
-  p3x3 = Pattern3x3(&b1.positions[0][0]);
+  p3x3 = Pattern3x3(&b1.positions[0*BOARD_SIZE + 0]);
   BOOST_CHECK_EQUAL(p3x3.hash, "OOOO__O_B");
 
 
@@ -674,10 +674,10 @@ BOOST_AUTO_TEST_CASE( testPattern5x5 )
   Board b1;
   b1.init();
   b1.makeMove(Point(1, 1));
-  p5x5 = Pattern5x5(&b1.positions[1][1]);
+  p5x5 = Pattern5x5(&b1.positions[1*BOARD_SIZE + 1]);
   BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOO____O_B__O____O____");
 
-  p5x5 = Pattern5x5(&b1.positions[0][0]);
+  p5x5 = Pattern5x5(&b1.positions[0*BOARD_SIZE + 0]);
   BOOST_CHECK_EQUAL(p5x5.hash, "OOOOOOOOOOOO___OO_B_OO___");
 
 

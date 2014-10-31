@@ -79,13 +79,13 @@ Point* Pattern::getRandomGoodMove(Board* b, Point& move, std::default_random_eng
     return nullptr;
   std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
   int choice = dist(engine);
-  return &b->positions[goodMoves[choice].first+move.row][goodMoves[choice].second+move.column];
+  return &b->positions[(goodMoves[choice].first+move.row)*BOARD_SIZE + goodMoves[choice].second+move.column];
 }
 
 std::vector<Point*> Pattern::getGoodMoves(Board* b, Point& move) {
   std::vector<Point*> movesToReturn;
   for (auto p : goodMoves) {
-    movesToReturn.push_back(&b->positions[p.first+move.row][p.second+move.column]);
+    movesToReturn.push_back(&b->positions[(p.first+move.row)*BOARD_SIZE + p.second+move.column]);
   }
   return movesToReturn;
 }

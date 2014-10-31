@@ -47,30 +47,30 @@ void Board::init() {
   legalMoves[0] = pass;
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
-      positions[row][column].row = row;
-      positions[row][column].column = column;
-      legalMoves[numLegalMoves] = &positions[row][column];
+      positions[row*BOARD_SIZE + column].row = row;
+      positions[row*BOARD_SIZE + column].column = column;
+      legalMoves[numLegalMoves] = &positions[row*BOARD_SIZE + column];
       ++numLegalMoves;
     }
   }
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       if (row + 1 < BOARD_SIZE)
-        positions[row][column].north = &positions[row+1][column];
+        positions[row*BOARD_SIZE + column].north = &positions[(row+1)*BOARD_SIZE + column];
       else
-        positions[row][column].north = outOfBoundsPoint;
+        positions[row*BOARD_SIZE + column].north = outOfBoundsPoint;
       if (column + 1 < BOARD_SIZE)
-        positions[row][column].east = &positions[row][column+1];
+        positions[row*BOARD_SIZE + column].east = &positions[row*BOARD_SIZE + column+1];
       else
-        positions[row][column].east = outOfBoundsPoint;
+        positions[row*BOARD_SIZE + column].east = outOfBoundsPoint;
       if (row - 1 >= 0)
-        positions[row][column].south = &positions[row-1][column];
+        positions[row*BOARD_SIZE + column].south = &positions[(row-1)*BOARD_SIZE + column];
       else
-        positions[row][column].south = outOfBoundsPoint;
+        positions[row*BOARD_SIZE + column].south = outOfBoundsPoint;
       if (column - 1 >= 0)
-        positions[row][column].west = &positions[row][column-1];
+        positions[row*BOARD_SIZE + column].west = &positions[row*BOARD_SIZE + column-1];
       else
-        positions[row][column].west = outOfBoundsPoint;
+        positions[row*BOARD_SIZE + column].west = outOfBoundsPoint;
     }
   }
 }
@@ -78,7 +78,7 @@ void Board::init() {
 bool Board::operator==(const Board &b) {
   for (int row = 0; row < BOARD_SIZE; row++)
     for (int column = 0; column < BOARD_SIZE; column++)
-      if (positions[row][column] != b.positions[row][column])
+      if (positions[row*BOARD_SIZE + column] != b.positions[row*BOARD_SIZE + column])
         return false;
   if (secondLastMove == nullptr && b.secondLastMove == nullptr
     && !(*lastMove == *b.lastMove))
@@ -94,8 +94,8 @@ Board* Board::clone() {
 
   for (unsigned char row = 0; row < BOARD_SIZE; row++) {
     for (unsigned char column = 0; column < BOARD_SIZE; column++) {
-      b->positions[row][column].row = row;
-      b->positions[row][column].column = column;
+      b->positions[row*BOARD_SIZE + column].row = row;
+      b->positions[row*BOARD_SIZE + column].column = column;
     }
   }
 
@@ -107,29 +107,29 @@ Board* Board::clone() {
 void Board::cloneInto(Board* b) {
   for (unsigned char r = 0; r < BOARD_SIZE; r++) {
     for (unsigned char c = 0; c < BOARD_SIZE; c++) {
-      b->positions[r][c].group = nullptr;
-      b->positions[r][c].color = positions[r][c].color;
+      b->positions[r*BOARD_SIZE + c].group = nullptr;
+      b->positions[r*BOARD_SIZE + c].color = positions[r*BOARD_SIZE + c].color;
     }
   }
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (r + 1 < BOARD_SIZE)
-        b->positions[r][c].north = &b->positions[r+1][c];
+        b->positions[r*BOARD_SIZE + c].north = &b->positions[(r+1)*BOARD_SIZE + c];
       else
-        b->positions[r][c].north = outOfBoundsPoint;
+        b->positions[r*BOARD_SIZE + c].north = outOfBoundsPoint;
       if (c + 1 < BOARD_SIZE)
-        b->positions[r][c].east = &b->positions[r][c+1];
+        b->positions[r*BOARD_SIZE + c].east = &b->positions[r*BOARD_SIZE + c+1];
       else
-        b->positions[r][c].east = outOfBoundsPoint;
+        b->positions[r*BOARD_SIZE + c].east = outOfBoundsPoint;
       if (r - 1 >= 0)
-        b->positions[r][c].south = &b->positions[r-1][c];
+        b->positions[r*BOARD_SIZE + c].south = &b->positions[(r-1)*BOARD_SIZE + c];
       else
-        b->positions[r][c].south = outOfBoundsPoint;
+        b->positions[r*BOARD_SIZE + c].south = outOfBoundsPoint;
       if (c - 1 >= 0)
-        b->positions[r][c].west = &b->positions[r][c-1];
+        b->positions[r*BOARD_SIZE + c].west = &b->positions[r*BOARD_SIZE + c-1];
       else
-        b->positions[r][c].west = outOfBoundsPoint;
+        b->positions[r*BOARD_SIZE + c].west = outOfBoundsPoint;
     }
   }
 
@@ -151,7 +151,7 @@ void Board::cloneGroupsInto(Board* b) {
   for(Group* g : blackGroups) {
     Group* gClone = new Group(Black);
     for(Point* p : g->stones) {
-      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)][static_cast<unsigned int>(p->column)];
+      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)*BOARD_SIZE + static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
@@ -161,7 +161,7 @@ void Board::cloneGroupsInto(Board* b) {
   for(Group* g : whiteGroups) {
     Group* gClone = new Group(White);
     for(Point* p : g->stones) {
-      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)][static_cast<unsigned int>(p->column)];
+      Point* pClone = &b->positions[static_cast<unsigned int>(p->row)*BOARD_SIZE + static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
     }
@@ -187,9 +187,9 @@ bool Board::isValidMove(Point move) {
 void Board::getSimpleScore(float* whiteScore, float* blackScore) {
   for (int row = 0; row < BOARD_SIZE; row++) {
     for (int column = 0; column < BOARD_SIZE; column++) {
-      if (positions[row][column].color == White) {
+      if (positions[row*BOARD_SIZE + column].color == White) {
         *whiteScore = *whiteScore + 1;
-      } else if (positions[row][column].color == Black) {
+      } else if (positions[row*BOARD_SIZE + column].color == Black) {
         *blackScore = *blackScore + 1;
       }
     }
@@ -203,20 +203,20 @@ float Board::getTaylorScore(float komi) {
     // static_cast<float>(capturedBlack);
   for (int row = 0; row < BOARD_SIZE; ++row) {
     for (int column = 0; column < BOARD_SIZE; ++column) {
-      if (positions[row][column].marked) {
+      if (positions[row*BOARD_SIZE + column].marked) {
         // Already visited empty space territory
         continue;
-      } else if (positions[row][column].color == Black) {
+      } else if (positions[row*BOARD_SIZE + column].color == Black) {
         ++score;
         continue;
-      } else if (positions[row][column].color == White) {
+      } else if (positions[row*BOARD_SIZE + column].color == White) {
         --score;
         continue;
       }
 
       // Unseen empty space
       std::stack<Point*> s;
-      s.push(&positions[row][column]);
+      s.push(&positions[row*BOARD_SIZE + column]);
       bool adjacentToBlack = false;
       bool adjacentToWhite = false;
       int sizeOfEmptySpace = 0;
@@ -252,7 +252,7 @@ float Board::getTaylorScore(float komi) {
 
   for (int r = 0; r < BOARD_SIZE; ++r)
     for (int c = 0; c < BOARD_SIZE; ++c)
-      positions[r][c].marked = false;
+      positions[r*BOARD_SIZE + c].marked = false;
   return score;
 }
 
@@ -467,7 +467,7 @@ unsigned long int Board::getHash() {
   std::string s;
   for (int row = 0; row < BOARD_SIZE; row++)
     for (int column = 0; column < BOARD_SIZE; column++)
-      s += (char)positions[row][column].color;
+      s += (char)positions[row*BOARD_SIZE + column].color;
   std::hash<std::string> strHash;
   return strHash(s);
 }
@@ -647,7 +647,7 @@ void Board::show() {
         boardString << row << " ";//static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
           // << " ";
       } else {
-        switch (positions[row][column].color) {
+        switch (positions[row*BOARD_SIZE + column].color) {
         case 0:
           boardString << "- ";
           break;
@@ -661,7 +661,7 @@ void Board::show() {
           boardString << "O ";
           break;
         default:
-          printf("Position[%d][%d] = %d", row, column, positions[row][column].color);
+          printf("Position[%d][%d] = %d", row, column, positions[row*BOARD_SIZE + column].color);
           assert(false);
         }
       }
@@ -741,20 +741,20 @@ void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHash
 
 bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes) {
   std::string s;
-  for (int r = 0; r < BOARD_SIZE; r++) {
-    for (int c = 0; c < BOARD_SIZE; c++) {
-      if (p != &positions[r][c]) {
-        if (positions[r][c].group != nullptr
-          && positions[r][c].group->isAdjacent(p)
-          && positions[r][c].group->numberLiberties == 1) {
+  for (int i = 0; i < BOARD_SIZE; i++) {
+    // for (int c = 0; c < BOARD_SIZE; c++) {
+      if (p != &positions[i]) {
+        if (positions[i].group != nullptr
+          && positions[i].group->isAdjacent(p)
+          && positions[i].group->numberLiberties == 1) {
           s += (char)Empty;
         } else {
-          s += (char)positions[r][c].color;
+          s += (char)positions[i].color;
         }
       } else {
         s += (char)turn;
       }
-    }
+    // }
   }
   std::hash<std::string> strHash;
   unsigned long int pHash = strHash(s);
@@ -779,32 +779,32 @@ void Board::getPossibleMoves() {
 
   legalMoves[0] = pass;
   numLegalMoves = 1;
-  for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
-    for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
-      if (positions[r][c].color == Empty
+  for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
+    // for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
+      if (positions[i].color == Empty
           // !isSuicide(&positions[r][c], sameColor, oppositeColor)
-          &&  (positions[r][c].west->color == Empty
-            || positions[r][c].east->color == Empty
-            || positions[r][c].north->color == Empty
-            || positions[r][c].south->color == Empty
+          &&  (positions[i].west->color == Empty
+            || positions[i].east->color == Empty
+            || positions[i].north->color == Empty
+            || positions[i].south->color == Empty
 
-            || (positions[r][c].west->color == sameColor && positions[r][c].west->group->numberLiberties > 1)
-            || (positions[r][c].west->color == oppositeColor && positions[r][c].west->group->numberLiberties == 1)
+            || (positions[i].west->color == sameColor && positions[i].west->group->numberLiberties > 1)
+            || (positions[i].west->color == oppositeColor && positions[i].west->group->numberLiberties == 1)
 
-            || (positions[r][c].east->color == sameColor && positions[r][c].east->group->numberLiberties > 1)
-            || (positions[r][c].east->color == oppositeColor && positions[r][c].east->group->numberLiberties == 1)
+            || (positions[i].east->color == sameColor && positions[i].east->group->numberLiberties > 1)
+            || (positions[i].east->color == oppositeColor && positions[i].east->group->numberLiberties == 1)
 
-            || (positions[r][c].north->color == sameColor && positions[r][c].north->group->numberLiberties > 1)
-            || (positions[r][c].north->color == oppositeColor && positions[r][c].north->group->numberLiberties == 1)
+            || (positions[i].north->color == sameColor && positions[i].north->group->numberLiberties > 1)
+            || (positions[i].north->color == oppositeColor && positions[i].north->group->numberLiberties == 1)
 
-            || (positions[r][c].south->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
-            || (positions[r][c].south->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
+            || (positions[i].south->color == sameColor && positions[i].south->group->numberLiberties > 1)
+            || (positions[i].south->color == oppositeColor && positions[i].south->group->numberLiberties == 1)
             )
          ) { // && &positions[r][c] != koPoint) {
-        legalMoves[numLegalMoves] = &positions[r][c];
+        legalMoves[numLegalMoves] = &positions[i];
         ++numLegalMoves;
       }
-    }
+    // }
   }
 
   // To replace ko check
@@ -819,6 +819,6 @@ Point* Board::getPoint(Point *p) {
   } else if (*p == *pass) {
     return pass;
   } else {
-    return &positions[(unsigned char)p->row][(unsigned char)p->column];
+    return &positions[p->row*BOARD_SIZE + p->column];
   }
 }

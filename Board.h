@@ -14,7 +14,7 @@ class Group;
 
 class Board {
  public:
-  Point positions[BOARD_SIZE][BOARD_SIZE];
+  Point positions[BOARD_SIZE*BOARD_SIZE];
 
   Point* legalMoves[BOARD_SIZE*BOARD_SIZE+1];
   unsigned short numLegalMoves;

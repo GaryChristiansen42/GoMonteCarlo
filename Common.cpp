@@ -95,8 +95,8 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   // check if b == currentNode->state
   for (int row = 0; row < BOARD_SIZE; ++row)
     for (int column = 0; column < BOARD_SIZE; ++column)
-      if (b->positions[row][column]
-        != (*currentNode)->state->positions[row][column]) {
+      if (b->positions[row*BOARD_SIZE + column]
+        != (*currentNode)->state->positions[row*BOARD_SIZE + column]) {
         printf("Problem at %d %d\n", row, column);
       }
   if (!(*b == *(*currentNode)->state))

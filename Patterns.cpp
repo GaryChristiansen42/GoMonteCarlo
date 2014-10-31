@@ -310,7 +310,7 @@ bool legal(Board* b, Point* goodMove) {
       Player sameColor = b->turn == Black ? Black : White;
       Player oppositeColor = b->turn == Black ? White : Black;
       int r = goodMove->row, c = goodMove->column;
-      if (b->positions[r][c].color == Empty
+      if (b->positions[r*BOARD_SIZE + c].color == Empty
         && !b->isSuicide(goodMove, sameColor, oppositeColor)
         && goodMove != b->koPoint) {
         isLegal = true;
