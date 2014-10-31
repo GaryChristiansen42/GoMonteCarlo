@@ -642,10 +642,10 @@ void Board::show() {
       if (row == BOARD_SIZE && column == BOARD_SIZE) {
         boardString << "  ";
       } else if (row == BOARD_SIZE) {
-        boardString << column+1 << " ";
+        boardString << column << " ";
       } else if (column == BOARD_SIZE) {
-        boardString << static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
-          << " ";
+        boardString << row << " ";//static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
+          // << " ";
       } else {
         switch (positions[row][column].color) {
         case 0:
@@ -783,7 +783,7 @@ void Board::getPossibleMoves() {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
       if (positions[r][c].color == Empty
           // !isSuicide(&positions[r][c], sameColor, oppositeColor)
-          && (positions[r][c].west->color == Empty
+          &&  (positions[r][c].west->color == Empty
             || positions[r][c].east->color == Empty
             || positions[r][c].north->color == Empty
             || positions[r][c].south->color == Empty
