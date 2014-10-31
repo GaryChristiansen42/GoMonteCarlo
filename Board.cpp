@@ -769,6 +769,14 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
 void Board::getPossibleMoves() {
   Player sameColor = turn == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
+
+  // To replace ko check below
+  Player koColor;
+  if (koPoint != nullptr) {
+    koColor = koPoint->color;
+    koPoint->color = Black;
+  }
+
   legalMoves[0] = pass;
   numLegalMoves = 1;
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
@@ -792,12 +800,16 @@ void Board::getPossibleMoves() {
             || (positions[r][c].south->color == sameColor && positions[r][c].south->group->numberLiberties > 1)
             || (positions[r][c].south->color == oppositeColor && positions[r][c].south->group->numberLiberties == 1)
             )
-        && &positions[r][c] != koPoint) {
+         ) { // && &positions[r][c] != koPoint) {
         legalMoves[numLegalMoves] = &positions[r][c];
         ++numLegalMoves;
       }
     }
   }
+
+  // To replace ko check
+  if (koPoint != nullptr)
+    koPoint->color = koColor;
 }
 
 // TODO(GaryChristiansen): Don't use this in Board, just positions[row][column]
