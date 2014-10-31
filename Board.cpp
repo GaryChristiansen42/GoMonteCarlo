@@ -767,7 +767,7 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
 }
 
 void Board::getPossibleMoves() {
-  Player sameColor = turn == Black ? Black : White;
+  Player sameColor = turn; // == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
 
   // To replace ko check below
