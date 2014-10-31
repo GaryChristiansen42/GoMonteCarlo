@@ -16,11 +16,13 @@ void Log(const char* message) {
 void playerMove(UCTNode** currentNode, Board* b) {
   bool validInput = false;
   Point choice(-1, -1);
+  b->getPossibleMoves();
   while (!validInput) {
     printf("Row: ");
     int input;
     int tokensRead = scanf("%d", &input);
     choice.row = static_cast<unsigned char>(input);
+    printf("%c", choice.row);
     if (tokensRead != 1) {
       printf("Problem %d\n", tokensRead);
     }
@@ -28,6 +30,7 @@ void playerMove(UCTNode** currentNode, Board* b) {
     printf("Column: ");
     tokensRead = scanf("%d", &input);
     choice.column = static_cast<unsigned char>(input);
+    printf("%d", (int)choice.column);
     if (tokensRead != 1) {
       printf("Problem %d\n", tokensRead);
     }
@@ -43,7 +46,11 @@ void playerMove(UCTNode** currentNode, Board* b) {
   printf("Row: %d\nColumn: %d\n", choice.row, choice.column);
 
   b->makeMove(choice);
-  UCTNode* newCurrentNode = new UCTNode(choice, nullptr);
+  b->getPossibleMoves();
+  UCTNode* newCurrentNode = new UCTNode(choice, (*currentNode));
+  (*currentNode)->addChild(newCurrentNode);
+  newCurrentNode->init();
+  (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 }

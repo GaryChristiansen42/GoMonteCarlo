@@ -20,24 +20,25 @@ int main(void) {
   float millaSecondsToThink = 1000;
 
   Board* b = new Board();
+  b->init();
 
   UCTNode *currentNode;
   root = new UCTNode(Point(-1, -1), nullptr);
-  root->state = b;
+  root->state = b->clone();
   currentNode = root;
 
   b->show();
 
   Patterns patterns;
-  patterns.init(patternsFile3x3, patternsFile5x5);
+  // patterns.init(patternsFile3x3, patternsFile5x5);
 
   GameResult result = None;
   while (!b->isGameOver(&result)) {
-    if (b->turn == Black)
-      computerMove(&currentNode, b, numSimulations, millaSecondsToThink, &patterns);
+    if (b->turn == White)
+      computerMove(&currentNode, b, numSimulations, millaSecondsToThink, nullptr); // &patterns);
     else
-      computerMove(&currentNode, b, numSimulations, millaSecondsToThink, &patterns);
-      // playerMove(&currentNode, b);
+      // computerMove(&currentNode, b, numSimulations, millaSecondsToThink, nullptr); // &patterns);
+      playerMove(&currentNode, b);
       // randomMove(&currentNode, b);
     b->show();
   }
