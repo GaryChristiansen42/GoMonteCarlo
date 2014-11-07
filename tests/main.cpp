@@ -232,8 +232,7 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
   b1.makeMove(Point(2,0)); // White
   previousHashes.push_back(b1.getHash());
 
-  b1.eliminatePositionalSuperKo(previousHashes);
-  BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0)), false);
+  BOOST_CHECK_EQUAL(b1.isValidMove(Point(1,0), &previousHashes), false);
 
 
   // Shouldn't fail here
@@ -242,55 +241,55 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
 
   previousHashes.clear();
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(2,2)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(2,3)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(1,3)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(1,2)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(3,3)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(2,1)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(3,1)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(1,1)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(3,2)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(3,0)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(0,0)); // Black
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(2,4)); // White
   previousHashes.push_back(b2.getHash());
-  b2.eliminatePositionalSuperKo(previousHashes);
+  // b2.eliminatePositionalSuperKo(previousHashes);
 
   b2.makeMove(Point(1,4)); // Black
   previousHashes.push_back(b2.getHash());

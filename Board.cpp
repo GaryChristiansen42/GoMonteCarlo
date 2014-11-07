@@ -11,7 +11,7 @@
 #include <stack>
 
 Board::Board() :
-  numLegalMoves(0),
+  emptySpaces(std::vector<Point*>()),
   blackGroups(std::vector<Group*>()),
   whiteGroups(std::vector<Group*>()),
   lastMove(nullptr),
@@ -43,16 +43,16 @@ Board::~Board() {
 }
 
 void Board::init() {
-  numLegalMoves = 1;
-  legalMoves[0] = pass;
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       positions[row*BOARD_SIZE + column].row = row;
       positions[row*BOARD_SIZE + column].column = column;
-      legalMoves[numLegalMoves] = &positions[row*BOARD_SIZE + column];
-      ++numLegalMoves;
+
+      emptySpaces.push_back(&positions[row*BOARD_SIZE + column]);
     }
   }
+  emptySpaces.push_back(pass);
+
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       if (row + 1 < BOARD_SIZE)
@@ -105,12 +105,16 @@ Board* Board::clone() {
 }
 
 void Board::cloneInto(Board* b) {
+  b->emptySpaces.clear();
   for (unsigned char r = 0; r < BOARD_SIZE; r++) {
     for (unsigned char c = 0; c < BOARD_SIZE; c++) {
       b->positions[r*BOARD_SIZE + c].group = nullptr;
       b->positions[r*BOARD_SIZE + c].color = positions[r*BOARD_SIZE + c].color;
+      if (b->positions[r*BOARD_SIZE + c].color == Empty)
+        b->emptySpaces.push_back(&b->positions[r*BOARD_SIZE + c]);
     }
   }
+  b->emptySpaces.push_back(b->pass);
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
@@ -132,10 +136,6 @@ void Board::cloneInto(Board* b) {
         b->positions[r*BOARD_SIZE + c].west = outOfBoundsPoint;
     }
   }
-
-  for (unsigned short i = 0; i < numLegalMoves; ++i)
-    b->legalMoves[i] = b->getPoint(legalMoves[i]);
-  b->numLegalMoves = numLegalMoves;
 
   b->turn = turn;
 
@@ -170,14 +170,17 @@ void Board::cloneGroupsInto(Board* b) {
   }
 }
 
-bool Board::isValidMove(Point move) {
+bool Board::isValidMove(Point move, std::list<unsigned long int> *previousHashes) {
   if (move == *pass)
     return true;
   if (move.row < 0 || move.row >= BOARD_SIZE)
     return false;
   if (move.column < 0 || move.column >= BOARD_SIZE)
     return false;
-  for (unsigned short i = 0; i < numLegalMoves; ++i)
+  auto legalMoves = getPossibleMoves();
+  if (previousHashes != nullptr)
+    eliminatePositionalSuperKo(legalMoves, previousHashes);
+  for (unsigned short i = 0; i < legalMoves.size(); ++i)
     if (move == *legalMoves[i])
       return true;
   return false;
@@ -388,6 +391,9 @@ void Board::removeDeadStones(Point& move, Player color) {
       koPoint = *deadGroup->stones.begin();
     }
     numDeadStones += numStones;
+    for (auto stone : deadGroup->stones) {
+      emptySpaces.push_back(stone);
+    }
     deadGroup->removeStones();
 
     std::remove(firstGroups->begin(), firstGroups->end(), deadGroup);
@@ -549,69 +555,30 @@ void Board::makeMove(Point* move) {
   secondLastMove = lastMove;
   lastMove = move;
 
-  numLegalMoves = 0;
   #ifdef RUNNING_TESTS
     // testPossibleMoves(this);
   #endif
 }
 
 Point* Board::getRandomMove(std::default_random_engine& engine) {
-  // if (lastMove == pass)
-    // return pass;
-  // std::uniform_int_distribution<> distBoardSize(0, BOARD_SIZE*BOARD_SIZE);
-  // Player sameColor = turn == Black ? Black : White;
-  // Player oppositeColor = turn == Black ? White : Black;
-  // unsigned int index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
 
-  // unsigned int numTries = 0;
-  // before:
-  /*if (numTries == 50) {
-    std::vector<unsigned int> v;
-    v.push_back(BOARD_SIZE*BOARD_SIZE);
-    for (int j = 0; j < BOARD_SIZE*BOARD_SIZE; ++j)
-      if (positions[j/BOARD_SIZE][j%BOARD_SIZE].color == Empty)
-        v.push_back(j);
-    if (v.size() == 1)
-      return pass;
-    
-    int i = rand() % v.size();
-    beforeWithVectors:
-    if (v[i] == BOARD_SIZE*BOARD_SIZE)
-      return pass;
-    if (!(!isSuicide(&positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE], sameColor, oppositeColor)
-        && &positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE] != koPoint)) {
-      i = rand() % v.size();
-      ++numTries;
-      goto beforeWithVectors;
-    }
-    return &positions[v[i]/BOARD_SIZE][v[i]%BOARD_SIZE];
-    
-  }*/
-  // if (numTries == 1) { // Requires tuning
-    
-    getPossibleMoves();
-    std::uniform_int_distribution<> dist(0, numLegalMoves-1);
+  Player sameColor = turn; // == Black ? Black : White;
+  Player oppositeColor = turn == Black ? White : Black;
+
+  while (true) {
+    std::uniform_int_distribution<> dist(0, (unsigned int)(emptySpaces.size()-1));
     unsigned int choice = dist(engine);
-    return legalMoves[choice];
-  /*}
-  if (index == BOARD_SIZE*BOARD_SIZE)
-    return pass;
-  if (!(positions[index/BOARD_SIZE][index%BOARD_SIZE].color == Empty
-      && !isSuicide(&positions[index/BOARD_SIZE][index%BOARD_SIZE], sameColor, oppositeColor)
-      && &positions[index/BOARD_SIZE][index%BOARD_SIZE] != koPoint)) {
-    index = rand() % (BOARD_SIZE*BOARD_SIZE+1);
-    ++numTries;
-    goto before;
-  }*/
-
-  /*if (numLegalMoves == 0)
-    getPossibleMoves();
-  std::uniform_int_distribution<> dist(0, numLegalMoves-1);
-  unsigned int choice = dist(engine);
-  return legalMoves[choice];
-  */
-  // return &positions[index/BOARD_SIZE][index%BOARD_SIZE];
-
+    // unsigned int choice = rand()%emptySpaces.size();
+    if (emptySpaces[choice] == pass)
+      return pass;
+    if (emptySpaces[choice]->color != Empty) {
+      emptySpaces[choice] = emptySpaces[emptySpaces.size()-1];
+      emptySpaces.pop_back();
+    }
+    else if (!isSuicide(emptySpaces[choice], sameColor, oppositeColor)
+      && emptySpaces[choice] != koPoint)
+      return emptySpaces[choice];
+  }
 }
 
 void Board::makeRandomMove(std::default_random_engine& engine) {
@@ -729,11 +696,11 @@ bool Board::isSuicide(Point* move, const Player &sameColor, const Player &opposi
   }
 }*/
 
-void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHashes) {
-  for (unsigned short i = 0; i < numLegalMoves; ++i) {
-    if (isPositionalSuperKo(legalMoves[i], previousHashes)) {
-      legalMoves[i] = legalMoves[numLegalMoves-1];
-      numLegalMoves--;
+void Board::eliminatePositionalSuperKo(std::vector<Point*> &legalMoves, std::list<unsigned long int> *previousHashes) {
+  for (unsigned short i = 0; i < legalMoves.size(); ++i) {
+    if (isPositionalSuperKo(legalMoves[i], *previousHashes)) {
+      legalMoves[i] = legalMoves[legalMoves.size()-1];
+      legalMoves.pop_back();
       i--;
     }
   }
@@ -741,20 +708,18 @@ void Board::eliminatePositionalSuperKo(std::list<unsigned long int> previousHash
 
 bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes) {
   std::string s;
-  for (int i = 0; i < BOARD_SIZE; i++) {
-    // for (int c = 0; c < BOARD_SIZE; c++) {
-      if (p != &positions[i]) {
-        if (positions[i].group != nullptr
-          && positions[i].group->isAdjacent(p)
-          && positions[i].group->numberLiberties == 1) {
-          s += (char)Empty;
-        } else {
-          s += (char)positions[i].color;
-        }
+  for (int i = 0; i < BOARD_SIZE*BOARD_SIZE; i++) {
+    if (p != &positions[i]) {
+      if (positions[i].group != nullptr
+        && positions[i].group->isAdjacent(p)
+        && positions[i].group->numberLiberties == 1) {
+        s += (char)Empty;
       } else {
-        s += (char)turn;
+        s += (char)positions[i].color;
       }
-    // }
+    } else {
+      s += (char)turn;
+    }
   }
   std::hash<std::string> strHash;
   unsigned long int pHash = strHash(s);
@@ -766,50 +731,48 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
   return false;
 }
 
-void Board::getPossibleMoves() {
+std::vector<Point*> Board::getPossibleMoves() {
   Player sameColor = turn; // == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
 
   // To replace ko check below
-  Player koColor;
+  Player koColor = Empty;
   if (koPoint != nullptr) {
     koColor = koPoint->color;
     koPoint->color = Black;
   }
 
-  legalMoves[0] = pass;
-  numLegalMoves = 1;
+  std::vector<Point*> legalMoves;
+  legalMoves.push_back(pass);
   for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
-    // for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
-      if (positions[i].color == Empty
-          // !isSuicide(&positions[r][c], sameColor, oppositeColor)
-          &&  (positions[i].west->color == Empty
-            || positions[i].east->color == Empty
-            || positions[i].north->color == Empty
-            || positions[i].south->color == Empty
+    if (positions[i].color == Empty
+        // !isSuicide(&positions[r][c], sameColor, oppositeColor)
+        &&  (positions[i].west->color == Empty
+          || positions[i].east->color == Empty
+          || positions[i].north->color == Empty
+          || positions[i].south->color == Empty
 
-            || (positions[i].west->color == sameColor && positions[i].west->group->numberLiberties > 1)
-            || (positions[i].west->color == oppositeColor && positions[i].west->group->numberLiberties == 1)
+          || (positions[i].west->color == sameColor && positions[i].west->group->numberLiberties > 1)
+          || (positions[i].west->color == oppositeColor && positions[i].west->group->numberLiberties == 1)
 
-            || (positions[i].east->color == sameColor && positions[i].east->group->numberLiberties > 1)
-            || (positions[i].east->color == oppositeColor && positions[i].east->group->numberLiberties == 1)
+          || (positions[i].east->color == sameColor && positions[i].east->group->numberLiberties > 1)
+          || (positions[i].east->color == oppositeColor && positions[i].east->group->numberLiberties == 1)
 
-            || (positions[i].north->color == sameColor && positions[i].north->group->numberLiberties > 1)
-            || (positions[i].north->color == oppositeColor && positions[i].north->group->numberLiberties == 1)
+          || (positions[i].north->color == sameColor && positions[i].north->group->numberLiberties > 1)
+          || (positions[i].north->color == oppositeColor && positions[i].north->group->numberLiberties == 1)
 
-            || (positions[i].south->color == sameColor && positions[i].south->group->numberLiberties > 1)
-            || (positions[i].south->color == oppositeColor && positions[i].south->group->numberLiberties == 1)
-            )
-         ) { // && &positions[r][c] != koPoint) {
-        legalMoves[numLegalMoves] = &positions[i];
-        ++numLegalMoves;
-      }
-    // }
+          || (positions[i].south->color == sameColor && positions[i].south->group->numberLiberties > 1)
+          || (positions[i].south->color == oppositeColor && positions[i].south->group->numberLiberties == 1)
+          )
+       ) { // && &positions[r][c] != koPoint) {
+      legalMoves.push_back(&positions[i]);
+    }
   }
 
   // To replace ko check
   if (koPoint != nullptr)
     koPoint->color = koColor;
+  return legalMoves;
 }
 
 // TODO(GaryChristiansen): Don't use this in Board, just positions[row][column]

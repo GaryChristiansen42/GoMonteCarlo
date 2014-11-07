@@ -69,9 +69,9 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == nullptr) {
-    node->state->getPossibleMoves();
-    for (unsigned short i = 0; i < node->state->numLegalMoves; ++i) {
-      UCTNode* child = new UCTNode(*node->state->legalMoves[i], node);
+    auto legalMoves = node->state->getPossibleMoves();
+    for (unsigned short i = 0; i < legalMoves.size(); ++i) {
+      UCTNode* child = new UCTNode(*legalMoves[i], node);
       node->possibleChildren.push_back(child);
     }
 
