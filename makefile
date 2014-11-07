@@ -1,5 +1,5 @@
 CC=g++ -pthread -march=native -mtune=native #-fvpt -fbranch-probabilities -fpeel-loops -D_GLIBCXX_PROFILE 
-CFLAGS=-c -Ofast -funroll-loops -std=c++0x -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -std=c++0x -Ofast -ftree-vectorize -funroll-loops -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
