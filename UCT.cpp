@@ -120,14 +120,7 @@ UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
   return node;
 }
 
-int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clone, Patterns* patterns) {
-  for (Group* g : clone->blackGroups)
-    delete g;
-  clone->blackGroups.clear();
-  for (Group* g : clone->whiteGroups)
-    delete g;
-  clone->whiteGroups.clear();
-
+int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Patterns* patterns) {
   auto state = node->getState();
   auto startingTurn = state->turn;
 
@@ -164,18 +157,15 @@ void backup(UCTNode* v, int reward) {
 }
 
 UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
-  Board* clone = new Board();
-  clone->init();
   std::default_random_engine engine(time(nullptr));
   for (int i = 0; i < numSimulations; i++) {
     UCTNode* v = TreePolicy(root, engine);
-    int reward = DefaultPolicy(engine, v, clone, patterns);
+    int reward = DefaultPolicy(engine, v, patterns);
     backup(v, reward);
 
     if (i % 1000 == 0 && i != 0)
       printf("%d\n", i);
   }
-  delete clone;
 
   UCTNode* best = root->child;
   UCTNode* next = root->child;
@@ -205,15 +195,13 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
   int i = 0;
 
   std::default_random_engine engine(time(nullptr));
-  Board* clone = new Board();
-  clone->init();
 
   while (diffclock(end, start) < millaSecondsToThink) {
     i++;
 
     UCTNode* v = TreePolicy(root, engine);
 
-    int reward = DefaultPolicy(engine, v, clone, patterns);
+    int reward = DefaultPolicy(engine, v, patterns);
 
     backup(v, reward);
 
@@ -227,7 +215,6 @@ void runSimulationThread(UCTNode* root, int millaSecondsToThink, Patterns* patte
     // end = clock();
     clock_gettime(CLOCK_MONOTONIC, &end);
   }
-  delete clone;
 
   simulationCount.fetch_add(i);
   Log(std::to_string(i).c_str());
