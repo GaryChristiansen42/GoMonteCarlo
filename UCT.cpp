@@ -129,6 +129,7 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clon
   clone->whiteGroups.clear();
 
   auto state = node->getState();
+  auto startingTurn = state->turn;
 
   GameResult r;
   if (patterns != nullptr && patterns->initialized)
@@ -136,7 +137,7 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clon
   else
     r = state->playRandomGame(engine);
 
-  if ((node->getState()->turn == Black ? White : Black) == static_cast<int>(r))
+  if ((startingTurn == Black ? White : Black) == static_cast<int>(r))
     return 1;
   else if (r != Draw)
     return -1;
