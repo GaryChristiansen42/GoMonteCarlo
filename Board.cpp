@@ -105,15 +105,14 @@ Board* Board::clone() {
 }
 
 void Board::cloneInto(Board* b) {
-  b->emptySpaces.clear();
-  for (unsigned char r = 0; r < BOARD_SIZE; r++) {
-    for (unsigned char c = 0; c < BOARD_SIZE; c++) {
-      b->positions[r*BOARD_SIZE + c].group = nullptr;
-      b->positions[r*BOARD_SIZE + c].color = positions[r*BOARD_SIZE + c].color;
-      if (b->positions[r*BOARD_SIZE + c].color == Empty)
-        b->emptySpaces.push_back(&b->positions[r*BOARD_SIZE + c]);
-    }
+  for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; i++) {
+    b->positions[i].group = nullptr;
+    b->positions[i].color = positions[i].color;
   }
+  b->emptySpaces.clear();
+  b->emptySpaces.reserve(emptySpaces.size());
+  for (auto& emptySpace : emptySpaces)
+    b->emptySpaces.push_back(b->getPoint(emptySpace));
   b->emptySpaces.push_back(b->pass);
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
