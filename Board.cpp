@@ -113,7 +113,6 @@ void Board::cloneInto(Board* b) {
   b->emptySpaces.reserve(emptySpaces.size());
   for (auto& emptySpace : emptySpaces)
     b->emptySpaces.push_back(b->getPoint(emptySpace));
-  b->emptySpaces.push_back(b->pass);
 
   for (unsigned char r = 0; r < BOARD_SIZE; ++r) {
     for (unsigned char c = 0; c < BOARD_SIZE; ++c) {
