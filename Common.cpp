@@ -7,6 +7,8 @@
 #include "Board.h"
 #include "UCT.h"
 
+std::default_random_engine engine(time(nullptr));
+
 void Log(const char* message) {
   std::ofstream file("log.txt", std::ios::app);
   file << message << '\n';
@@ -49,7 +51,6 @@ void playerMove(UCTNode** currentNode, Board* b) {
   b->getPossibleMoves();
   UCTNode* newCurrentNode = new UCTNode(choice, (*currentNode));
   (*currentNode)->addChild(newCurrentNode);
-  newCurrentNode->init();
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
@@ -96,11 +97,12 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   for (int row = 0; row < BOARD_SIZE; ++row)
     for (int column = 0; column < BOARD_SIZE; ++column)
       if (b->positions[row*BOARD_SIZE + column]
-        != (*currentNode)->state->positions[row*BOARD_SIZE + column]) {
+        != (*currentNode)->getState()->positions[row*BOARD_SIZE + column]) {
         printf("Problem at %d %d\n", row, column);
       }
-  if (!(*b == *(*currentNode)->state))
+  if (!(*b == *(*currentNode)->getState()))
     assert(false);
+  
 
   /*ofstream myfile;
   myfile.open ("tree.txt");
@@ -109,15 +111,12 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
 }
 
 void randomMove(UCTNode** currentNode, Board* b) {
-  std::default_random_engine engine(time(nullptr));
-
   Point* chosenMove = b->getRandomMove(engine);
 
   b->makeMove(*chosenMove);
   UCTNode* newCurrentNode = new UCTNode(*chosenMove, nullptr);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
-  (*currentNode)->state = b->clone();
 
 }
 

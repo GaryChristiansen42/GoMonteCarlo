@@ -69,7 +69,8 @@ UCTNode* bestChild(UCTNode* node) {
 UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   node->mutex.lock();
   if (node->possibleChildren.empty() && node->child == nullptr) {
-    auto legalMoves = node->state->getPossibleMoves();
+    auto state = node->getState();
+    auto legalMoves = state->getPossibleMoves();
     for (unsigned short i = 0; i < legalMoves.size(); ++i) {
       UCTNode* child = new UCTNode(*legalMoves[i], node);
       node->possibleChildren.push_back(child);
@@ -96,15 +97,13 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
     node->possibleChildren[choice] = node->possibleChildren.back();
     node->possibleChildren.pop_back();
     node->mutex.unlock();
-    if (chosenChild->visits == 0)
-      chosenChild->init();
     return chosenChild;
   //  }
 }
 
 UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
-  GameResult r;
-  while (!node->state->isGameOver(&r)) {  // Not terminal
+  Point passPoint(BOARD_SIZE, BOARD_SIZE);
+  while (!(node->move == passPoint && node->parent != nullptr && node->parent->move != passPoint)) {  // Not terminal
     UCTNode* newChild = getNewChild(node, engine);
     if (newChild != nullptr) {
       node->addChild(newChild);
@@ -129,15 +128,15 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Board* clon
     delete g;
   clone->whiteGroups.clear();
 
-  node->state->cloneInto(clone);
+  auto state = node->getState();
 
   GameResult r;
   if (patterns != nullptr && patterns->initialized)
-    r = clone->playGame(patterns, engine);
+    r = state->playGame(patterns, engine);
   else
-    r = clone->playRandomGame(engine);
+    r = state->playRandomGame(engine);
 
-  if ((node->state->turn == Black ? White : Black) == static_cast<int>(r))
+  if ((node->getState()->turn == Black ? White : Black) == static_cast<int>(r))
     return 1;
   else if (r != Draw)
     return -1;

@@ -56,6 +56,7 @@ int main(void) {
   float komi = 0;
   // PlayerType player1 = WithPatterns1000Sims;
   PlayerType player1 = RandomPlayer;
+  // PlayerType player1 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player1 = MyMonteCarlo1Second;
   PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
@@ -70,8 +71,8 @@ int main(void) {
         printf("\nTrial Number: %d\n", i);
       Board* b = new Board();
       b->init();
+      UCTNode::rootState = b;
       UCTNode *node = new UCTNode(Point(-1, -1), nullptr);
-      node->state = b->clone();
 
       GameResult r;
       while (!b->isGameOver(&r)) {
@@ -121,7 +122,7 @@ int main(void) {
           assert(false);
           break;
         }
-        // b->show();
+        b->show();
       }
 
       if (static_cast<Player>(r) == Black) {

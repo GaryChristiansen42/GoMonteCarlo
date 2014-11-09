@@ -17,14 +17,14 @@ int main(void) {
   printf("Go MonteCarloAI\n");
 
   int numSimulations = 0;
-  float millaSecondsToThink = 1000;
+  float millaSecondsToThink = 15000;
 
   Board* b = new Board();
   b->init();
 
   UCTNode *currentNode;
   root = new UCTNode(Point(-1, -1), nullptr);
-  root->state = b->clone();
+  UCTNode::rootState = b;
   currentNode = root;
 
   b->show();

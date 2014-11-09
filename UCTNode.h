@@ -1,6 +1,7 @@
 #ifndef UCTNODE_H_
 #define UCTNODE_H_
 
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -10,7 +11,8 @@
 struct UCTNode {
   Point move;
 
-  Board* state;
+  static Board* rootState;
+
 
   UCTNode* bestNode;
   UCTNode* child;
@@ -28,7 +30,7 @@ struct UCTNode {
   UCTNode operator=(const UCTNode& n);
   ~UCTNode();
 
-  void init();
+  std::unique_ptr<Board> getState();
 
   void addChild(UCTNode* newChild);
   void removeChild(UCTNode* childToRemove);

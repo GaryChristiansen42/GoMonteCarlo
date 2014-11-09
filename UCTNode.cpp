@@ -2,17 +2,21 @@
 
 #include <stddef.h>
 #include <assert.h>
+
+#include <stack>
 #include <vector>
 
+#include "Board.h"
+
+Board* UCTNode::rootState = nullptr;
+
 UCTNode::UCTNode(Point newMove, UCTNode* newParent) :
-  move(newMove), state(nullptr), bestNode(nullptr), child(nullptr), sibling(nullptr),
+  move(newMove), bestNode(nullptr), child(nullptr), sibling(nullptr),
   parent(newParent), possibleChildren(std::vector<UCTNode*>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
 
 UCTNode::~UCTNode() {
-  if (state)
-    delete state;
   if (child)
     delete child;
   if (sibling)
@@ -22,11 +26,20 @@ UCTNode::~UCTNode() {
     delete possibleChildren[i];
 }
 
-void UCTNode::init() {
-  mutex.lock();
-  state = parent->state->clone();
-  state->makeMove(*parent->state->getPoint(&move));
-  mutex.unlock();
+std::unique_ptr<Board> UCTNode::getState() {
+  std::unique_ptr<Board> state(UCTNode::rootState->clone());
+  std::stack<Point> moves;
+
+  auto node = this;
+  while (node->parent != nullptr) {
+    moves.push(node->move);
+    node = node->parent;
+  }
+  while (moves.size() > 0) {
+    state->makeMove(moves.top());
+    moves.pop();
+  }
+  return state;
 }
 
 void UCTNode::addChild(UCTNode* newChild) {
