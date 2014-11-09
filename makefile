@@ -1,5 +1,5 @@
 CC=g++ -pthread -march=native -mtune=native #-fvpt -fbranch-probabilities -fpeel-loops -D_GLIBCXX_PROFILE 
-CFLAGS=-c -std=c++0x -Ofast -ftree-vectorize -funroll-loops -Wall -Wextra -Weffc++ -Werror -pedantic \
+CFLAGS=-c -g -std=c++0x -Ofast -ftree-vectorize -funroll-loops -Wall -Wextra -Weffc++ -Werror -pedantic \
 	-Wdisabled-optimization -Wcast-align \
 	-Wcast-qual -Wchar-subscripts -Wcomment -Wconversion \
 	-Wfloat-equal -Wformat -Wformat=2 \
@@ -71,3 +71,15 @@ Common.o: Common.cpp
 
 clean:
 	rm -rf  *.o GoMonteCarlo CheckStrength Benchmark
+
+callgrind:
+	valgrind --tool=callgrind ./Benchmark
+
+leakcheck:
+	valgrind --leak-check=full ./Benchmark
+
+massif:
+	valgrind --tool=massif --stacks=yes ./Benchmark && ms_print massif.out.* | less
+
+test:
+	cd tests && $(MAKE) && ./TestGoMonteCarlo && cd ..
