@@ -15,8 +15,7 @@ Group::~Group() {
 void Group::addStone(Point& p) {
   p.group = this;
   stones.push_back(&p);
-  p.decrementNeighborGroups();
-/*
+
   if (!(p.north->color != Empty
     || (p.north->north->group == this)
     || (p.north->east->group == this)
@@ -37,7 +36,6 @@ void Group::addStone(Point& p) {
     || (p.west->south->group == this)
     || (p.west->west->group == this)))
     numberLiberties++;
-    */
 }
 
 void Group::removeStones() {
