@@ -7,7 +7,6 @@
 
 #include <atomic>
 #include <cstdlib>
-#include <mutex>
 #include <random>
 #include <thread>
 
@@ -20,8 +19,6 @@
 
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
-std::mutex treePolicyMutex;
-std::mutex backUpMutex;
 std::atomic<int> simulationCount;
 
 
