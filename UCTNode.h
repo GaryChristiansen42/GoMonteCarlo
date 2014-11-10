@@ -10,21 +10,20 @@
 
 struct UCTNode {
 
+  static Board* rootState;
+
   unsigned char row;
   unsigned char column;
 
-  static Board* rootState;
 
-
-  UCTNode* bestNode;
   UCTNode* child;
   UCTNode* sibling;
   UCTNode* parent;
 
   std::vector<UCTNode*> possibleChildren;
 
-  double totalRewards;
-  int visits;
+  long totalRewards;
+  long visits;
   std::mutex mutex;
 
   UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent);

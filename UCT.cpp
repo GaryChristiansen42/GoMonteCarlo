@@ -32,7 +32,7 @@ double diffclock(timespec start, timespec finish) {
 }
 
 void printNode(UCTNode* n, char* spaces) {
-  printf("%sn(%d %d) V %d R %f\n", spaces, n->row, n->column,
+  printf("%sn(%d %d) V %ld R %ld\n", spaces, n->row, n->column,
     n->visits, n->totalRewards);
   // std::cout << spaces << "n (" << n->move.row << " " << n->move.column
     // << ") V " << n->visits << " R " << n->totalRewards << std::endl;
@@ -54,8 +54,8 @@ UCTNode* bestChild(UCTNode* node) {
   double bestScore = -100000;
   UCTNode* next = node->child;
   while (next != nullptr) {
-    double uctScore = next->totalRewards / next->visits
-      + c*sqrt((2*log(static_cast<float>(node->visits))) / next->visits);
+    double uctScore = (double)(next->totalRewards) / (double)(next->visits)
+      + c*sqrt((2*log(static_cast<float>(node->visits))) / (double)(next->visits));
     if (bestScore < uctScore) {
       bestChild = next;
       bestScore = uctScore;
@@ -249,9 +249,9 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
 
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
-    "Thought for %d simulations.\nR: %f V: %d\nR/V: %f\t%d %d",
+    "Thought for %d simulations.\nR: %ld V: %ld\nR/V: %f\t%d %d",
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
-    static_cast<double>(best->totalRewards/best->visits), best->row, best->column);
+    static_cast<double>((double)(best->totalRewards)/(double)(best->visits)), best->row, best->column);
   Log(buffer);
   if (patterns != nullptr) {
     snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);

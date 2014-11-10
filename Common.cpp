@@ -69,7 +69,7 @@ void showTree(UCTNode* node, int numTabs, int maxDepth) {
   printTabs(numTabs);
   printf("\tMove: %d %d\n", node->row, node->column);
   printTabs(numTabs);
-  printf("\tRewards/Visits: %f %d\n", node->totalRewards, node->visits);
+  printf("\tRewards/Visits: %ld %ld\n", node->totalRewards, node->visits);
   printTabs(numTabs);
   // (*file) << "Wins: " << root->wins
   // << " Losses: " << root->losses << " Visits: " << root->visits << endl;

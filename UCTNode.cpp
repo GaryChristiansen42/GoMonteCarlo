@@ -11,7 +11,7 @@
 Board* UCTNode::rootState = nullptr;
 
 UCTNode::UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent) :
-  row(newRow), column(newColumn), bestNode(nullptr), child(nullptr), sibling(nullptr),
+  row(newRow), column(newColumn), child(nullptr), sibling(nullptr),
   parent(newParent), possibleChildren(std::vector<UCTNode*>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
