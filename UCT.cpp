@@ -51,7 +51,7 @@ UCTNode* bestChild(UCTNode* node) {
   const double c = 1;  // / sqrt(static_cast<float>(2));
   // const double c = 1;
   UCTNode* bestChild = node->child;
-  double bestScore = -100000;
+  double bestScore = std::numeric_limits<double>::lowest();
   UCTNode* next = node->child;
   while (next != nullptr) {
     double uctScore = (double)(next->totalRewards) / (double)(next->visits)
