@@ -32,7 +32,7 @@ double diffclock(timespec start, timespec finish) {
 }
 
 void printNode(UCTNode* n, char* spaces) {
-  printf("%sn(%d %d) V %d R %f\n", spaces, n->move.row, n->move.column,
+  printf("%sn(%d %d) V %d R %f\n", spaces, n->row, n->column,
     n->visits, n->totalRewards);
   // std::cout << spaces << "n (" << n->move.row << " " << n->move.column
     // << ") V " << n->visits << " R " << n->totalRewards << std::endl;
@@ -72,12 +72,11 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
     auto state = node->getState();
     auto legalMoves = state->getPossibleMoves();
     for (unsigned short i = 0; i < legalMoves.size(); ++i) {
-      UCTNode* child = new UCTNode(*legalMoves[i], node);
+      UCTNode* child = new UCTNode(legalMoves[i]->row, legalMoves[i]->column, node);
       node->possibleChildren.push_back(child);
     }
 
-    Point pass(BOARD_SIZE, BOARD_SIZE);
-    UCTNode* passChild = new UCTNode(pass, node);
+    UCTNode* passChild = new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
     node->possibleChildren.push_back(passChild);
   }
 
@@ -103,7 +102,8 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
 
 UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
   Point passPoint(BOARD_SIZE, BOARD_SIZE);
-  while (!(node->move == passPoint && node->parent != nullptr && node->parent->move != passPoint)) {  // Not terminal
+  while (!(node->row == passPoint.row && node->column == passPoint.column && node->parent != nullptr 
+        && node->parent->row == passPoint.row && node->parent->column == passPoint.column)) {  // Not terminal
     UCTNode* newChild = getNewChild(node, engine);
     if (newChild != nullptr) {
       node->addChild(newChild);
@@ -112,11 +112,11 @@ UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
       node = bestChild(node);
     }
   }
-  Point pass(BOARD_SIZE, BOARD_SIZE);
+  /*Point pass(BOARD_SIZE, BOARD_SIZE);
   if (node->move != pass
     && node->move.color != Empty) {
     assert(false);
-  }
+  }*/
   return node;
 }
 
@@ -175,15 +175,11 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
     next = next->sibling;
   }
 
-  Point pass(BOARD_SIZE, BOARD_SIZE);
+  /*Point pass(BOARD_SIZE, BOARD_SIZE);
   if (!(best->move == pass)
     && best->move.color != Empty) {
     assert(false);
-  }
-  if (!(best->move == pass)
-    && best->move.color != Empty) {
-    assert(false);
-  }
+  }*/
   return best;
 }
 
@@ -242,21 +238,20 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
     next = next->sibling;
   }
 
-  Point pass(BOARD_SIZE, BOARD_SIZE);
-  if (!(best->move == pass)
+  // if (!(best->row == BOARD_SIZE && best->column == BOARD_SIZE)) {
+    // && best->move.color != Empty) {
+    // assert(false);
+  // }
+  /*if (!(best->move == pass)
     && best->move.color != Empty) {
     assert(false);
-  }
-  if (!(best->move == pass)
-    && best->move.color != Empty) {
-    assert(false);
-  }
+  }*/
 
   char buffer[100];
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %f V: %d\nR/V: %f\t%d %d",
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
-    static_cast<double>(best->totalRewards/best->visits), best->move.row, best->move.column);
+    static_cast<double>(best->totalRewards/best->visits), best->row, best->column);
   Log(buffer);
   if (patterns != nullptr) {
     snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);

@@ -49,7 +49,7 @@ void playerMove(UCTNode** currentNode, Board* b) {
 
   b->makeMove(choice);
   b->getPossibleMoves();
-  UCTNode* newCurrentNode = new UCTNode(choice, (*currentNode));
+  UCTNode* newCurrentNode = new UCTNode(choice.row, choice.column, (*currentNode));
   (*currentNode)->addChild(newCurrentNode);
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -67,7 +67,7 @@ void showTree(UCTNode* node, int numTabs, int maxDepth) {
   printTabs(numTabs);
   printf("Node\n");
   printTabs(numTabs);
-  printf("\tMove: %d %d\n", node->move.row, node->move.column);
+  printf("\tMove: %d %d\n", node->row, node->column);
   printTabs(numTabs);
   printf("\tRewards/Visits: %f %d\n", node->totalRewards, node->visits);
   printTabs(numTabs);
@@ -92,7 +92,7 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   delete (*currentNode);
 
   (*currentNode) = newCurrentNode;
-  b->makeMove((*currentNode)->move);
+  b->makeMove(Point((*currentNode)->row, (*currentNode)->column));
   // check if b == currentNode->state
   auto state = (*currentNode)->getState();
   for (int row = 0; row < BOARD_SIZE; ++row)
@@ -115,7 +115,7 @@ void randomMove(UCTNode** currentNode, Board* b) {
   Point* chosenMove = b->getRandomMove(engine);
 
   b->makeMove(*chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(*chosenMove, nullptr);
+  UCTNode* newCurrentNode = new UCTNode(chosenMove->row, chosenMove->column, nullptr);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
 

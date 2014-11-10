@@ -9,7 +9,9 @@
 #include "Board.h"
 
 struct UCTNode {
-  Point move;
+
+  unsigned char row;
+  unsigned char column;
 
   static Board* rootState;
 
@@ -25,7 +27,7 @@ struct UCTNode {
   int visits;
   std::mutex mutex;
 
-  UCTNode(Point newMove, UCTNode* newParent);
+  UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent);
   UCTNode(const UCTNode& n);
   UCTNode operator=(const UCTNode& n);
   ~UCTNode();

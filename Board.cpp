@@ -43,6 +43,7 @@ Board::~Board() {
 }
 
 void Board::init() {
+  emptySpaces.reserve(BOARD_SIZE*BOARD_SIZE+1);
   for (unsigned char row = 0; row < BOARD_SIZE; ++row) {
     for (unsigned char column = 0; column < BOARD_SIZE; ++column) {
       positions[row*BOARD_SIZE + column].row = row;

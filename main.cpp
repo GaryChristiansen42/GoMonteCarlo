@@ -23,7 +23,7 @@ int main(void) {
   b->init();
 
   UCTNode *currentNode;
-  root = new UCTNode(Point(-1, -1), nullptr);
+  root = new UCTNode(-1, -1, nullptr);
   UCTNode::rootState = b;
   currentNode = root;
 

@@ -20,7 +20,7 @@ int main(void) {
   Board* b = new Board();
   b->init();
   UCTNode::rootState = b;
-  UCTNode *node = new UCTNode(Point(-1, -1), nullptr);
+  UCTNode *node = new UCTNode(1, -1, nullptr);
 
   GameResult r;
   while (!b->isGameOver(&r)) {

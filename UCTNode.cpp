@@ -10,8 +10,8 @@
 
 Board* UCTNode::rootState = nullptr;
 
-UCTNode::UCTNode(Point newMove, UCTNode* newParent) :
-  move(newMove), bestNode(nullptr), child(nullptr), sibling(nullptr),
+UCTNode::UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent) :
+  row(newRow), column(newColumn), bestNode(nullptr), child(nullptr), sibling(nullptr),
   parent(newParent), possibleChildren(std::vector<UCTNode*>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
@@ -32,7 +32,7 @@ std::unique_ptr<Board> UCTNode::getState() {
 
   auto node = this;
   while (node->parent != nullptr) {
-    moves.push(node->move);
+    moves.push(Point(node->row, node->column));
     node = node->parent;
   }
   while (moves.size() > 0) {
@@ -80,7 +80,7 @@ bool UCTNode::isChild(Point nodeMove) {
   mutex.lock();
   UCTNode* next = child;
   while (next != nullptr) {
-    if (next->move.row == nodeMove.row && next->move.column == nodeMove.column) {
+    if (next->row == nodeMove.row && next->column == nodeMove.column) {
       mutex.unlock();
       return true;
     }

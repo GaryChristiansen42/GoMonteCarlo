@@ -55,8 +55,8 @@ int main(void) {
   // int numSimulations = 1000;
   float komi = 0;
   // PlayerType player1 = WithPatterns1000Sims;
-  PlayerType player1 = RandomPlayer;
-  // PlayerType player1 = MyMonteCarlo14AndHalfSeconds;
+  // PlayerType player1 = RandomPlayer;
+  PlayerType player1 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player1 = MyMonteCarlo1Second;
   PlayerType player2 = MyMonteCarlo14AndHalfSeconds;
   // PlayerType player2 = MyMonteCarlo1Second;
@@ -72,7 +72,7 @@ int main(void) {
       Board* b = new Board();
       b->init();
       UCTNode::rootState = b;
-      UCTNode *node = new UCTNode(Point(-1, -1), nullptr);
+      UCTNode *node = new UCTNode(1, -1, nullptr);
 
       GameResult r;
       while (!b->isGameOver(&r)) {
