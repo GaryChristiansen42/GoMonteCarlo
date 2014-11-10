@@ -76,7 +76,7 @@ void UCTNode::removeChild(UCTNode* childToRemove) {
   assert(false);
 }
 
-bool UCTNode::isChild(Point nodeMove) {
+/*bool UCTNode::isChild(Point nodeMove) {
   mutex.lock();
   UCTNode* next = child;
   while (next != nullptr) {
@@ -88,4 +88,4 @@ bool UCTNode::isChild(Point nodeMove) {
   }
   mutex.unlock();
   return false;
-}
+}*/

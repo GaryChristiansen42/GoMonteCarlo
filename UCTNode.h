@@ -36,6 +36,6 @@ struct UCTNode {
   void addChild(UCTNode* newChild);
   void removeChild(UCTNode* childToRemove);
 
-  bool isChild(Point nodeMove);
+  // bool isChild(Point nodeMove);
 };
 #endif  // UCTNODE_H_
