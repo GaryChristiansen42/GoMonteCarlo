@@ -203,58 +203,55 @@ float Board::getTaylorScore(float komi) {
   float score = -komi;  // score = blackScore - whiteScore
   // score += static_cast<float>(capturedWhite) -
     // static_cast<float>(capturedBlack);
-  for (int row = 0; row < BOARD_SIZE; ++row) {
-    for (int column = 0; column < BOARD_SIZE; ++column) {
-      if (positions[row*BOARD_SIZE + column].marked) {
-        // Already visited empty space territory
-        continue;
-      } else if (positions[row*BOARD_SIZE + column].color == Black) {
-        ++score;
-        continue;
-      } else if (positions[row*BOARD_SIZE + column].color == White) {
-        --score;
-        continue;
-      }
+  for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
+    if (positions[i].marked) {
+      // Already visited empty space territory
+      continue;
+    } else if (positions[i].color == Black) {
+      ++score;
+      continue;
+    } else if (positions[i].color == White) {
+      --score;
+      continue;
+    }
 
-      // Unseen empty space
-      std::stack<Point*> s;
-      s.push(&positions[row*BOARD_SIZE + column]);
-      bool adjacentToBlack = false;
-      bool adjacentToWhite = false;
-      int sizeOfEmptySpace = 0;
-      while (!s.empty()) {
-        Point *p = s.top();
-        s.pop();
-        if (p->color == Black) {
-          adjacentToBlack = true;
-        } else if (p->color == White) {
-          adjacentToWhite = true;
-        } else if (p->color == Empty && !p->marked) {
-          if (!p->north->marked)
-            s.push(p->north);
-          if (!p->east->marked)
-            s.push(p->east);
-          if (!p->south->marked)
-            s.push(p->south);
-          if (!p->west->marked)
-            s.push(p->west);
-          sizeOfEmptySpace++;
+    // Unseen empty space
+    std::stack<Point*> s;
+    s.push(&positions[i]);
+    bool adjacentToBlack = false;
+    bool adjacentToWhite = false;
+    int sizeOfEmptySpace = 0;
+    while (!s.empty()) {
+      Point *p = s.top();
+      s.pop();
+      if (p->color == Black) {
+        adjacentToBlack = true;
+      } else if (p->color == White) {
+        adjacentToWhite = true;
+      } else if (p->color == Empty && !p->marked) {
+        if (!p->north->marked)
+          s.push(p->north);
+        if (!p->east->marked)
+          s.push(p->east);
+        if (!p->south->marked)
+          s.push(p->south);
+        if (!p->west->marked)
+          s.push(p->west);
+        sizeOfEmptySpace++;
 
-          p->marked = true;
-        }
+        p->marked = true;
       }
+    }
 
-      if (adjacentToBlack && !adjacentToWhite) {
-        score += static_cast<float>(sizeOfEmptySpace);
-      } else if (!adjacentToBlack && adjacentToWhite) {
-        score -= static_cast<float>(sizeOfEmptySpace);
-      }
+    if (adjacentToBlack && !adjacentToWhite) {
+      score += static_cast<float>(sizeOfEmptySpace);
+    } else if (!adjacentToBlack && adjacentToWhite) {
+      score -= static_cast<float>(sizeOfEmptySpace);
     }
   }
 
-  for (int r = 0; r < BOARD_SIZE; ++r)
-    for (int c = 0; c < BOARD_SIZE; ++c)
-      positions[r*BOARD_SIZE + c].marked = false;
+  for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i)
+    positions[i].marked = false;
   return score;
 }
 
