@@ -69,12 +69,8 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
     auto state = node->getState();
     auto legalMoves = state->getPossibleMoves();
     for (unsigned short i = 0; i < legalMoves.size(); ++i) {
-      UCTNode* child = new UCTNode(legalMoves[i]->row, legalMoves[i]->column, node);
-      node->possibleChildren.push_back(child);
+      node->possibleChildren.push_back((unsigned short)(legalMoves[i]->row*BOARD_SIZE + legalMoves[i]->column));
     }
-
-    UCTNode* passChild = new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
-    node->possibleChildren.push_back(passChild);
   }
 
   if (node->possibleChildren.size() == 0) {
@@ -85,7 +81,7 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   // {
     std::uniform_int_distribution<> dist(0, (int)node->possibleChildren.size()-1);
     unsigned int choice = dist(engine);
-    UCTNode* chosenChild = node->possibleChildren[choice];
+    auto chosenChildIndex = node->possibleChildren[choice];
     // for(unsigned int i = 0; i < possibleChildren.size(); i++)
     //  if(i != choice)
     //    delete possibleChildren[i];
@@ -93,7 +89,10 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
     node->possibleChildren[choice] = node->possibleChildren.back();
     node->possibleChildren.pop_back();
     node->mutex.unlock();
-    return chosenChild;
+    if (chosenChildIndex == BOARD_SIZE*BOARD_SIZE + BOARD_SIZE)
+      return new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
+    else
+      return new UCTNode((unsigned char)(chosenChildIndex/BOARD_SIZE), (unsigned char)(chosenChildIndex%BOARD_SIZE), node);
   //  }
 }
 

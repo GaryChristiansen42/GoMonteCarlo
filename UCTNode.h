@@ -20,7 +20,7 @@ struct UCTNode {
   UCTNode* sibling;
   UCTNode* parent;
 
-  std::vector<UCTNode*> possibleChildren;
+  std::vector<unsigned short> possibleChildren;
 
   long totalRewards;
   long visits;

@@ -12,7 +12,7 @@ Board* UCTNode::rootState = nullptr;
 
 UCTNode::UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent) :
   row(newRow), column(newColumn), child(nullptr), sibling(nullptr),
-  parent(newParent), possibleChildren(std::vector<UCTNode*>()),
+  parent(newParent), possibleChildren(std::vector<unsigned short>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
 
@@ -21,9 +21,6 @@ UCTNode::~UCTNode() {
     delete child;
   if (sibling)
     delete sibling;
-
-  for (unsigned int i = 0; i < possibleChildren.size(); i++)
-    delete possibleChildren[i];
 }
 
 std::unique_ptr<Board> UCTNode::getState() {
