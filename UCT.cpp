@@ -77,23 +77,17 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
     node->mutex.unlock();
     return nullptr;
   }
-  // else //Pick random child
-  // {
-    std::uniform_int_distribution<> dist(0, (int)node->possibleChildren.size()-1);
-    unsigned int choice = dist(engine);
-    auto chosenChildIndex = node->possibleChildren[choice];
-    // for(unsigned int i = 0; i < possibleChildren.size(); i++)
-    //  if(i != choice)
-    //    delete possibleChildren[i];
-    // node->possibleChildren.erase(&node->possibleChildren.begin()+choice);
-    node->possibleChildren[choice] = node->possibleChildren.back();
-    node->possibleChildren.pop_back();
-    node->mutex.unlock();
-    if (chosenChildIndex == BOARD_SIZE*BOARD_SIZE + BOARD_SIZE)
-      return new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
-    else
-      return new UCTNode((unsigned char)(chosenChildIndex/BOARD_SIZE), (unsigned char)(chosenChildIndex%BOARD_SIZE), node);
-  //  }
+
+  std::uniform_int_distribution<> dist(0, (int)node->possibleChildren.size()-1);
+  unsigned int choice = dist(engine);
+  auto chosenChildIndex = node->possibleChildren[choice];
+  node->possibleChildren[choice] = node->possibleChildren.back();
+  node->possibleChildren.pop_back();
+  node->mutex.unlock();
+  if (chosenChildIndex == BOARD_SIZE*BOARD_SIZE + BOARD_SIZE)
+    return new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
+  else
+    return new UCTNode((unsigned char)(chosenChildIndex/BOARD_SIZE), (unsigned char)(chosenChildIndex%BOARD_SIZE), node);
 }
 
 UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
