@@ -333,14 +333,20 @@ void Board::updateStructures(Point& move) {
   }
 
   if (numGroupsToCombine > 1) {
+    Group* largest = groupsToCombine[0];
+    for (unsigned char i = 1; i < numGroupsToCombine; ++i)
+      if (largest->stones.size() < groupsToCombine[i]->stones.size())
+        largest = groupsToCombine[i];
+
     for (unsigned char i = 0; i < numGroupsToCombine; ++i) {
       Group* g = groupsToCombine[i];
-      if (g == move.group) {  // move's group will survive, others removed
+      if (g == largest) {  // move's group will survive, others removed
         continue;
       }
 
-      for (auto& x : g->stones)
-        move.group->addStone(*x);
+      for (auto& x : g->stones) {
+        largest->addStone(*x);
+      }
       g->stones.clear();
 
       std::remove(groupsSameColor->begin(), groupsSameColor->end(), g);
