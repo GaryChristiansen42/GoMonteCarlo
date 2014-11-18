@@ -19,8 +19,8 @@ CFLAGS=-c -g -std=c++0x -Ofast -funroll-loops -Wall -Wextra -Weffc++ -Werror -pe
 	-Wvolatile-register-var  -Wwrite-strings \
 	#-Wpadded -Wunsafe-loop-optimizations 
 
-GTPClient: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o -o GTPClient -lrt
+GTPClient: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o -o GTPClient -lrt 
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -42,6 +42,18 @@ Board.o: ../Board.cpp
 
 Common.o: ../Common.cpp
 	$(CC) $(CFLAGS) ../Common.cpp
+
+Pattern3x3.o: ../Pattern3x3.cpp
+	$(CC) $(CFLAGS) ../Pattern3x3.cpp
+
+Pattern5x5.o: ../Pattern5x5.cpp
+	$(CC) $(CFLAGS) ../Pattern5x5.cpp
+
+Pattern.o: ../Pattern.cpp
+	$(CC) $(CFLAGS) ../Pattern.cpp
+
+Patterns.o: ../Patterns.cpp
+	$(CC) $(CFLAGS) ../Patterns.cpp
 
 clean:
 	rm -rf  *.o GTPClient

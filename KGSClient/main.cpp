@@ -10,7 +10,7 @@
 #include "../Common.h"
 
 //UCTNode *currentMove;
-float millaSecondsToThink = 14500;
+float millaSecondsToThink = 1000;
 char name[] = "TestGoBot";
 char version[] = "3.5.11";
 
@@ -29,9 +29,15 @@ void switchTurnTo(Player color) {
 Player readColor() {
   char colorStr[10];
   std::cin >> colorStr;
+  Log("readColor");
+  Log(colorStr);
   if (!strcmp(colorStr, "w")) {
     return White;
   } else if (!strcmp(colorStr, "b")) {
+    return Black;
+  } else if (!strcmp(colorStr, "white")) {
+    return White;
+  } else if (!strcmp(colorStr, "black")) {
     return Black;
   } else {
     printf("? Unknown Player color\n");
@@ -59,10 +65,12 @@ void doPlay() {
 
   char moveStr[10];
   std::cin >> moveStr;
+  Log("moveStr");
+  Log(moveStr);
   unsigned char row = BOARD_SIZE, column = BOARD_SIZE;
   if (strcmp(moveStr, "pass")) {
-    row = (unsigned char)(moveStr[0] - 'a');
-    if (moveStr[0] >= 'i') {
+    row = (unsigned char)(toupper(moveStr[0]) - 'A');
+    if (toupper(moveStr[0]) >= 'I') {
       row--;
     }
     column = (unsigned char)(atoi(moveStr+1)-1);
@@ -85,15 +93,14 @@ void doGenMove() {
 
   switchTurnTo(color);
 
-  b->eliminatePositionalSuperKo(previousHashes);
+  // b->eliminatePositionalSuperKo(previousHashes);
 
-  UCTNode* currentMove = new UCTNode(Point(-1, -1), nullptr);
-  currentMove->state = b->clone();
-  UCTNode* bestMoveNode = UCTSearch(currentMove, millaSecondsToThink);
-  if ((1.0*bestMoveNode->totalRewards)/bestMoveNode->visits < (-0.9)) {
+  UCTNode* currentMove = new UCTNode(-1, -1, nullptr);
+  UCTNode* bestMoveNode = UCTSearch(currentMove, millaSecondsToThink, nullptr);
+  if ((1.0*((double)bestMoveNode->totalRewards))/((double)bestMoveNode->visits) < (-0.9)) {
     printf("= resign\n\n");
   } else {
-    Point bestMove = bestMoveNode->move;
+    Point bestMove = Point(bestMoveNode->row, bestMoveNode->column);
     char* output = pointToKGSPosition(bestMove);
     printf("= %s\n\n", output);
     delete output;
@@ -119,6 +126,7 @@ void doBoardSize() {
   previousHashes.clear();
   b = new Board();
   b->init();
+  UCTNode::rootState = b;
 
   previousHashes.push_back(b->getHash());
 
@@ -128,6 +136,7 @@ void doBoardSize() {
 int main() {
   b = new Board();
   b->init();
+  UCTNode::rootState = b;
 
   previousHashes.push_back(b->getHash());
   //currentMove = new UCTNode(Point(-1, -1), b, nullptr);
@@ -163,6 +172,12 @@ int main() {
       Log(throwaway);
     } else if (!strcmp(command, "genmove")) {
       doGenMove();
+    } else if (!strcmp(command, "genmove_black")) {
+      b->turn = Black;
+      doGenMove();
+    } else if (!strcmp(command, "genmove_white")) {
+      b->turn = White;
+      doGenMove();
     } else if (!strcmp(command, "kgs-genmove_cleanup")) {
       doGenMove();
     } else if (!strcmp(command, "komi")) {
@@ -174,11 +189,14 @@ int main() {
       printf("clear_board\n");
       printf("final_status_list\n");
       printf("genmove\n");
+      printf("genmove_black\n");
+      printf("genmove_white\n");
       printf("kgs-genmove_cleanup\n");
       printf("komi\n");
       printf("list_commands\n");
       printf("name\n");
       printf("play\n");
+      printf("protocol_version\n");
       printf("quit\n");
       printf("time_left\n");
       printf("version\n");
@@ -187,18 +205,21 @@ int main() {
       printf("= %s\n\n", name);
     } else if (!strcmp(command, "play")) {
       doPlay();
+    } else if (!strcmp(command, "protocol_version")) {
+      printf("= %s\n\n", version);
     } else if (!strcmp(command, "quit")) {
       printf("= \n\n");
+      exit(0);
     } else if (!strcmp(command, "special")) {
       // printf("%d\n", b->isSuicide(Point(4,1)));
       printf("%d %d\n", b->koPoint->row, b->koPoint->column);
-    } else if (!strcmp(command, "show_board")) {
-      b->show();
-      printf("\n\n");
+    } else if (!strcmp(command, "show_board") || !strcmp(command, "showboard")) {
+      printf("= \n");
+      printf("\n");
     } else if (!strcmp(command, "show_moves")) {
-      b->getPossibleMoves();
-      for (int i = 0; i < b->numLegalMoves; i++)
-        printf("%d%d ", b->legalMoves[i]->row, b->legalMoves[i]->column);
+      auto legalMoves = b->getPossibleMoves();
+      for (unsigned int i = 0; i < legalMoves.size(); i++)
+        printf("%d%d ", legalMoves[i]->row, legalMoves[i]->column);
       printf("\n\n");
     } else if (!strcmp(command, "time_left")) {
       char throwawayColor[10];
