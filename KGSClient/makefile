@@ -19,8 +19,8 @@ CFLAGS=-c -g -std=c++0x -Ofast -funroll-loops -Wall -Wextra -Weffc++ -Werror -pe
 	-Wvolatile-register-var  -Wwrite-strings \
 	#-Wpadded -Wunsafe-loop-optimizations 
 
-GTPClient: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o
-	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o -o GTPClient -lrt 
+GTPClient: main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o GnuGoInterface.o
+	$(CC) main.o UCTNode.o UCT.o Point.o Group.o Board.o Common.o Patterns.o Pattern.o Pattern3x3.o Pattern5x5.o GnuGoInterface.o -o GTPClient -lrt 
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
@@ -54,6 +54,9 @@ Pattern.o: ../Pattern.cpp
 
 Patterns.o: ../Patterns.cpp
 	$(CC) $(CFLAGS) ../Patterns.cpp
+
+GnuGoInterface.o: GnuGoInterface.cpp
+	$(CC) $(CFLAGS) GnuGoInterface.cpp
 
 clean:
 	rm -rf  *.o GTPClient

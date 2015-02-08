@@ -4,13 +4,18 @@
 #include <string.h>
 #include <cstdlib>
 #include <fstream>
+#include <sstream>
 #include <unistd.h>
 
 #include "../UCT.h"
 #include "../Common.h"
 
+#include "GnuGoInterface.h"
+
+// #define USING_TOP_MOVES
+
 //UCTNode *currentMove;
-float millaSecondsToThink = 1000;
+float millaSecondsToThink = 14500;
 char name[] = "TestGoBot";
 char version[] = "3.5.11";
 
@@ -57,6 +62,17 @@ char* pointToKGSPosition(Point p) {
       rowChar, p.column+1);
   return buffer;
 }
+Point KGSPositionToPoint(const char* position) {
+  Point p;
+  if (strcmp(position, "pass")) {
+    p.row = (unsigned char)(toupper(position[0]) - 'A');
+    if (toupper(position[0]) >= 'I') {
+      p.row--;
+    }
+    p.column = (unsigned char)(atoi(position+1)-1);
+  }
+  return p;
+}
 
 void doPlay() {
   Player color = readColor();
@@ -67,22 +83,21 @@ void doPlay() {
   std::cin >> moveStr;
   Log("moveStr");
   Log(moveStr);
-  unsigned char row = BOARD_SIZE, column = BOARD_SIZE;
-  if (strcmp(moveStr, "pass")) {
-    row = (unsigned char)(toupper(moveStr[0]) - 'A');
-    if (toupper(moveStr[0]) >= 'I') {
-      row--;
-    }
-    column = (unsigned char)(atoi(moveStr+1)-1);
-  }
-
+  Point p = KGSPositionToPoint(moveStr);
+  
   switchTurnTo(color);
-  b->makeMove(Point(row, column));
+  b->makeMove(p);
   previousHashes.push_back(b->getHash());
   printf("=\n\n");
 
+#ifdef USING_TOP_MOVES
+  std::string gnugoMessage = "play " + (color == Black ? std::string("b") : std::string("w")) + " " + moveStr;
+  GnuGoSend(gnugoMessage);
+  GnuGoReceive();
+#endif
+
   char buffer[100];
-  sprintf(buffer, "Play %d at %d %d", color, row, column);
+  sprintf(buffer, "Play %d at %d %d", color, p.row, p.column);
   Log(buffer);
 }
 
@@ -96,6 +111,27 @@ void doGenMove() {
   // b->eliminatePositionalSuperKo(previousHashes);
 
   UCTNode* currentMove = new UCTNode(-1, -1, nullptr);
+
+#ifdef USING_TOP_MOVES
+  GnuGoSend(std::string("top_moves_") + (color == Black ? std::string("black") : std::string("white")));
+  auto response = GnuGoReceive(); // takes form of "= F3 16.77 E4 16.55 G4 16.55"
+
+  std::string buf;
+  std::stringstream ss(response);
+  std::vector<std::string> tokens;
+
+  while (ss >> buf)
+    tokens.push_back(buf);
+
+  for (unsigned int i = 1; i < tokens.size(); i += 2) {
+    // printf("%s\n", tokens[i].c_str());
+    Point p = KGSPositionToPoint(tokens[i].c_str());
+    currentMove->possibleChildren.push_back((unsigned short)(p.row*BOARD_SIZE + p.column));
+  }
+#endif 
+
+
+
   UCTNode* bestMoveNode = UCTSearch(currentMove, millaSecondsToThink, nullptr);
   if ((1.0*((double)bestMoveNode->totalRewards))/((double)bestMoveNode->visits) < (-0.9)) {
     printf("= resign\n\n");
@@ -103,6 +139,13 @@ void doGenMove() {
     Point bestMove = Point(bestMoveNode->row, bestMoveNode->column);
     char* output = pointToKGSPosition(bestMove);
     printf("= %s\n\n", output);
+
+#ifdef USING_TOP_MOVES
+    std::string gnugoMessage = "play " + (color == Black ? std::string("b") : std::string("w")) + " " + output;
+    GnuGoSend(gnugoMessage);
+    GnuGoReceive();
+#endif
+
     delete output;
 
     char buffer[100];
@@ -112,6 +155,7 @@ void doGenMove() {
     b->makeMove(bestMove);
     previousHashes.push_back(b->getHash());
   }   
+
   // Takes a long time, print out message to send to server first
   usleep(1000);
   delete currentMove;
@@ -130,6 +174,11 @@ void doBoardSize() {
 
   previousHashes.push_back(b->getHash());
 
+#ifdef USING_TOP_MOVES
+  GnuGoSend(std::string("boardsize ") + std::to_string(boardSize));
+  GnuGoReceive();
+#endif
+
   printf("= \n\n");
 }
 
@@ -140,6 +189,10 @@ int main() {
 
   previousHashes.push_back(b->getHash());
   //currentMove = new UCTNode(Point(-1, -1), b, nullptr);
+
+#ifdef USING_TOP_MOVES
+  GnuGoSetup();
+#endif
 
   while (true) {
     char command[128];
@@ -155,6 +208,10 @@ int main() {
       b->init();
       printf("= \n\n");
     } else if (!strcmp(command, "exit")) {
+#ifdef USING_TOP_MOVES
+      GnuGoCleanup();
+#endif
+
       exit(0);
     } else if (!strcmp(command, "final_status_list")) {
       char throwaway[200];
@@ -205,15 +262,31 @@ int main() {
       printf("= %s\n\n", name);
     } else if (!strcmp(command, "play")) {
       doPlay();
+#ifdef USING_TOP_MOVES
+      GnuGoSend("showboard");
+      Log(GnuGoReceiveBoard().c_str());
+#endif
     } else if (!strcmp(command, "protocol_version")) {
       printf("= %s\n\n", version);
     } else if (!strcmp(command, "quit")) {
       printf("= \n\n");
+#ifdef USING_TOP_MOVES
+      GnuGoCleanup();
+#endif
+
       exit(0);
     } else if (!strcmp(command, "special")) {
       // printf("%d\n", b->isSuicide(Point(4,1)));
-      printf("%d %d\n", b->koPoint->row, b->koPoint->column);
+      // printf("%d %d\n", b->koPoint->row, b->koPoint->column);
+      GnuGoSend("top_moves_black");
+      printf("%s", GnuGoReceive().c_str());
     } else if (!strcmp(command, "show_board") || !strcmp(command, "showboard")) {
+      /*b->show();
+#ifdef USING_TOP_MOVES
+      GnuGoSend("showboard");
+      printf("%s\n", GnuGoReceiveBoard().c_str());
+#endif
+      */
       printf("= \n");
       printf("\n");
     } else if (!strcmp(command, "show_moves")) {
