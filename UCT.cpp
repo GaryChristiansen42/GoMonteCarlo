@@ -17,6 +17,8 @@
 #define snprintf _snprintf
 #endif
 
+// #define RANK_SEARCH_BY_DISTANCE_AMOUNT 0.075
+
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
 std::atomic<int> simulationCount;
@@ -45,6 +47,7 @@ void printNode(UCTNode* n, char* spaces) {
 
 UCTNode* bestChild(UCTNode* node) {
   node->mutex.lock();
+
   const double c = 1;  // / sqrt(static_cast<float>(2));
   // const double c = 1;
   UCTNode* bestChild = node->child;
@@ -53,6 +56,11 @@ UCTNode* bestChild(UCTNode* node) {
   while (next != nullptr) {
     double uctScore = (double)(next->totalRewards) / (double)(next->visits)
       + c*sqrt((2*log(static_cast<float>(node->visits))) / (double)(next->visits));
+#ifdef RANK_SEARCH_BY_DISTANCE_AMOUNT
+    double distance = sqrt(pow(node->row - next->row, 2) + pow(node->column - next->column, 2));
+    if (distance <= 5.0)
+      uctScore += RANK_SEARCH_BY_DISTANCE_AMOUNT;
+#endif
     if (bestScore < uctScore) {
       bestChild = next;
       bestScore = uctScore;
