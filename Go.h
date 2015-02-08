@@ -1,7 +1,7 @@
 #ifndef GO_H_
 #define GO_H_
 
-#define BOARD_SIZE 19
+#define BOARD_SIZE 9
 
 enum GameResult {
   None = -1,
