@@ -1,29 +1,33 @@
 #include "GnuGoInterface.h"
-#include "../Common.h"
-#include "../Go.h"
 
 #include <unistd.h>
 
-int commpipe[4] = { 1, 2, 3, 4};        /* This holds the fd for the input & output of the pipe */
+#include <string>
+
+#include "../Common.h"
+#include "../Go.h"
+
+// This holds the fd for the input & output of the pipe
+int commpipe[4] = { 1, 2, 3, 4};
 
 void GnuGoSetup() {
   pid_t pid;
 
-  if(pipe(commpipe)){
-    fprintf(stderr,"Pipe error!\n");
+  if (pipe(commpipe)) {
+    fprintf(stderr, "Pipe error!\n");
     exit(1);
   }
-  if(pipe(commpipe+2)){
-    fprintf(stderr,"Pipe error!\n");
+  if (pipe(commpipe+2)) {
+    fprintf(stderr, "Pipe error!\n");
     exit(1);
   }
 
-  if( (pid=fork()) == -1){
-    fprintf(stderr,"Fork error. Exiting.\n");  /* something went wrong */
-    exit(1);        
+  if ((pid=fork()) == -1) {
+    fprintf(stderr, "Fork error. Exiting.\n");  /* something went wrong */
+    exit(1);
   }
 
-  if(pid) {
+  if (pid) {
     /* A positive (non-negative) PID indicates the parent process */
     // dup2(commpipe[2],0);    /* Replace stdin with in side of the pipe */
     // dup2(commpipe[1],1);    /* Replace stdout with out side of the pipe */
@@ -31,9 +35,9 @@ void GnuGoSetup() {
 
   } else {
     /* A zero PID indicates that this is the child process */
-    dup2(commpipe[0],0);    /* Replace stdin with the in side of the pipe */
-    dup2(commpipe[3],1);    /* Replace stdout with the out side of the pipe */
-    setvbuf(stdout,(char*)NULL,_IONBF,0);   /* Set non-buffered output on stdout */
+    dup2(commpipe[0], 0);    /* Replace stdin with the in side of the pipe */
+    dup2(commpipe[3], 1);    /* Replace stdout with the out side of the pipe */
+    setvbuf(stdout, (char*)NULL, _IONBF, 0);   /* Set non-buffered output on stdout */
     // close(commpipe[1]);     /* Close unused side of pipe (out side) */
     /* Replace the child fork with a new process */
 
@@ -57,10 +61,10 @@ void GnuGoSetup() {
     // return 0;
     // write(commpipe[0], "showboard\n", 10);
     */
-    if(execl("/usr/games/gnugo","gnugo", "--mode", "gtp", NULL) == -1){
+    if (execl("/usr/games/gnugo", "gnugo", "--mode", "gtp", NULL) == -1) {
     // if(execl("/bin/ls","ls", "-al", NULL) == -1){
     // if(execl("test","test", NULL) == -1){
-      fprintf(stderr,"execl Error!");
+      fprintf(stderr, "execl Error!");
       exit(1);
     }
   }
