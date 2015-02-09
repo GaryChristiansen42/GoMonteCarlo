@@ -43,4 +43,4 @@ class Patterns {
 
   Point* getMove(Board& b, std::default_random_engine& engine);
 };
-#endif  // PATTERN_H_
+#endif  // PATTERNS_H_

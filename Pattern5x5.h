@@ -1,12 +1,12 @@
-#ifndef PATTERN_5X5_H_
-#define PATTERN_5X5_H_
+#ifndef PATTERN5X5_H_
+#define PATTERN5X5_H_
 
 #include "Pattern.h"
 
 class Pattern5x5 : public Pattern {
  public:
   Pattern5x5();
-  Pattern5x5(Point* p);
+  explicit Pattern5x5(Point* p);
 
   void rotate90();
 
@@ -22,4 +22,4 @@ class Pattern5x5 : public Pattern {
 
 std::ostream& operator<<(std::ostream &os, const Pattern5x5 &pattern);
 std::istream& operator>>(std::istream &is, Pattern5x5& pattern);
-#endif  // PATTERN_5X5_H_
+#endif  // PATTERN5X5_H_

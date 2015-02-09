@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Point.h"
@@ -12,14 +13,13 @@ class Board;
 
 class Pattern {
  public:
-
   std::string hash;
   std::vector<std::pair<char, char>> goodMoves;
 
   Pattern();
   // Pattern(Point* p);
   virtual ~Pattern();
-  friend bool operator== ( const Pattern &p1, const Pattern &p2);
+  friend bool operator== (const Pattern &p1, const Pattern &p2);
 
   char pointToChar(Point* p);
 
@@ -31,12 +31,12 @@ class Pattern {
   // void determineRandomGoodMoves(std::default_random_engine& engine);
   // void mutate(std::default_random_engine& engine);
   // Pattern getMutated(std::default_random_engine& engine);
-  
-  Point* getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine);
+
+  Point* getRandomGoodMove(Board* b, Point& move,
+      std::default_random_engine& engine);
   std::vector<Point*> getGoodMoves(Board* b, Point& move);
 
   // static Pattern getRandomPattern(std::default_random_engine& engine);
-
 };
 
 #endif  // PATTERN_H_

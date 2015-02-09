@@ -6,9 +6,12 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
+#include <list>
 #include <set>
 #include <sstream>
 #include <stack>
+#include <string>
+#include <vector>
 
 Board::Board() :
   emptySpaces(std::vector<Point*>()),
@@ -29,9 +32,9 @@ Board::Board() :
 }
 
 Board::~Board() {
-  for(Group* g : blackGroups)
+  for (Group* g : blackGroups)
     delete g;
-  for(Group* g : whiteGroups)
+  for (Group* g : whiteGroups)
     delete g;
 
   if (pass != nullptr)
@@ -147,9 +150,9 @@ void Board::cloneInto(Board* b) {
 }
 
 void Board::cloneGroupsInto(Board* b) {
-  for(Group* g : blackGroups) {
+  for (Group* g : blackGroups) {
     Group* gClone = new Group(Black);
-    for(Point* p : g->stones) {
+    for (Point* p : g->stones) {
       Point* pClone = &b->positions[static_cast<unsigned int>(p->row)*BOARD_SIZE + static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
@@ -157,9 +160,9 @@ void Board::cloneGroupsInto(Board* b) {
     gClone->numberLiberties = g->numberLiberties;
     b->blackGroups.push_back(gClone);
   }
-  for(Group* g : whiteGroups) {
+  for (Group* g : whiteGroups) {
     Group* gClone = new Group(White);
-    for(Point* p : g->stones) {
+    for (Point* p : g->stones) {
       Point* pClone = &b->positions[static_cast<unsigned int>(p->row)*BOARD_SIZE + static_cast<unsigned int>(p->column)];
       gClone->stones.push_back(pClone);
       pClone->group = gClone;
@@ -386,7 +389,7 @@ void Board::removeDeadStones(Point& move, Player color) {
   }
 
   // beg1:
-  for(auto deadGroup : deadGroups) {
+  for (auto deadGroup : deadGroups) {
     // remove dead stones on board
     unsigned int numStones = (unsigned int)deadGroup->stones.size();
     if (numStones == 1) {
@@ -563,8 +566,7 @@ void Board::makeMove(Point* move) {
 }
 
 Point* Board::getRandomMove(std::default_random_engine& engine) {
-
-  Player sameColor = turn; // == Black ? Black : White;
+  Player sameColor = turn;  // == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
 
   while (true) {
@@ -576,10 +578,10 @@ Point* Board::getRandomMove(std::default_random_engine& engine) {
     if (emptySpaces[choice]->color != Empty) {
       emptySpaces[choice] = emptySpaces[emptySpaces.size()-1];
       emptySpaces.pop_back();
-    }
-    else if (!isSuicide(emptySpaces[choice], sameColor, oppositeColor)
-      && emptySpaces[choice] != koPoint)
+    } else if (!isSuicide(emptySpaces[choice], sameColor, oppositeColor)
+      && emptySpaces[choice] != koPoint) {
       return emptySpaces[choice];
+    }
   }
 }
 
@@ -613,7 +615,7 @@ void Board::show() {
       } else if (row == BOARD_SIZE) {
         boardString << column << " ";
       } else if (column == BOARD_SIZE) {
-        boardString << row << " ";//static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
+        boardString << row << " ";  // static_cast<char>(row+'a' + (row > 7 ? 1 : 0))
           // << " ";
       } else {
         switch (positions[row*BOARD_SIZE + column].color) {
@@ -656,7 +658,6 @@ bool Board::isSuicide(Point move, const Player &sameColor, const Player &opposit
 
 // http://en.wikibooks.org/wiki/Computer_Go/Recognizing_Illegal_Moves
 bool Board::isSuicide(Point* move, const Player &sameColor, const Player &oppositeColor) {
-
   //   Check for empty neighbors
   //   Check for neighbors of same color with more than one liberty
   //   Check for neighbors of opposite color with only one liberty
@@ -734,7 +735,7 @@ bool Board::isPositionalSuperKo(Point* p, std::list<unsigned long int> previousH
 }
 
 std::vector<Point*> Board::getPossibleMoves() {
-  Player sameColor = turn; // == Black ? Black : White;
+  Player sameColor = turn;  // == Black ? Black : White;
   Player oppositeColor = turn == Black ? White : Black;
 
   // To replace ko check below
@@ -748,7 +749,7 @@ std::vector<Point*> Board::getPossibleMoves() {
   legalMoves.push_back(pass);
   for (unsigned short i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
     if (positions[i].color == Empty
-        // !isSuicide(&positions[r][c], sameColor, oppositeColor)
+        //  !isSuicide(&positions[r][c], sameColor, oppositeColor)
         &&  (positions[i].west->color == Empty
           || positions[i].east->color == Empty
           || positions[i].north->color == Empty
@@ -766,7 +767,7 @@ std::vector<Point*> Board::getPossibleMoves() {
           || (positions[i].south->color == sameColor && positions[i].south->group->numberLiberties > 1)
           || (positions[i].south->color == oppositeColor && positions[i].south->group->numberLiberties == 1)
           )
-       ) { // && &positions[r][c] != koPoint) {
+       ) {  // && &positions[r][c] != koPoint) {
       legalMoves.push_back(&positions[i]);
     }
   }

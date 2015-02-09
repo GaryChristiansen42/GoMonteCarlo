@@ -9,7 +9,6 @@
 #include "Board.h"
 
 struct UCTNode {
-
   static Board* rootState;
 
   unsigned char row;

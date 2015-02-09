@@ -50,7 +50,8 @@ class Board {
   void cloneInto(Board* clone);
   void cloneGroupsInto(Board* clone);
 
-  bool isValidMove(Point move, std::list<unsigned long int> *previousHashes=nullptr);
+  bool isValidMove(Point move,
+      std::list<unsigned long int> *previousHashes = nullptr);
 
   // Fuego
   void getSimpleScore(float* whiteScore, float* blackScore);
@@ -72,15 +73,19 @@ class Board {
 
   void show();
 
-  bool isSuicide(Point move, const Player &sameColor, const Player &oppositeColor);
-  bool isSuicide(Point* move, const Player &sameColor, const Player &oppositeColor);
+  bool isSuicide(Point move, const Player &sameColor,
+      const Player &oppositeColor);
+  bool isSuicide(Point* move, const Player &sameColor,
+      const Player &oppositeColor);
 
-  void eliminatePositionalSuperKo(std::vector<Point*> &legalMoves, std::list<unsigned long int> *previousHashes);
-  bool isPositionalSuperKo(Point* p, std::list<unsigned long int> previousHashes);
+  void eliminatePositionalSuperKo(std::vector<Point*> &legalMoves,
+      std::list<unsigned long int> *previousHashes);
+  bool isPositionalSuperKo(Point* p,
+      std::list<unsigned long int> previousHashes);
 
   // private:
   std::vector<Point*> getPossibleMoves();
-  
+
   Point* getPoint(Point* p);
 };
 #endif  // BOARD_H_
