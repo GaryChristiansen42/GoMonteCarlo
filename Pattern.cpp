@@ -55,29 +55,27 @@ Pattern::Pattern(Point* p) : hash(""),
 
 }*/
 
-Pattern::~Pattern() {
-
-}
+Pattern::~Pattern() = default;
 
 bool operator==(const Pattern &p1, const Pattern &p2) {
-  if (p1.hash.compare(p2.hash))
-    return false;
-  return true;
+  return p1.hash.compare(p2.hash) == 0;
 }
 
 void Pattern::invertColor() {
   for (char& c : hash) {
-    if (c == 'B')
+    if (c == 'B') {
       c = 'W';
-    else if (c == 'W')
+    } else if (c == 'W') {
       c = 'B';
+    }
   }
 }
 
 Point* Pattern::getRandomGoodMove(Board* b, Point& move, std::default_random_engine& engine) {
-  if (goodMoves.size() == 0)
+  if (goodMoves.empty()) {
     return nullptr;
-  std::uniform_int_distribution<> dist(0, (int)goodMoves.size()-1);
+  }
+  std::uniform_int_distribution<> dist(0, static_cast<int>(goodMoves.size()-1));
   int choice = dist(engine);
   return &b->positions[(goodMoves[choice].first+move.row)*BOARD_SIZE + goodMoves[choice].second+move.column];
 }

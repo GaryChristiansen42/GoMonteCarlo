@@ -9,8 +9,9 @@ Pattern5x5::Pattern5x5() {
 
 Pattern5x5::Pattern5x5(Point* p) {
 
-  if (*p == Point(BOARD_SIZE, BOARD_SIZE))
+  if (*p == Point(BOARD_SIZE, BOARD_SIZE)) {
     return;
+  }
   
   Point* s = p->south;
   Point* sw = s->west;
@@ -138,20 +139,22 @@ void Pattern5x5::rotate90() {
 
   for (auto& move : goodMoves) {
     std::swap(move.first, move.second);
-    if (move.second == -2)
+    if (move.second == -2) {
       move.second = 2;
-    else if (move.second == -1)
+    } else if (move.second == -1) {
       move.second = 1;
-    else if (move.second == 1)
+    } else if (move.second == 1) {
       move.second = -1;
-    else if (move.second == 2)
+    } else if (move.second == 2) {
       move.second = -2;
+    }
   }
 }
 
 bool Pattern5x5::isLegalPattern() {
-  if (hash[12] != 'B' && hash[12] != 'W')
+  if (hash[12] != 'B' && hash[12] != 'W') {
     return false;
+  }
 
   char matrix[5][5];
   int i = 0, j = 0, pos = 0;
@@ -162,9 +165,11 @@ bool Pattern5x5::isLegalPattern() {
   }
 
   bool foundEmpty = false;
-  for (char c : hash)
-    if (c == '_')
+  for (char c : hash) {
+    if (c == '_') {
       foundEmpty = true;
+    }
+  }
   if (!foundEmpty) {
     // std::cout << *this;
     return false;
@@ -211,8 +216,9 @@ void Pattern5x5::determineRandomGoodMoves(std::default_random_engine& engine) {
   std::uniform_int_distribution<> boolDist(0, 1);
   int i = -2, j = -2;
   for (char c : hash) {
-    if (c == '_' && (boolDist(engine) == 0))
+    if (c == '_' && (boolDist(engine) == 0)) {
       goodMoves.push_back(std::make_pair(i, j));
+    }
     if (j == 2) {
       j = -3;
       i++;
@@ -225,8 +231,9 @@ void Pattern5x5::changeOneGoodMove(std::default_random_engine& engine) {
   std::vector<std::pair<char, char>> possibleMoves;
   int i = -2, j = -2;
   for (char c : hash) {
-    if (c == '_')
+    if (c == '_') {
       possibleMoves.push_back(std::make_pair(i, j));
+    }
     if (j == 2) {
       j = -3;
       i++;
@@ -234,7 +241,7 @@ void Pattern5x5::changeOneGoodMove(std::default_random_engine& engine) {
     j++;
   }
 
-  std::uniform_int_distribution<> dist(0, (int)possibleMoves.size()-1);
+  std::uniform_int_distribution<> dist(0, static_cast<int>(possibleMoves.size()-1));
   int choice = dist(engine);
   // auto m = std::find_if(goodMoves.begin(), goodMoves.end(), [possibleMoves[choice]] (std::pair<char, char> p) { return p.first == possibleMoves[choice].first && p.second == possibleMoves[choice].second; });
   auto m = std::find(goodMoves.begin(), goodMoves.end(), possibleMoves[choice]);
@@ -268,13 +275,14 @@ Pattern5x5 Pattern5x5::getRandomPattern(std::default_random_engine& engine) {
 
   p.determineRandomGoodMoves(engine);
 
-  if (p.isLegalPattern())
+  if (p.isLegalPattern()) {
     return p;
+  }
   return getRandomPattern(engine);
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern5x5 &pattern) {
-  assert(pattern.goodMoves.size() > 0);
+  assert(!pattern.goodMoves.empty());
   for (auto& x : pattern.goodMoves) {
     assert(x.first >= -2);
     assert(x.second >= -2);
@@ -303,10 +311,11 @@ std::ostream& operator<<(std::ostream &os, const Pattern5x5 &pattern) {
           break;
         }
       }
-      if (found)
+      if (found) {
         os << "1";
-      else
+      } else {
         os << "0";
+      }
     }
     os << "\n";
   }

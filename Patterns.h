@@ -31,7 +31,7 @@ class Patterns {
 
   explicit Patterns();
 
-  void init(std::string patternFile3x3, std::string patternFile5x5);
+  void init(std::string patternsFile3x3, std::string patternsFile5x5);
   void clear();
   void save(std::string fileName3x3, std::string fileName5x5);
 

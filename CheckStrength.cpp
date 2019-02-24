@@ -45,7 +45,7 @@ const char * playerTypeStrings[14] = {
   "GnuGo"
 };
 
-int main(void) {
+int main() {
   printf("Running...\n");
 
   Patterns patterns;
@@ -67,12 +67,13 @@ int main(void) {
     int player2Wins = 0;
 
     for (int i = 0; i < numTrials; i++) {
-      if (i % 10 == 0 && i != 0)
+      if (i % 10 == 0 && i != 0) {
         printf("\nTrial Number: %d\n", i);
-      Board* b = new Board();
+      }
+      auto b = new Board();
       b->init();
       UCTNode::rootState = b;
-      UCTNode *node = new UCTNode(1, -1, nullptr);
+      auto node = new UCTNode(1, -1, nullptr);
 
       GameResult r;
       while (!b->isGameOver(&r)) {

@@ -13,13 +13,13 @@ const std::string patternsFile5x5 = "patterns5x5.pat";
 
 UCTNode *root;
 
-int main(void) {
+int main() {
   printf("Go MonteCarloAI\n");
 
   int numSimulations = 0;
   float millaSecondsToThink = 15000;
 
-  Board* b = new Board();
+  auto b = new Board();
   b->init();
 
   UCTNode *currentNode;
@@ -34,21 +34,23 @@ int main(void) {
 
   GameResult result = None;
   while (!b->isGameOver(&result)) {
-    if (b->turn == White)
+    if (b->turn == White) {
       computerMove(&currentNode, b, numSimulations, millaSecondsToThink, nullptr); // &patterns);
-    else
+    } else {
       // computerMove(&currentNode, b, numSimulations, millaSecondsToThink, nullptr); // &patterns);
       playerMove(&currentNode, b);
       // randomMove(&currentNode, b);
+    }
     b->show();
   }
 
-  if (result == Draw)
+  if (result == Draw) {
     printf("Draw\n");
-  else if (static_cast<Player>(result) == Black)
+  } else if (static_cast<Player>(result) == Black) {
     printf("Black Won\n");
-  else
+  } else {
     printf("White Won\n");
+  }
 
   float score = 0;
   score = b->getTaylorScore(0.5);

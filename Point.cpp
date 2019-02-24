@@ -21,18 +21,12 @@ Point::Point(char newRow, char newColumn, Player newColor, Group* newGroup,
 { }
 
 bool Point::operator==(const Point &p) {
-  if (this->row == p.row
-      && this->column == p.column)
-    return true;
-  return false;
+  return this->row == p.row && this->column == p.column;
 }
 
 
 bool Point::operator!=(const Point &p) {
-  if (this->row == p.row
-      && this->column == p.column)
-    return false;
-  return true;
+  return !((*this) == p);
 }
 
 bool Point::isAdjacent(const Point &p) {

@@ -11,7 +11,7 @@
 // Implemented using http://www.cameronius.com/cv/mcts-survey-master.pdf
 
 
-void printNode(UCTNode* n, const char* spaces="");
+void printNode(UCTNode* n, std::string spaces="");
 
 UCTNode* bestChild(UCTNode* node);
 
@@ -25,6 +25,6 @@ int DefaultPolicy(UCTNode* node, Patterns* patterns,
 void backup(UCTNode* v, int reward);
 
 UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns);
-UCTNode* UCTSearch(UCTNode* root, float secondsToThink, Patterns* patterns);
+UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns);
 
 #endif  // UCT_H_

@@ -1,8 +1,8 @@
 #include "UCTNode.h"
 
-#include <stddef.h>
 #include <assert.h>
 
+#include <cstdint>
 #include <stack>
 #include <vector>
 
@@ -12,15 +12,17 @@ Board* UCTNode::rootState = nullptr;
 
 UCTNode::UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent) :
   row(newRow), column(newColumn), child(nullptr), sibling(nullptr),
-  parent(newParent), possibleChildren(std::vector<unsigned short>()),
+  parent(newParent), possibleChildren(std::vector<uint16_t>()),
   totalRewards(0.0), visits(0.0), mutex()
 { }
 
 UCTNode::~UCTNode() {
-  if (child)
+  if (child != nullptr) {
     delete child;
-  if (sibling)
+  }
+  if (sibling != nullptr) {
     delete sibling;
+  }
 }
 
 std::unique_ptr<Board> UCTNode::getState() {
@@ -32,7 +34,7 @@ std::unique_ptr<Board> UCTNode::getState() {
     moves.push(Point(node->row, node->column));
     node = node->parent;
   }
-  while (moves.size() > 0) {
+  while (!moves.empty()) {
     state->makeMove(moves.top());
     moves.pop();
   }
@@ -45,8 +47,9 @@ void UCTNode::addChild(UCTNode* newChild) {
     child = newChild;
   } else {
     UCTNode* temp = child;
-    while (temp->sibling != nullptr)
+    while (temp->sibling != nullptr) {
       temp = temp->sibling;
+    }
     temp->sibling = newChild;
   }
   mutex.unlock();

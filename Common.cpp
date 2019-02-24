@@ -32,24 +32,25 @@ void playerMove(UCTNode** currentNode, Board* b) {
     printf("Column: ");
     tokensRead = scanf("%d", &input);
     choice.column = static_cast<unsigned char>(input);
-    printf("%d", (int)choice.column);
+    printf("%d", static_cast<int>(choice.column));
     if (tokensRead != 1) {
       printf("Problem %d\n", tokensRead);
     }
 
     printf("\n");
 
-    if (b->isValidMove(choice))
+    if (b->isValidMove(choice)) {
       validInput = true;
-    else
+    } else {
       printf("That position is not valid\n");
+    }
   }
 
   printf("Row: %d\nColumn: %d\n", choice.row, choice.column);
 
   b->makeMove(choice);
   b->getPossibleMoves();
-  UCTNode* newCurrentNode = new UCTNode(choice.row, choice.column, (*currentNode));
+  auto newCurrentNode = new UCTNode(choice.row, choice.column, (*currentNode));
   (*currentNode)->addChild(newCurrentNode);
   (*currentNode)->removeChild(newCurrentNode);
   delete (*currentNode);
@@ -57,13 +58,15 @@ void playerMove(UCTNode** currentNode, Board* b) {
 }
 
 void printTabs(int numTabs) {
-  for (int i = 0; i < numTabs; i++)
+  for (int i = 0; i < numTabs; i++) {
     printf("\t");
+  }
 }
 
 void showTree(UCTNode* node, int numTabs, int maxDepth) {
-  if (node == nullptr || numTabs >= maxDepth || node->visits < 2)
+  if (node == nullptr || numTabs >= maxDepth || node->visits < 2) {
     return;
+  }
   printTabs(numTabs);
   printf("Node\n");
   printTabs(numTabs);
@@ -95,14 +98,17 @@ void computerMove(UCTNode** currentNode, Board* b, int numSimulations,
   b->makeMove(Point((*currentNode)->row, (*currentNode)->column));
   // check if b == currentNode->state
   auto state = (*currentNode)->getState();
-  for (int row = 0; row < BOARD_SIZE; ++row)
-    for (int column = 0; column < BOARD_SIZE; ++column)
+  for (int row = 0; row < BOARD_SIZE; ++row) {
+    for (int column = 0; column < BOARD_SIZE; ++column) {
       if (b->positions[row*BOARD_SIZE + column]
         != state->positions[row*BOARD_SIZE + column]) {
         printf("Problem at %d %d\n", row, column);
       }
-  if (!(*b == *state))
+    }
+  }
+  if (!(*b == *state)) {
     assert(false);
+  }
   
 
   /*ofstream myfile;
@@ -115,10 +121,7 @@ void randomMove(UCTNode** currentNode, Board* b) {
   Point* chosenMove = b->getRandomMove(engine);
 
   b->makeMove(*chosenMove);
-  UCTNode* newCurrentNode = new UCTNode(chosenMove->row, chosenMove->column, nullptr);
+  auto newCurrentNode = new UCTNode(chosenMove->row, chosenMove->column, nullptr);
   delete (*currentNode);
   (*currentNode) = newCurrentNode;
-
 }
-
-

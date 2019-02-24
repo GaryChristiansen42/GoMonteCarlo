@@ -11,16 +11,16 @@
 const std::string patternsFile3x3 = "patterns3x3.pat";
 const std::string patternsFile5x5 = "patterns5x5.pat";
 
-int main(void) {
+int main() {
   printf("Running...\n");
 
   Patterns patterns;
   // patterns.init(patternsFile3x3, patternsFile5x5);
 
-  Board* b = new Board();
+  auto b = new Board();
   b->init();
   UCTNode::rootState = b;
-  UCTNode *node = new UCTNode(1, -1, nullptr);
+  auto node = new UCTNode(1, -1, nullptr);
 
   GameResult r;
   while (!b->isGameOver(&r)) {

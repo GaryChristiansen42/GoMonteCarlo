@@ -24,31 +24,35 @@ Patterns::Patterns() :
 
 
 bool Patterns::operator==(const Patterns &p) {
-  if (p.hashTable3x3.size() != hashTable3x3.size())
+  if (p.hashTable3x3.size() != hashTable3x3.size()) {
     return false;
+  }
   for (auto i : hashTable3x3) {
     bool found = false;
     for (auto j : p.hashTable3x3) {
-      if (!i.first.compare(j.first)) {
+      if (i.first.compare(j.first) == 0) {
         found = true;
         break;
       }
     }
-    if (!found)
+    if (!found) {
       return false;
+    }
   }
-  if (p.hashTable5x5.size() != hashTable5x5.size())
+  if (p.hashTable5x5.size() != hashTable5x5.size()) {
     return false;
+  }
   for (auto i : hashTable5x5) {
     bool found = false;
     for (auto j : p.hashTable5x5) {
-      if (!i.first.compare(j.first)) {
+      if (i.first.compare(j.first) == 0) {
         found = true;
         break;
       }
     }
-    if (!found)
+    if (!found) {
       return false;
+    }
   }
  
   return true;
@@ -56,13 +60,15 @@ bool Patterns::operator==(const Patterns &p) {
 
 void Patterns::init(std::string patternsFile3x3, std::string patternsFile5x5) {
 
-  if (patternsFile3x3 == "")
+  if (patternsFile3x3 == "") {
     return;
+  }
   
   std::ifstream in;
   in.open(patternsFile3x3);
-  if (!in.is_open())
+  if (!in.is_open()) {
     assert(false);
+  }
 
   initialized = true;
 
@@ -97,8 +103,9 @@ void Patterns::init(std::string patternsFile3x3, std::string patternsFile5x5) {
   in.close();
 
   in.open(patternsFile5x5);
-  if (!in.is_open())
+  if (!in.is_open()) {
     assert(false);
+  }
 
   Pattern5x5 pattern5x5;
   while (in >> pattern5x5) {
@@ -145,12 +152,13 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
   std::ofstream f;
   f.open(fileName3x3, std::ofstream::out);
   assert(f.is_open());
-  if (!f || f.fail())
+  if (!f || f.fail()) {
     std::cout << "3x3 Failed" << std::endl;
+  }
 
   auto count = 0;
   for (auto& i : hashTable3x3) {
-    if (i.second.goodMoves.size() > 0) {
+    if (!i.second.goodMoves.empty()) {
       f << i.second;
       ++count;
     } else {
@@ -164,12 +172,13 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
   std::ofstream f2;
   f2.open(fileName5x5, std::ofstream::out);
   assert(f2.is_open());
-  if (!f2 || f2.fail())
+  if (!f2 || f2.fail()) {
     std::cout << "5x5 Failed" << std::endl;
+  }
 
   count = 0;
   for (auto& i : hashTable5x5) {
-    if (i.second.goodMoves.size() > 0) {
+    if (!i.second.goodMoves.empty()) {
       f2 << i.second;
       ++count;
     } else {
@@ -184,85 +193,85 @@ void Patterns::save(std::string fileName3x3, std::string fileName5x5) {
 
 void Patterns::addPattern(Pattern3x3 pattern) {
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.invertColor();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable3x3[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 }
 
 
 void Patterns::addPattern(Pattern5x5 pattern) {
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.invertColor();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 
   pattern.rotate90();
   hashTable5x5[pattern.hash] = pattern;
-  assert(pattern.goodMoves.size() > 0);
-  assert(pattern.hash.size() > 0);
+  assert(!pattern.goodMoves.empty());
+  assert(!pattern.hash.empty());
 }
 
 /*void Patterns::mutate(std::default_random_engine& engine) {

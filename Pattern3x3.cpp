@@ -9,8 +9,9 @@ Pattern3x3::Pattern3x3() {
 
 Pattern3x3::Pattern3x3(Point* p) {
 
-  if (*p == Point(BOARD_SIZE, BOARD_SIZE))
+  if (*p == Point(BOARD_SIZE, BOARD_SIZE)) {
     return;
+  }
   
   Point* s = p->south;
   Point* sw = s->west;
@@ -36,8 +37,9 @@ Pattern3x3::Pattern3x3(Point* p) {
 
 Pattern3x3::Pattern3x3(Board& b, Point& p) {
 
-  if (&p == b.pass)
+  if (&p == b.pass) {
     return;
+  }
   
   Point* s = p.south;
   Point* sw = s->west;
@@ -83,16 +85,18 @@ void Pattern3x3::rotate90() {
 
   for (auto& move : goodMoves) {
     std::swap(move.first, move.second);
-    if (move.second == -1)
+    if (move.second == -1) {
       move.second = 1;
-    else if (move.second == 1)
+    } else if (move.second == 1) {
       move.second = -1;
+    }
   }
 }
 
 bool Pattern3x3::isLegalPattern() {
-  if (hash[4] != 'B' && hash[4] != 'W')
+  if (hash[4] != 'B' && hash[4] != 'W') {
     return false;
+  }
 
   char matrix[3][3];
   int i = 0, j = 0, pos = 0;
@@ -103,9 +107,11 @@ bool Pattern3x3::isLegalPattern() {
   }
 
   bool foundEmpty = false;
-  for (char c : hash)
-    if (c == '_')
+  for (char c : hash) {
+    if (c == '_') {
       foundEmpty = true;
+    }
+  }
   if (!foundEmpty) {
     // std::cout << *this;
     return false;
@@ -152,8 +158,9 @@ void Pattern3x3::determineRandomGoodMoves(std::default_random_engine& engine) {
   std::uniform_int_distribution<> boolDist(0, 1);
   int i = -1, j = -1;
   for (char c : hash) {
-    if (c == '_' && (boolDist(engine) == 0))
+    if (c == '_' && (boolDist(engine) == 0)) {
       goodMoves.push_back(std::make_pair(i, j));
+    }
     if (j == 1) {
       j = -2;
       i++;
@@ -173,7 +180,7 @@ Pattern3x3 Pattern3x3::getMutated(std::default_random_engine& engine) {
 }
 
 std::ostream& operator<<(std::ostream &os, const Pattern3x3 &pattern) {
-  assert(pattern.goodMoves.size() > 0);
+  assert(!pattern.goodMoves.empty());
   for (auto& x : pattern.goodMoves) {
     assert(x.first >= -1);
     assert(x.second >= -1);

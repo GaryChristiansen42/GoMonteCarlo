@@ -1,7 +1,7 @@
 #include "Group.h"
 
-#include <vector>
 #include <cstdio>
+#include <vector>
 
 Group::Group(Player newColor) :
   stones(std::vector<Point*>()),
@@ -9,8 +9,7 @@ Group::Group(Player newColor) :
   stones.reserve(25); // tuning required
 }
 
-Group::~Group() {
-}
+Group::~Group() = default;
 
 void Group::addStone(Point& p) {
   p.group = this;
@@ -19,23 +18,27 @@ void Group::addStone(Point& p) {
   if (!(p.north->color != Empty
     || (p.north->north->group == this)
     || (p.north->east->group == this)
-    || (p.north->west->group == this)))
+    || (p.north->west->group == this))) {
     numberLiberties++;
+  }
   if (!(p.east->color != Empty
     || (p.east->north->group == this)
     || (p.east->east->group == this)
-    || (p.east->south->group == this)))
+    || (p.east->south->group == this))) {
     numberLiberties++;
+  }
   if (!(p.south->color != Empty
     || (p.south->east->group == this)
     || (p.south->south->group == this)
-    || (p.south->west->group == this)))
+    || (p.south->west->group == this))) {
     numberLiberties++;
+  }
   if (!(p.west->color != Empty
     || (p.west->north->group == this)
     || (p.west->south->group == this)
-    || (p.west->west->group == this)))
+    || (p.west->west->group == this))) {
     numberLiberties++;
+  }
 }
 
 void Group::removeStones() {
@@ -48,21 +51,23 @@ void Group::removeStones() {
 }
 
 bool Group::contains(Point* p) {
-  if (p->group == this)
-    return true;
-  return false;
+  return p->group == this;
 }
 
 bool Group::isAdjacent(Point* p) {
   for(Point* stone : stones) {
-    if (stone->north == p)
+    if (stone->north == p) {
       return true;
-    if (stone->east == p)
+    }
+    if (stone->east == p) {
       return true;
-    if (stone->south == p)
+    }
+    if (stone->south == p) {
       return true;
-    if (stone->west == p)
+    }
+    if (stone->west == p) {
       return true;
+    }
   }
   return false;
 }

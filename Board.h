@@ -51,7 +51,7 @@ class Board {
   void cloneGroupsInto(Board* clone);
 
   bool isValidMove(Point move,
-      std::list<unsigned long int> *previousHashes = nullptr);
+      std::list<uint64_t> *previousHashes = nullptr);
 
   // Fuego
   void getSimpleScore(float* whiteScore, float* blackScore);
@@ -62,7 +62,7 @@ class Board {
   void updateStructures(Point& move);
   void removeDeadStones(Point& move, Player color);
 
-  unsigned long int getHash();
+  uint64_t getHash();
 
   Point* getRandomMove(std::default_random_engine& engine);
   void makeMove(Point move);
@@ -79,9 +79,9 @@ class Board {
       const Player &oppositeColor);
 
   void eliminatePositionalSuperKo(std::vector<Point*> &legalMoves,
-      std::list<unsigned long int> *previousHashes);
+      std::list<uint64_t> *previousHashes);
   bool isPositionalSuperKo(Point* p,
-      std::list<unsigned long int> previousHashes);
+      std::list<uint64_t> previousHashes);
 
   // private:
   std::vector<Point*> getPossibleMoves();

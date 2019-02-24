@@ -23,8 +23,8 @@ struct Point{
 
   Point();
   Point(char newRow, char newColumn);
-  Point(char newRow, char newColumn, Player color, Group* group,
-    Point* north, Point* east, Point* south, Point* west);
+  Point(char newRow, char newColumn, Player newColor, Group* newGroup,
+    Point* newNorth, Point* newEast, Point* newSouth, Point* newWest);
 
   bool operator==(const Point &p);
   bool operator!=(const Point &p);

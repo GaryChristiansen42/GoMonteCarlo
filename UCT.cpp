@@ -30,16 +30,15 @@ double diffclock(timespec start, timespec finish) {
   return elapsed * (-1000);
 }
 
-void printNode(UCTNode* n, char* spaces) {
-  printf("%sn(%d %d) V %ld R %ld\n", spaces, n->row, n->column,
+void printNode(UCTNode* n, std::string spaces) {
+  printf("%sn(%d %d) V %ld R %ld\n", spaces.c_str(), n->row, n->column,
     n->visits, n->totalRewards);
   // std::cout << spaces << "n (" << n->move.row << " " << n->move.column
     // << ") V " << n->visits << " R " << n->totalRewards << std::endl;
 
   UCTNode* next = n->child;
   while (next != nullptr) {
-    char moreSpaces[100];
-    snprintf(moreSpaces, sizeof(spaces), "%s ", spaces);
+    auto moreSpaces = spaces + " ";
     printNode(next, moreSpaces);
     next = next->sibling;
   }
@@ -54,12 +53,13 @@ UCTNode* bestChild(UCTNode* node) {
   double bestScore = std::numeric_limits<double>::lowest();
   UCTNode* next = node->child;
   while (next != nullptr) {
-    double uctScore = (double)(next->totalRewards) / (double)(next->visits)
-      + c*sqrt((2*log(static_cast<float>(node->visits))) / (double)(next->visits));
+    double uctScore = static_cast<double>(next->totalRewards) / static_cast<double>(next->visits)
+      + c*sqrt((2*log(static_cast<float>(node->visits))) / static_cast<double>(next->visits));
 #ifdef RANK_SEARCH_BY_DISTANCE_AMOUNT
     double distance = sqrt(pow(node->row - next->row, 2) + pow(node->column - next->column, 2));
-    if (distance <= 5.0)
+    if (distance <= 5.0) {
       uctScore += RANK_SEARCH_BY_DISTANCE_AMOUNT;
+    }
 #endif
     if (bestScore < uctScore) {
       bestChild = next;
@@ -76,26 +76,26 @@ UCTNode* getNewChild(UCTNode* node, std::default_random_engine& engine) {
   if (node->possibleChildren.empty() && node->child == nullptr) {
     auto state = node->getState();
     auto legalMoves = state->getPossibleMoves();
-    for (unsigned short i = 0; i < legalMoves.size(); ++i) {
-      node->possibleChildren.push_back((unsigned short)(legalMoves[i]->row*BOARD_SIZE + legalMoves[i]->column));
+    for (auto move : legalMoves) {
+      node->possibleChildren.push_back(static_cast<uint16_t>(move->row*BOARD_SIZE + move->column));
     }
   }
 
-  if (node->possibleChildren.size() == 0) {
+  if (node->possibleChildren.empty()) {
     node->mutex.unlock();
     return nullptr;
   }
 
-  std::uniform_int_distribution<> dist(0, (int)node->possibleChildren.size()-1);
+  std::uniform_int_distribution<> dist(0, static_cast<int>(node->possibleChildren.size()-1));
   unsigned int choice = dist(engine);
   auto chosenChildIndex = node->possibleChildren[choice];
   node->possibleChildren[choice] = node->possibleChildren.back();
   node->possibleChildren.pop_back();
   node->mutex.unlock();
-  if (chosenChildIndex == BOARD_SIZE*BOARD_SIZE + BOARD_SIZE)
+  if (chosenChildIndex == BOARD_SIZE*BOARD_SIZE + BOARD_SIZE) {
     return new UCTNode(BOARD_SIZE, BOARD_SIZE, node);
-  else
-    return new UCTNode((unsigned char)(chosenChildIndex/BOARD_SIZE), (unsigned char)(chosenChildIndex%BOARD_SIZE), node);
+  }
+  return new UCTNode(static_cast<unsigned char>(chosenChildIndex/BOARD_SIZE), static_cast<unsigned char>(chosenChildIndex%BOARD_SIZE), node);
 }
 
 UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
@@ -106,9 +106,8 @@ UCTNode* TreePolicy(UCTNode* node, std::default_random_engine& engine) {
     if (newChild != nullptr) {
       node->addChild(newChild);
       return newChild;
-    } else {
-      node = bestChild(node);
     }
+    node = bestChild(node);
   }
   /*Point pass(BOARD_SIZE, BOARD_SIZE);
   if (node->move != pass
@@ -123,19 +122,22 @@ int DefaultPolicy(std::default_random_engine& engine, UCTNode* node, Patterns* p
   auto startingTurn = state->turn;
 
   GameResult r;
-  if (patterns != nullptr && patterns->initialized)
+  if (patterns != nullptr && patterns->initialized) {
     r = state->playGame(patterns, engine);
-  else
+  } else {
     r = state->playRandomGame(engine);
+  }
 
-  if ((startingTurn == Black ? White : Black) == static_cast<int>(r))
+  if ((startingTurn == Black ? White : Black) == static_cast<int>(r)) {
     return 1;
-  else if (r != Draw)
+  }
+  if (r != Draw) {
     return -1;
-  else if (r == Draw)
+  }
+  if (r == Draw) {
     return 0;
-  else
-    assert(false);
+  }
+  assert(false);
 }
 
 void backup(UCTNode* v, int reward) {
@@ -144,10 +146,11 @@ void backup(UCTNode* v, int reward) {
   while (v != nullptr) {
     v->mutex.lock();
     v->visits++;
-    if (me)
+    if (me) {
       v->totalRewards += reward;
-    else
+    } else {
       v->totalRewards -= reward;
+    }
     v->mutex.unlock();
     v = v->parent;
     me = !me;
@@ -161,15 +164,17 @@ UCTNode* UCTSearch(UCTNode* root, int numSimulations, Patterns* patterns) {
     int reward = DefaultPolicy(engine, v, patterns);
     backup(v, reward);
 
-    if (i % 1000 == 0 && i != 0)
+    if (i % 1000 == 0 && i != 0) {
       printf("%d\n", i);
+    }
   }
 
   UCTNode* best = root->child;
   UCTNode* next = root->child;
   while (next != nullptr) {
-    if (next->visits > best->visits)
+    if (next->visits > best->visits) {
       best = next;
+    }
     next = next->sibling;
   }
 
@@ -218,21 +223,23 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
   simulationCount = 0;
 
   int numThreads = 4;
-  std::thread* threads = new std::thread[numThreads];
+  auto threads = new std::thread[numThreads];
   for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum] = std::thread(runSimulationThread, root,
       millaSecondsToThink, patterns);
   }
 
-  for (int threadNum = 0; threadNum < numThreads; threadNum++)
+  for (int threadNum = 0; threadNum < numThreads; threadNum++) {
     threads[threadNum].join();
+  }
   delete[] threads;
 
   UCTNode* best = root->child;
   UCTNode* next = root->child;
   while (next != nullptr) {
-    if (next->visits > best->visits)
+    if (next->visits > best->visits) {
       best = next;
+    }
     next = next->sibling;
   }
 
@@ -249,7 +256,7 @@ UCTNode* UCTSearch(UCTNode* root, float millaSecondsToThink, Patterns* patterns)
   snprintf(buffer, sizeof(buffer),
     "Thought for %d simulations.\nR: %ld V: %ld\nR/V: %f\t%d %d",
     static_cast<int>(simulationCount), best->totalRewards, best->visits,
-    static_cast<double>((double)(best->totalRewards)/(double)(best->visits)), best->row, best->column);
+    static_cast<double>(static_cast<double>(best->totalRewards)/static_cast<double>(best->visits)), best->row, best->column);
   Log(buffer);
   if (patterns != nullptr) {
     snprintf(buffer, sizeof(buffer), "Called\t\t%d times", patterns->numCalled);
