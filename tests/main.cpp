@@ -14,9 +14,11 @@ BOOST_AUTO_TEST_CASE( testBoard )
   Board b2;
   b2.init();
 
-  for(int i = 0; i < BOARD_SIZE; i++)
-    for(int j = 0; j < BOARD_SIZE; j++)
+  for(int i = 0; i < BOARD_SIZE; i++) {
+    for(int j = 0; j < BOARD_SIZE; j++) {
       BOOST_CHECK_EQUAL(b2.positions[i*BOARD_SIZE + j].color, Empty);
+    }
+  }
   
   //Valid moves 
   for(int i = 0; i < BOARD_SIZE; i++)
@@ -202,7 +204,7 @@ BOOST_AUTO_TEST_CASE( testBoardPositionalSuperKo )
   Board b1;
   b1.init();
 
-  std::list<unsigned long int> previousHashes;
+  std::list<uint64_t> previousHashes;
   previousHashes.push_back(b1.getHash());
 
   b1.makeMove(Point(0,1)); // Black
@@ -489,17 +491,21 @@ BOOST_AUTO_TEST_CASE( testGroupAdjacent )
     for(int column = 0; column < BOARD_SIZE; column++)
     {
       //above
-      if(row > 0)
+      if(row > 0) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
+      }
       //below
-      if(row < BOARD_SIZE-1)
+      if(row < BOARD_SIZE-1) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
+      }
       //left
-      if(column > 0)
+      if(column > 0) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
+      }
       //above
-      if(column < BOARD_SIZE-1)
+      if(column < BOARD_SIZE-1) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
+      }
       
       //pass
       BOOST_CHECK_EQUAL(testAdjacent(row, column, BOARD_SIZE, BOARD_SIZE), false);
@@ -547,17 +553,21 @@ BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
     for(int column = 0; column < BOARD_SIZE; column++)
     {
       //above
-      if(row > 0)
+      if(row > 0) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row-1, column), true);
+      }
       //below
-      if(row < BOARD_SIZE-1)
+      if(row < BOARD_SIZE-1) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row+1, column), true);
+      }
       //left
-      if(column > 0)
+      if(column > 0) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column-1), true);
+      }
       //above
-      if(column < BOARD_SIZE-1)
+      if(column < BOARD_SIZE-1) {
         BOOST_CHECK_EQUAL(testAdjacent(row, column, row, column+1), true);
+      }
       
       //pass
       BOOST_CHECK_EQUAL(testAdjacent(row, column, BOARD_SIZE, BOARD_SIZE), false);
@@ -568,7 +578,7 @@ BOOST_AUTO_TEST_CASE( testGroupHasLiberties )
 
 BOOST_AUTO_TEST_CASE( testBoardClone )
 {
-  Board* b1 = new Board();
+  auto b1 = new Board();
   b1->init();
   b1->makeMove(Point(1,1));
 
@@ -586,7 +596,7 @@ BOOST_AUTO_TEST_CASE( testBoardClone )
 
 BOOST_AUTO_TEST_CASE( testBoardTaylorScore )
 {
-  Board* b1 = new Board();
+  auto b1 = new Board();
   b1->init();
   for(int row = 0; row < BOARD_SIZE-1; row++)
   {

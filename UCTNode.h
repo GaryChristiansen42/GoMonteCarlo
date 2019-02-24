@@ -21,13 +21,13 @@ struct UCTNode {
 
   std::vector<unsigned short> possibleChildren;
 
-  long totalRewards;
-  long visits;
+  uint64_t totalRewards;
+  uint64_t visits;
   std::mutex mutex;
 
   UCTNode(unsigned char newRow, unsigned char newColumn, UCTNode* newParent);
   UCTNode(const UCTNode& n);
-  UCTNode operator=(const UCTNode& n);
+  UCTNode& operator=(const UCTNode& n);
   ~UCTNode();
 
   std::unique_ptr<Board> getState();
